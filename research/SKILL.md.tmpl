@@ -1,0 +1,112 @@
+---
+name: research
+version: 1.0.0
+description: |
+  Repository and dependency research for implementation planning. Reads
+  `00-scope.md`, maps the current system, identifies reusable code and external
+  constraints, and writes `01-research.md`. Use when asked to "research this",
+  "map the codebase", or "figure out what already exists before we plan".
+allowed-tools:
+  - Bash
+  - Read
+  - Grep
+  - Glob
+  - Write
+  - Edit
+  - AskUserQuestion
+  - WebSearch
+---
+
+{{PREAMBLE}}
+
+# /research
+
+You are running the `/research` workflow. This is a **plan-mode research pass**
+that turns the scoped request into implementation context. Your only durable
+output is `01-research.md`.
+
+## Hard Gates
+
+- Do NOT write implementation code.
+- Do NOT turn this into a plan yet.
+- Your job is discovery, constraint mapping, and recommendation.
+
+## Step 1: Read the scope
+
+Read `00-scope.md` first. If it does not exist, say so explicitly and either:
+
+- use the user’s request as a temporary scope input, or
+- recommend running `/scope` first if the request is still ambiguous.
+
+Then read, if present:
+
+- `README.md`
+- `CLAUDE.md`
+- `TODOS.md`
+- `DESIGN.md`
+- `01-research.md`
+- `02-plan.md`
+
+## Step 2: Research the implementation landscape
+
+Inspect the codebase and map the relevant system:
+
+- entrypoints
+- routes/pages
+- services/modules
+- data models/types
+- existing tests
+- prior patterns worth reusing
+
+If the task depends on external libraries, APIs, or specs, read the relevant
+docs or source references. Prefer primary sources and official docs.
+
+When important ambiguity remains, ask focused questions. Otherwise discover
+facts through reading and inspection before asking.
+
+## Step 3: Write `01-research.md`
+
+Write or update `01-research.md` in the repo root with this structure:
+
+```markdown
+# Research
+
+## Scope Baseline
+- Short summary of the scoped task
+
+## Current System Map
+- Key files, modules, flows, and ownership boundaries
+
+## Reuse Opportunities
+- Existing code or patterns we should build on
+
+## External References
+- Libraries, APIs, docs, or standards that matter
+
+## Constraints
+- Technical, product, platform, or dependency constraints
+
+## Risks
+- High-risk areas or likely integration failures
+
+## Unknowns
+- Open questions that planning must resolve
+
+## Recommended Direction
+- Best path into `/plan`
+```
+
+Requirements:
+
+- Cite concrete files, modules, or URLs where relevant.
+- Keep it implementation-oriented.
+- Distinguish facts from inference.
+- If a prior `01-research.md` exists, update it instead of duplicating it.
+
+## Step 4: Handoff
+
+After writing `01-research.md`:
+
+- Summarize the top reuse opportunities.
+- Call out the most important risk.
+- Recommend `/plan` as the next step.

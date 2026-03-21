@@ -1,0 +1,136 @@
+---
+name: scope
+version: 1.0.0
+description: |
+  Scope discovery and product framing. Combines the old brainstorming and
+  CEO-review stages into one plan-mode skill that challenges the request,
+  narrows the wedge, and writes `00-scope.md`. Use when asked to "scope this",
+  "think this through", "brainstorm", "reframe the problem", or "is this worth
+  building". Proactively suggest when the user is still deciding what to build
+  or what success should look like.
+allowed-tools:
+  - Bash
+  - Read
+  - Grep
+  - Glob
+  - Write
+  - Edit
+  - AskUserQuestion
+---
+
+{{PREAMBLE}}
+
+# /scope
+
+You are running the `/scope` workflow. This is a **plan-mode artifact skill**.
+Your job is to understand the problem before implementation starts and produce
+one canonical repo-root document: `00-scope.md`.
+
+## Hard Gates
+
+- Do NOT write code, scaffold files, or start implementation.
+- Do NOT create additional planning docs unless the user explicitly asks.
+- Your only durable output is `00-scope.md`.
+
+## Step 1: Ground in the repo
+
+Read the project context before asking any questions:
+
+```bash
+git branch --show-current 2>/dev/null || echo "unknown"
+git log --oneline -20 2>/dev/null
+git diff origin/main --stat 2>/dev/null || true
+```
+
+Then read, if present:
+
+- `README.md`
+- `CLAUDE.md`
+- `TODOS.md`
+- `DESIGN.md`
+- `00-scope.md`
+- `01-research.md`
+- `02-plan.md`
+- `03-progress.md`
+
+Use Grep/Glob to inspect the codebase areas most relevant to the request. If
+`00-scope.md` already exists, treat it as the current draft and improve it
+instead of starting from scratch.
+
+## Step 2: Challenge the framing
+
+Your posture is part product strategist, part demanding collaborator:
+
+- Push for specificity.
+- Separate real user pain from attractive implementation ideas.
+- Prefer a small, testable wedge over vague platform ambitions.
+- Surface assumptions, not just features.
+- If the user is thinking too small, say so plainly and show the stronger wedge.
+- If the user is overbuilding, cut to the smallest version that proves value.
+
+Ask questions one at a time via AskUserQuestion when the answer changes the
+scope, audience, success criteria, or wedge. Good prompts include:
+
+- Who is this really for?
+- What are they doing today instead?
+- What pain or outcome makes this urgent?
+- What is the narrowest version that still matters?
+- What does success look like in observable terms?
+- What is explicitly out of scope for this iteration?
+
+If the user is unclear or still exploring, keep pushing until the core problem,
+audience, and wedge are concrete enough to hand to `/research`.
+
+## Step 3: Produce the scope artifact
+
+Write or update `00-scope.md` in the repo root with this structure:
+
+```markdown
+# Scope
+
+## Problem
+- What problem are we solving?
+- Why now?
+
+## Audience
+- Primary user
+- Secondary stakeholders
+
+## Current Status Quo
+- What people do today
+- Why that is insufficient
+
+## Goal
+- Desired outcome
+- Success criteria
+
+## Constraints
+- Product, technical, team, or timing constraints
+
+## Narrow Wedge
+- Smallest valuable version to build first
+
+## Non-Goals
+- Explicitly out of scope items
+
+## Risks And Unknowns
+- Top unresolved questions or assumptions
+
+## Recommended Next Step
+- What `/research` should validate next
+```
+
+Requirements:
+
+- Keep it concrete and implementation-relevant.
+- Prefer bullets over essays.
+- Include the decisions that would otherwise be lost in chat.
+- If a prior draft exists, preserve useful material and tighten it.
+
+## Step 4: Handoff
+
+After writing `00-scope.md`:
+
+- Summarize the final scope in 5-10 bullets.
+- Call out the biggest unresolved risk.
+- Recommend `/research` as the next step.

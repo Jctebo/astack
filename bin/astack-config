@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+# astack-config — read/write ~/.astack/config.yaml
+#
+# Usage:
+#   astack-config get <key>          — read a config value
+#   astack-config set <key> <value>  — write a config value
+#   astack-config list               — show all config
+#
+# Env overrides (for testing):
+#   ASTACK_STATE_DIR  — override ~/.astack state directory
+set -euo pipefail
+
+STATE_DIR="${ASTACK_STATE_DIR:-$HOME/.astack}"
+CONFIG_FILE="$STATE_DIR/config.yaml"
+
+case "${1:-}" in
+  get)
+    KEY="${2:?Usage: astack-config get <key>}"
+    grep -E "^${KEY}:" "$CONFIG_FILE" 2>/dev/null | tail -1 | awk '{print $2}' | tr -d '[:space:]' || true
+    ;;
+  set)
+    KEY="${2:?Usage: astack-config set <key> <value>}"
+    VALUE="${3:?Usage: astack-config set <key> <value>}"
+    mkdir -p "$STATE_DIR"
+    TMP_FILE="$(mktemp "$STATE_DIR/config.XXXXXX")"
+    if [ -f "$CONFIG_FILE" ]; then
+      awk -v key="$KEY" -v value="$VALUE" '
+        BEGIN { updated = 0 }
+        $1 == key ":" {
+          print key ": " value
+          updated = 1
+          next
+        }
+        { print }
+        END {
+          if (!updated) print key ": " value
+        }
+      ' "$CONFIG_FILE" > "$TMP_FILE"
+    else
+      printf '%s: %s\n' "$KEY" "$VALUE" > "$TMP_FILE"
+    fi
+    mv "$TMP_FILE" "$CONFIG_FILE"
+    ;;
+  list)
+    cat "$CONFIG_FILE" 2>/dev/null || true
+    ;;
+  *)
+    echo "Usage: astack-config {get|set|list} [key] [value]"
+    exit 1
+    ;;
+esac

@@ -1,0 +1,131 @@
+---
+name: plan
+version: 1.0.0
+description: |
+  Unified planning review. Combines engineering review, design review, and
+  implementation planning into one plan-mode skill that resolves decisions and
+  writes `02-plan.md`. Use when asked to "make the plan", "review the
+  architecture", "lock the implementation plan", or "finalize what we should
+  build".
+allowed-tools:
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - AskUserQuestion
+  - Bash
+---
+
+{{PREAMBLE}}
+
+# /plan
+
+You are running the `/plan` workflow. This is the final plan-mode stage before
+implementation. Your job is to turn `00-scope.md` and `01-research.md` into one
+decision-complete implementation spec: `02-plan.md`.
+
+## Hard Gates
+
+- Do NOT write implementation code.
+- Do NOT leave important technical or UX choices implicit.
+- Your only durable output is `02-plan.md`.
+
+## Step 1: Gather the planning inputs
+
+Read these files first if they exist:
+
+- `00-scope.md`
+- `01-research.md`
+- `02-plan.md`
+- `DESIGN.md`
+- `README.md`
+- `CLAUDE.md`
+- `TODOS.md`
+
+Then inspect the code paths, types, routes, components, and tests most relevant
+to the request.
+
+If `00-scope.md` or `01-research.md` is missing, say so explicitly and proceed
+only if the user has already provided enough context. Otherwise recommend
+running the missing stage first.
+
+## Step 2: Resolve the remaining decisions
+
+Treat this like a combined engineering + design review:
+
+- Reuse existing code and patterns whenever possible.
+- Prefer the smallest design that fully solves the scoped problem.
+- Make interfaces, state transitions, and error handling explicit.
+- Specify the user-facing behavior, not just backend mechanics.
+- If there is UI scope, define empty, loading, success, and error states.
+- If there is no UI scope, say that plainly and keep the design section light.
+
+Use AskUserQuestion only for real tradeoffs that materially change the build:
+
+- architecture or integration choice
+- UX pattern or interaction model
+- rollout or compatibility decision
+- test/eval scope when more than one sensible option exists
+
+## Step 3: Write `02-plan.md`
+
+Write or update `02-plan.md` in the repo root with this structure:
+
+```markdown
+# Plan
+
+## Summary
+- What we are building
+- Why this plan is the chosen approach
+
+## What Already Exists
+- Existing code, patterns, or systems we will reuse
+
+## Architecture
+- Components, services, data flow, interfaces
+
+## UX And States
+- User journey
+- Loading / empty / success / error states
+- Accessibility or responsive notes if relevant
+
+## Implementation Outline
+- Ordered steps for `/implement`
+
+## Failure Modes
+- What can break
+- How we detect it
+- How the user experiences it
+
+## QA And Test Matrix
+- Routes/pages to verify
+- Critical flows
+- Edge cases
+- Regression tests or evals required
+
+## Rollout Notes
+- Flags, migrations, rollout sequencing, or compatibility notes
+
+## Not In Scope
+- Explicitly deferred work
+
+## Open Questions
+- Remaining unknowns, if any
+```
+
+Additional requirements:
+
+- Include at least one ASCII diagram for non-trivial flows.
+- The `QA And Test Matrix` must be specific enough for `/qa` and `/qa-only` to
+  use directly.
+- The `Implementation Outline` must be ordered, concrete, and executable by
+  `/implement` without guessing.
+
+## Step 4: Handoff
+
+After writing `02-plan.md`:
+
+- Summarize the plan in implementation order.
+- Call out the highest-risk part of the build.
+- Recommend `/implement` as the next step.

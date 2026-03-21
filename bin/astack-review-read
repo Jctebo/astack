@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# astack-review-read — read review log and config for dashboard
+# Usage: astack-review-read
+set -euo pipefail
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+eval $("$SCRIPT_DIR/astack-slug" 2>/dev/null)
+ASTACK_HOME="${ASTACK_HOME:-$HOME/.astack}"
+cat "$ASTACK_HOME/projects/$SLUG/$BRANCH-reviews.jsonl" 2>/dev/null || echo "NO_REVIEWS"
+echo "---CONFIG---"
+"$SCRIPT_DIR/astack-config" get skip_eng_review 2>/dev/null || echo "false"
+echo "---HEAD---"
+git rev-parse --short HEAD 2>/dev/null || echo "unknown"
