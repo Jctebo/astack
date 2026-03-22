@@ -72,7 +72,9 @@ SKILL docs are generated.
 1. Edit the relevant `.tmpl` file.
 2. Run `bun run gen:skill-docs`.
 3. Run `bun run gen:skill-docs --host codex`.
-4. Commit both template and generated outputs.
+4. Run `bun run gen:skill-docs --host copilot` when the skill belongs in the
+   Copilot workflow surface.
+5. Commit the template and every generated host output affected by the change.
 
 ## Platform-agnostic rules
 

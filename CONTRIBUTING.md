@@ -240,7 +240,7 @@ To add a browse command, add it to `browse/src/commands.ts`. To add a snapshot f
 
 astack generates SKILL.md files for three hosts: **Claude** (`.claude/skills/`), **Codex** (`.agents/skills/`), and **Copilot** (`.copilot/skills/`). Every template change needs to be generated for all relevant hosts.
 
-### Generating for both hosts
+### Generating for all hosts
 
 ```bash
 # Generate Claude output (default)
