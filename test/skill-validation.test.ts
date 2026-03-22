@@ -81,6 +81,15 @@ describe('astack workflow structure', () => {
     expect(read('implement/SKILL.md')).toContain('Progress');
   });
 
+  test('workflow docs mention branch bootstrap and merge cleanup', () => {
+    expect(read('scope/SKILL.md')).toContain('enhancement/<slug>');
+    expect(read('research/SKILL.md')).toContain('enhancement/<slug>');
+    expect(read('plan/SKILL.md')).toContain('enhancement/<slug>');
+    expect(read('implement/SKILL.md')).toContain('enhancement/<slug>');
+    expect(read('ship/SKILL.md')).toContain('gh pr merge --merge --delete-branch');
+    expect(read('ship/SKILL.md')).toContain('Step 8.6: Final merge decision');
+  });
+
   test('root astack skill points to the new planning flow', () => {
     const content = read('SKILL.md');
     expect(content).toContain('/scope-astack');

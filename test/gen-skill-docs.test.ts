@@ -98,6 +98,22 @@ describe('gen-skill-docs', () => {
     expect(implementContent).toContain('Progress');
   });
 
+  test('workflow skills advertise branch lifecycle automation', () => {
+    const scopeContent = fs.readFileSync(path.join(ROOT, 'scope', 'SKILL.md'), 'utf-8');
+    const researchContent = fs.readFileSync(path.join(ROOT, 'research', 'SKILL.md'), 'utf-8');
+    const planContent = fs.readFileSync(path.join(ROOT, 'plan', 'SKILL.md'), 'utf-8');
+    const implementContent = fs.readFileSync(path.join(ROOT, 'implement', 'SKILL.md'), 'utf-8');
+    const shipContent = fs.readFileSync(path.join(ROOT, 'ship', 'SKILL.md'), 'utf-8');
+
+    expect(scopeContent).toContain('Step 1.6: Bootstrap the enhancement branch');
+    expect(scopeContent).toContain('enhancement/<slug>');
+    expect(researchContent).toContain('Step 1.5: Ensure the enhancement branch');
+    expect(planContent).toContain('Step 1.5: Ensure the enhancement branch');
+    expect(implementContent).toContain('Step 1.5: Ensure the enhancement branch');
+    expect(shipContent).toContain('Step 8.6: Final merge decision');
+    expect(shipContent).toContain('gh pr merge --merge --delete-branch');
+  });
+
   test('root skill suggests the new astack workflow', () => {
     const content = fs.readFileSync(path.join(ROOT, 'SKILL.md'), 'utf-8');
     expect(content).toContain('suggest /scope-astack');

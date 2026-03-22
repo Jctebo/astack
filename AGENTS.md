@@ -12,7 +12,7 @@ GitHub Copilot support is also available as a system-level install in
 
 | Skill | What it does |
 |-------|--------------|
-| `/scope-astack` | Scope discovery and product framing. Updates the `Scope` section in the active release artifact. |
+| `/scope-astack` | Scope discovery and product framing. Updates the `Scope` section in the active release artifact and auto-branches from `main` when needed. |
 | `/research-astack` | Repository and dependency research. Updates the `Research` section in the active release artifact. |
 | `/plan-astack` | Unified engineering and design planning. Updates the `Plan` section in the active release artifact. |
 | `/implement-astack` | Plan-driven implementation. Updates the `Progress` section in the active release artifact. |
@@ -22,7 +22,7 @@ GitHub Copilot support is also available as a system-level install in
 | `/design-review-astack` | Live-site design audit and fix loop. |
 | `/qa-astack` | Browser QA plus fixes and re-verification. |
 | `/qa-only-astack` | Browser QA report without code changes. |
-| `/ship-astack` | Run checks, prepare release state, push, and open PRs. |
+| `/ship-astack` | Run checks, prepare release state, push, open PRs, ask whether to merge, and clean up the branch if approved. |
 | `/document-release-astack` | Sync project docs after shipping. |
 | `/retro-astack` | Retrospective based on git history and workflow artifacts. |
 | `/browse-astack` | Fast persistent browser automation. |
