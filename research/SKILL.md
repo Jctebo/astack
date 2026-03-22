@@ -1,5 +1,5 @@
 ---
-name: research
+name: research-astack
 version: 1.0.0
 description: |
   Repository and dependency research for implementation planning. Reads
@@ -42,14 +42,14 @@ _SESSION_ID="$$-$(date +%s)"
 echo "TELEMETRY: ${_TEL:-off}"
 echo "TEL_PROMPTED: $_TEL_PROMPTED"
 mkdir -p ~/.astack/analytics
-echo '{"skill":"research","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.astack/analytics/skill-usage.jsonl 2>/dev/null || true
+echo '{"skill":"research-astack","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.astack/analytics/skill-usage.jsonl 2>/dev/null || true
 for _PF in ~/.astack/analytics/.pending-*; do [ -f "$_PF" ] && ~/.claude/skills/astack/bin/astack-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true; break; done
 ```
 
 If `PROACTIVE` is `"false"`, do not proactively suggest astack skills — only invoke
 them when the user explicitly asks. The user opted out of proactive suggestions.
 
-If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/astack/astack-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running astack v{to} (just updated!)" and continue.
+If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/astack-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running astack v{to} (just updated!)" and continue.
 
 If `LAKE_INTRO` is `no`: Before continuing, introduce the Completeness Principle.
 Tell the user: "astack follows the **Boil the Lake** principle — always do the complete
@@ -223,9 +223,9 @@ success/error/abort, and `USED_BROWSE` with true/false based on whether `$B` was
 If you cannot determine the outcome, use "unknown". This runs in the background and
 never blocks the user.
 
-# /research
+# /research-astack
 
-You are running the `/research` workflow. This is a **plan-mode research pass**
+You are running the `/research-astack` workflow. This is a **plan-mode research pass**
 that turns the scoped request into implementation context. Your only durable
 output is `01-research.md`.
 
@@ -233,6 +233,10 @@ output is `01-research.md`.
 
 - Do NOT write implementation code.
 - Do NOT turn this into a plan yet.
+- Prioritize correctness over completeness, and completeness over noise
+  reduction.
+- Do NOT include raw code dumps, verbose grep/glob logs, or exploratory notes
+  that are not useful for review.
 - Your job is discovery, constraint mapping, and recommendation.
 
 ## Step 1: Read the scope
@@ -240,7 +244,7 @@ output is `01-research.md`.
 Read `00-scope.md` first. If it does not exist, say so explicitly and either:
 
 - use the user’s request as a temporary scope input, or
-- recommend running `/scope` first if the request is still ambiguous.
+- recommend running `/scope-astack` first if the request is still ambiguous.
 
 Then read, if present:
 
@@ -265,6 +269,9 @@ Inspect the codebase and map the relevant system:
 If the task depends on external libraries, APIs, or specs, read the relevant
 docs or source references. Prefer primary sources and official docs.
 
+Use disciplined exploration. Keep verbose discovery work compact and only carry
+forward distilled findings that planning will need.
+
 When important ambiguity remains, ask focused questions. Otherwise discover
 facts through reading and inspection before asking.
 
@@ -277,6 +284,10 @@ Write or update `01-research.md` in the repo root with this structure:
 
 ## Scope Baseline
 - Short summary of the scoped task
+
+## Relevant Files
+- Exact file paths
+- Why each file matters
 
 ## Current System Map
 - Key files, modules, flows, and ownership boundaries
@@ -293,18 +304,24 @@ Write or update `01-research.md` in the repo root with this structure:
 ## Risks
 - High-risk areas or likely integration failures
 
+## Assumptions To Validate
+- Facts we are not fully certain about yet
+- Questions a human should confirm before planning
+
 ## Unknowns
 - Open questions that planning must resolve
 
 ## Recommended Direction
-- Best path into `/plan`
+- Best path into `/plan-astack`
 ```
 
 Requirements:
 
+- Keep the artifact compact and reviewable.
 - Cite concrete files, modules, or URLs where relevant.
 - Keep it implementation-oriented.
 - Distinguish facts from inference.
+- Do not paste raw code unless a tiny excerpt is necessary to explain a risk.
 - If a prior `01-research.md` exists, update it instead of duplicating it.
 
 ## Step 4: Handoff
@@ -313,4 +330,8 @@ After writing `01-research.md`:
 
 - Summarize the top reuse opportunities.
 - Call out the most important risk.
-- Recommend `/plan` as the next step.
+- Call out the most important assumption that still needs validation.
+- If the research is still materially uncertain or incomplete, say another
+  research pass is needed before `/plan-astack`.
+- Recommend `/plan-astack` only when the research is accurate enough to serve as a
+  planning input.

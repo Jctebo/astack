@@ -50,7 +50,7 @@ if (!evalsEnabled) {
 // Gemini E2E touchfiles — keyed by test name, same pattern as Codex E2E
 const GEMINI_E2E_TOUCHFILES: Record<string, string[]> = {
   'gemini-discover-skill':  ['.agents/skills/**', 'test/helpers/gemini-session-runner.ts'],
-  'gemini-review-findings': ['review/**', '.agents/skills/astack-review/**', 'test/helpers/gemini-session-runner.ts'],
+  'gemini-review-findings': ['review/**', '.agents/skills/review-astack/**', 'test/helpers/gemini-session-runner.ts'],
 };
 
 let selectedTests: string[] | null = null; // null = run all
@@ -139,9 +139,9 @@ describeGemini('Gemini E2E', () => {
   }, 120_000);
 
   testIfSelected('gemini-review-findings', async () => {
-    // Run astack-review skill via Gemini on this repo
+    // Run review-astack skill via Gemini on this repo
     const result = await runGeminiSkill({
-      prompt: 'Run the astack-review skill on this repository. Review the current branch diff and report your findings.',
+      prompt: 'Run the review-astack skill on this repository. Review the current branch diff and report your findings.',
       timeoutMs: 540_000,
       cwd: ROOT,
     });

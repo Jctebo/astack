@@ -1,5 +1,5 @@
 ---
-name: plan
+name: plan-astack
 version: 1.0.0
 description: |
   Unified planning review. Combines engineering review, design review, and
@@ -42,14 +42,14 @@ _SESSION_ID="$$-$(date +%s)"
 echo "TELEMETRY: ${_TEL:-off}"
 echo "TEL_PROMPTED: $_TEL_PROMPTED"
 mkdir -p ~/.astack/analytics
-echo '{"skill":"plan","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.astack/analytics/skill-usage.jsonl 2>/dev/null || true
+echo '{"skill":"plan-astack","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.astack/analytics/skill-usage.jsonl 2>/dev/null || true
 for _PF in ~/.astack/analytics/.pending-*; do [ -f "$_PF" ] && ~/.claude/skills/astack/bin/astack-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true; break; done
 ```
 
 If `PROACTIVE` is `"false"`, do not proactively suggest astack skills — only invoke
 them when the user explicitly asks. The user opted out of proactive suggestions.
 
-If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/astack/astack-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running astack v{to} (just updated!)" and continue.
+If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/astack-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running astack v{to} (just updated!)" and continue.
 
 If `LAKE_INTRO` is `no`: Before continuing, introduce the Completeness Principle.
 Tell the user: "astack follows the **Boil the Lake** principle — always do the complete
@@ -223,9 +223,9 @@ success/error/abort, and `USED_BROWSE` with true/false based on whether `$B` was
 If you cannot determine the outcome, use "unknown". This runs in the background and
 never blocks the user.
 
-# /plan
+# /plan-astack
 
-You are running the `/plan` workflow. This is the final plan-mode stage before
+You are running the `/plan-astack` workflow. This is the final plan-mode stage before
 implementation. Your job is to turn `00-scope.md` and `01-research.md` into one
 decision-complete implementation spec: `02-plan.md`.
 
@@ -233,6 +233,8 @@ decision-complete implementation spec: `02-plan.md`.
 
 - Do NOT write implementation code.
 - Do NOT leave important technical or UX choices implicit.
+- Do NOT include verbose exploration logs or rejected alternatives unless they
+  are critical context for the chosen plan.
 - Your only durable output is `02-plan.md`.
 
 ## Step 1: Gather the planning inputs
@@ -260,10 +262,14 @@ Treat this like a combined engineering + design review:
 
 - Reuse existing code and patterns whenever possible.
 - Prefer the smallest design that fully solves the scoped problem.
+- Break the build into phases that can be implemented and verified
+  independently.
 - Make interfaces, state transitions, and error handling explicit.
 - Specify the user-facing behavior, not just backend mechanics.
 - If there is UI scope, define empty, loading, success, and error states.
 - If there is no UI scope, say that plainly and keep the design section light.
+- Name exact files, functions, classes, routes, components, and tests whenever
+  they are known.
 
 Use AskUserQuestion only for real tradeoffs that materially change the build:
 
@@ -289,13 +295,34 @@ Write or update `02-plan.md` in the repo root with this structure:
 ## Architecture
 - Components, services, data flow, interfaces
 
+## Concrete Changes
+- Exact file paths to edit
+- Specific functions, classes, components, routes, or interfaces to modify
+- New files, migrations, or tests to add
+
 ## UX And States
 - User journey
 - Loading / empty / success / error states
 - Accessibility or responsive notes if relevant
 
-## Implementation Outline
-- Ordered steps for `/implement`
+## Implementation Phases
+### Phase 1: <name>
+- Goal
+- Exact files to edit
+- Symbols/interfaces touched
+- Change summary
+- Verification steps or commands
+- Rollback note
+- Dependencies on earlier phases, if any
+
+### Phase N: <name>
+- Goal
+- Exact files to edit
+- Symbols/interfaces touched
+- Change summary
+- Verification steps or commands
+- Rollback note
+- Dependencies on earlier phases, if any
 
 ## Failure Modes
 - What can break
@@ -321,10 +348,13 @@ Write or update `02-plan.md` in the repo root with this structure:
 Additional requirements:
 
 - Include at least one ASCII diagram for non-trivial flows.
-- The `QA And Test Matrix` must be specific enough for `/qa` and `/qa-only` to
+- Keep the plan compact and execution-oriented. Do not restate the full
+  research log.
+- The `QA And Test Matrix` must be specific enough for `/qa-astack` and `/qa-only-astack` to
   use directly.
-- The `Implementation Outline` must be ordered, concrete, and executable by
-  `/implement` without guessing.
+- The `Concrete Changes` section must use exact file paths whenever possible.
+- Every phase must be independently verifiable and concrete enough for
+  `/implement-astack` to execute without guessing.
 
 ## Step 4: Handoff
 
@@ -332,4 +362,7 @@ After writing `02-plan.md`:
 
 - Summarize the plan in implementation order.
 - Call out the highest-risk part of the build.
-- Recommend `/implement` as the next step.
+- If material open questions remain, say the plan is not approved for
+  implementation yet and call out what needs to be resolved first.
+- Recommend `/implement-astack` only when the plan is decision-complete enough to
+  execute safely.

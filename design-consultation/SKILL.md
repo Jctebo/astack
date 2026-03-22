@@ -1,11 +1,11 @@
 ---
-name: design-consultation
+name: design-consultation-astack
 version: 1.0.0
 description: |
   Design consultation: understands your product, researches the landscape, proposes a
   complete design system (aesthetic, typography, color, layout, spacing, motion), and
   generates font+color preview pages. Creates DESIGN.md as your project's design source
-  of truth. Feed DESIGN.md into /plan when you are ready to lock implementation details.
+  of truth. Feed DESIGN.md into /plan-astack when you are ready to lock implementation details.
   Use when asked to "design system", "brand guidelines", or "create DESIGN.md".
   Proactively suggest when starting a new project's UI with no existing
   design system or DESIGN.md.
@@ -45,14 +45,14 @@ _SESSION_ID="$$-$(date +%s)"
 echo "TELEMETRY: ${_TEL:-off}"
 echo "TEL_PROMPTED: $_TEL_PROMPTED"
 mkdir -p ~/.astack/analytics
-echo '{"skill":"design-consultation","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.astack/analytics/skill-usage.jsonl 2>/dev/null || true
+echo '{"skill":"design-consultation-astack","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.astack/analytics/skill-usage.jsonl 2>/dev/null || true
 for _PF in ~/.astack/analytics/.pending-*; do [ -f "$_PF" ] && ~/.claude/skills/astack/bin/astack-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true; break; done
 ```
 
 If `PROACTIVE` is `"false"`, do not proactively suggest astack skills — only invoke
 them when the user explicitly asks. The user opted out of proactive suggestions.
 
-If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/astack/astack-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running astack v{to} (just updated!)" and continue.
+If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/astack-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running astack v{to} (just updated!)" and continue.
 
 If `LAKE_INTRO` is `no`: Before continuing, introduce the Completeness Principle.
 Tell the user: "astack follows the **Boil the Lake** principle — always do the complete
@@ -226,7 +226,7 @@ success/error/abort, and `USED_BROWSE` with true/false based on whether `$B` was
 If you cannot determine the outcome, use "unknown". This runs in the background and
 never blocks the user.
 
-# /design-consultation: Your Design System, Built Together
+# /design-consultation-astack: Your Design System, Built Together
 
 You are a senior product designer with strong opinions about typography, color, and visual systems. You don't present menus — you listen, think, research, and propose. You're opinionated but not dogmatic. You explain your reasoning and welcome pushback.
 
@@ -253,7 +253,7 @@ cat package.json 2>/dev/null | head -20
 ls src/ app/ pages/ components/ 2>/dev/null | head -30
 ```
 
-Look for `/scope` output:
+Look for `/scope-astack` output:
 
 ```bash
 source <(~/.claude/skills/astack/bin/astack-slug 2>/dev/null)
@@ -263,7 +263,7 @@ ls .context/*scope* .context/attachments/*scope* 2>/dev/null
 
 If `00-scope.md` or scoped context exists, read it — the product context is pre-filled.
 
-If the codebase is empty and purpose is unclear, say: *"I don't have a clear picture of what you're building yet. Want to start with `/scope`? Once we know the product direction, we can set up the design system."*
+If the codebase is empty and purpose is unclear, say: *"I don't have a clear picture of what you're building yet. Want to start with `/scope-astack`? Once we know the product direction, we can set up the design system."*
 
 **Find the browse binary (optional — enables visual competitive research):**
 
@@ -551,7 +551,7 @@ Write `DESIGN.md` to the repo root with this structure:
 ## Decisions Log
 | Date | Decision | Rationale |
 |------|----------|-----------|
-| [today] | Initial design system created | Created by /design-consultation based on [product context / research] |
+| [today] | Initial design system created | Created by /design-consultation-astack based on [product context / research] |
 ```
 
 **Update CLAUDE.md** (or create it if it doesn't exist) — append this section:

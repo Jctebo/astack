@@ -1,5 +1,5 @@
 ---
-name: retro
+name: retro-astack
 version: 2.0.0
 description: |
   Weekly engineering retrospective. Analyzes commit history, work patterns,
@@ -40,14 +40,14 @@ _SESSION_ID="$$-$(date +%s)"
 echo "TELEMETRY: ${_TEL:-off}"
 echo "TEL_PROMPTED: $_TEL_PROMPTED"
 mkdir -p ~/.astack/analytics
-echo '{"skill":"retro","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.astack/analytics/skill-usage.jsonl 2>/dev/null || true
+echo '{"skill":"retro-astack","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.astack/analytics/skill-usage.jsonl 2>/dev/null || true
 for _PF in ~/.astack/analytics/.pending-*; do [ -f "$_PF" ] && ~/.claude/skills/astack/bin/astack-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true; break; done
 ```
 
 If `PROACTIVE` is `"false"`, do not proactively suggest astack skills — only invoke
 them when the user explicitly asks. The user opted out of proactive suggestions.
 
-If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/astack/astack-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running astack v{to} (just updated!)" and continue.
+If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/astack-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running astack v{to} (just updated!)" and continue.
 
 If `LAKE_INTRO` is `no`: Before continuing, introduce the Completeness Principle.
 Tell the user: "astack follows the **Boil the Lake** principle — always do the complete
@@ -231,20 +231,20 @@ say `origin/<default>` below.
 
 ---
 
-# /retro — Weekly Engineering Retrospective
+# /retro-astack — Weekly Engineering Retrospective
 
 Generates a comprehensive engineering retrospective analyzing commit history, work patterns, and code quality metrics. Team-aware: identifies the user running the command, then analyzes every contributor with per-person praise and growth opportunities. Designed for a senior IC/CTO-level builder using Claude Code as a force multiplier.
 
 ## User-invocable
-When the user types `/retro`, run this skill.
+When the user types `/retro-astack`, run this skill.
 
 ## Arguments
-- `/retro` — default: last 7 days
-- `/retro 24h` — last 24 hours
-- `/retro 14d` — last 14 days
-- `/retro 30d` — last 30 days
-- `/retro compare` — compare current window vs prior same-length window
-- `/retro compare 14d` — compare with explicit window
+- `/retro-astack` — default: last 7 days
+- `/retro-astack 24h` — last 24 hours
+- `/retro-astack 14d` — last 14 days
+- `/retro-astack 30d` — last 30 days
+- `/retro-astack compare` — compare current window vs prior same-length window
+- `/retro-astack compare 14d` — compare with explicit window
 
 ## Instructions
 
@@ -254,13 +254,13 @@ Parse the argument to determine the time window. Default to 7 days if no argumen
 
 **Argument validation:** If the argument doesn't match a number followed by `d`, `h`, or `w`, the word `compare`, or `compare` followed by a number and `d`/`h`/`w`, show this usage and stop:
 ```
-Usage: /retro [window]
-  /retro              — last 7 days (default)
-  /retro 24h          — last 24 hours
-  /retro 14d          — last 14 days
-  /retro 30d          — last 30 days
-  /retro compare      — compare this period vs prior period
-  /retro compare 14d  — compare with explicit window
+Usage: /retro-astack [window]
+  /retro-astack              — last 7 days (default)
+  /retro-astack 24h          — last 24 hours
+  /retro-astack 14d          — last 14 days
+  /retro-astack 30d          — last 30 days
+  /retro-astack compare      — compare this period vs prior period
+  /retro-astack compare 14d  — compare with explicit window
 ```
 
 ### Step 1: Gather Raw Data
@@ -371,7 +371,7 @@ If TODOS.md doesn't exist, skip the Backlog Health row.
 **Skill Usage (if analytics exist):** Read `~/.astack/analytics/skill-usage.jsonl` if it exists. Filter entries within the retro time window by `ts` field. Separate skill activations (no `event` field) from hook fires (`event: "hook_fire"`). Aggregate by skill name. Present as:
 
 ```
-| Skill Usage | /ship(12) /qa(8) /review(5) · 3 safety hook fires |
+| Skill Usage | /ship-astack(12) /qa-astack(8) /review-astack(5) · 3 safety hook fires |
 ```
 
 If the JSONL file doesn't exist or has no entries in the window, skip the Skill Usage row.
@@ -697,7 +697,7 @@ Small, practical, realistic. Each must be something that takes <5 minutes to ado
 
 ## Compare Mode
 
-When the user runs `/retro compare` (or `/retro compare 14d`):
+When the user runs `/retro-astack compare` (or `/retro-astack compare 14d`):
 
 1. Compute metrics for the current window (default 7d) using the midnight-aligned start date (same logic as the main retro — e.g., if today is 2026-03-18 and window is 7d, use `--since="2026-03-11T00:00:00"`)
 2. Compute metrics for the immediately prior same-length window using both `--since` and `--until` with midnight-aligned dates to avoid overlap (e.g., for a 7d window starting 2026-03-11: prior window is `--since="2026-03-04T00:00:00" --until="2026-03-11T00:00:00"`)

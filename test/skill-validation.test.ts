@@ -83,10 +83,10 @@ describe('astack workflow structure', () => {
 
   test('root astack skill points to the new planning flow', () => {
     const content = read('SKILL.md');
-    expect(content).toContain('/scope');
-    expect(content).toContain('/research');
-    expect(content).toContain('/plan');
-    expect(content).toContain('/implement');
+    expect(content).toContain('/scope-astack');
+    expect(content).toContain('/research-astack');
+    expect(content).toContain('/plan-astack');
+    expect(content).toContain('/implement-astack');
     expect(content).not.toContain('/office-hours');
     expect(content).not.toContain('/plan-ceo-review');
     expect(content).not.toContain('/plan-eng-review');
@@ -132,9 +132,14 @@ describe('generated skill health', () => {
   test('setup script links astack skill roots for Claude and Codex', () => {
     const setup = read('setup');
     expect(setup).toContain('.agents/skills');
+    expect(setup).toContain('.copilot/skills');
     expect(setup).toContain('link_claude_skill_dirs');
     expect(setup).toContain('link_codex_skill_dirs');
+    expect(setup).toContain('link_copilot_skill_dirs');
+    expect(setup).toContain('create_runtime_root');
     expect(setup).toContain('$HOME/.codex/skills');
+    expect(setup).toContain('$HOME/.copilot/skills');
+    expect(setup).not.toContain('ln -snf "$ASTACK_DIR" "$CODEX_ASTACK"');
   });
 });
 
@@ -160,17 +165,19 @@ describe('Codex sidecars', () => {
   test('codex output uses astack naming and has no active gstack entries', () => {
     const entries = fs.readdirSync(AGENTS_DIR);
     expect(entries).toContain('astack');
-    expect(entries).toContain('astack-scope');
-    expect(entries).toContain('astack-research');
-    expect(entries).toContain('astack-plan');
-    expect(entries).toContain('astack-implement');
+    expect(entries).toContain('scope-astack');
+    expect(entries).toContain('research-astack');
+    expect(entries).toContain('plan-astack');
+    expect(entries).toContain('implement-astack');
     expect(entries.some((entry) => entry === 'gstack' || entry.startsWith('gstack-'))).toBe(false);
   });
 
   test('codex sidecars use codex paths instead of claude paths', () => {
-    for (const skillName of ['astack-review', 'astack-ship', 'astack-plan', 'astack-implement']) {
+    for (const skillName of ['review-astack', 'ship-astack', 'plan-astack', 'implement-astack']) {
       const content = fs.readFileSync(path.join(AGENTS_DIR, skillName, 'SKILL.md'), 'utf-8');
       expect(content).toContain('~/.codex/skills/astack');
+      expect(content).toContain('~/.codex/skills/astack-upgrade/SKILL.md');
+      expect(content).not.toContain('~/.codex/skills/astack/astack-upgrade/SKILL.md');
       expect(content).not.toContain('~/.claude/skills/astack');
       expect(content).not.toContain('.claude/skills');
     }

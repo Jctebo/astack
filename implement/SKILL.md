@@ -1,5 +1,5 @@
 ---
-name: implement
+name: implement-astack
 version: 1.0.0
 description: |
   Plan-driven implementation workflow. Reads `02-plan.md`, makes the code
@@ -40,14 +40,14 @@ _SESSION_ID="$$-$(date +%s)"
 echo "TELEMETRY: ${_TEL:-off}"
 echo "TEL_PROMPTED: $_TEL_PROMPTED"
 mkdir -p ~/.astack/analytics
-echo '{"skill":"implement","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.astack/analytics/skill-usage.jsonl 2>/dev/null || true
+echo '{"skill":"implement-astack","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.astack/analytics/skill-usage.jsonl 2>/dev/null || true
 for _PF in ~/.astack/analytics/.pending-*; do [ -f "$_PF" ] && ~/.claude/skills/astack/bin/astack-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true; break; done
 ```
 
 If `PROACTIVE` is `"false"`, do not proactively suggest astack skills — only invoke
 them when the user explicitly asks. The user opted out of proactive suggestions.
 
-If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/astack/astack-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running astack v{to} (just updated!)" and continue.
+If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/astack-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running astack v{to} (just updated!)" and continue.
 
 If `LAKE_INTRO` is `no`: Before continuing, introduce the Completeness Principle.
 Tell the user: "astack follows the **Boil the Lake** principle — always do the complete
@@ -221,9 +221,9 @@ success/error/abort, and `USED_BROWSE` with true/false based on whether `$B` was
 If you cannot determine the outcome, use "unknown". This runs in the background and
 never blocks the user.
 
-# /implement
+# /implement-astack
 
-You are running the `/implement` workflow. This is the execution stage. Read
+You are running the `/implement-astack` workflow. This is the execution stage. Read
 `02-plan.md`, implement the work, and keep `03-progress.md` current as the
 single source of truth for execution status.
 
@@ -239,7 +239,7 @@ Read these files first:
 - `CLAUDE.md`
 - `TODOS.md`
 
-If `02-plan.md` is missing, stop and tell the user to run `/plan` first.
+If `02-plan.md` is missing, stop and tell the user to run `/plan-astack` first.
 
 ## Step 2: Execute against the plan
 
@@ -298,4 +298,4 @@ Before declaring success:
 - ensure `03-progress.md` reflects the final state
 - run the most relevant validation available
 - summarize what was implemented, what was verified, and what still needs
-  `/review` or `/qa`
+  `/review-astack` or `/qa-astack`

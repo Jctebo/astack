@@ -6,7 +6,8 @@
  *   - Browse command validation for active skills
  *   - Template coverage for active skills
  *   - Codex sidecar health
- *   - Generator freshness for Claude and Codex outputs
+ *   - Copilot skill export health
+ *   - Generator freshness for Claude, Codex, and Copilot outputs
  */
 
 import { execSync } from 'child_process';
@@ -16,6 +17,7 @@ import { validateSkill } from '../test/helpers/skill-parser';
 
 const ROOT = path.resolve(import.meta.dir, '..');
 const AGENTS_DIR = path.join(ROOT, '.agents', 'skills');
+const COPILOT_DIR = path.join(ROOT, '.copilot', 'skills');
 
 function discoverClaudeSkills(): string[] {
   const skills = ['SKILL.md'];
@@ -58,13 +60,24 @@ function discoverCodexSkills(): string[] {
   return fs.readdirSync(AGENTS_DIR, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name)
-    .filter((name) => name === 'astack' || name.startsWith('astack-'))
+    .filter((name) => fs.existsSync(path.join(AGENTS_DIR, name, 'SKILL.md')))
+    .sort();
+}
+
+function discoverCopilotSkills(): string[] {
+  if (!fs.existsSync(COPILOT_DIR)) return [];
+
+  return fs.readdirSync(COPILOT_DIR, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .filter((name) => fs.existsSync(path.join(COPILOT_DIR, name, 'SKILL.md')))
     .sort();
 }
 
 const CLAUDE_SKILLS = discoverClaudeSkills();
 const TEMPLATES = discoverTemplates();
 const CODEX_SKILLS = discoverCodexSkills();
+const COPILOT_SKILLS = discoverCopilotSkills();
 
 let hasErrors = false;
 
@@ -134,6 +147,30 @@ if (CODEX_SKILLS.length === 0) {
   }
 }
 
+console.log('\n  Copilot Skills (.copilot/skills/):');
+if (COPILOT_SKILLS.length === 0) {
+  hasErrors = true;
+  console.log('  ❌ No Copilot skills found. Run: bun run gen:skill-docs --host copilot');
+} else {
+  for (const skillName of COPILOT_SKILLS) {
+    const skillPath = path.join(COPILOT_DIR, skillName, 'SKILL.md');
+    if (!fs.existsSync(skillPath)) {
+      hasErrors = true;
+      console.log(`  ❌ ${skillName.padEnd(30)} - SKILL.md missing`);
+      continue;
+    }
+
+    const content = fs.readFileSync(skillPath, 'utf-8');
+    if (content.includes('.claude/skills') || content.includes('~/.claude/')) {
+      hasErrors = true;
+      console.log(`  ❌ ${skillName.padEnd(30)} - contains Claude path reference`);
+      continue;
+    }
+
+    console.log(`  ✅ ${skillName.padEnd(30)} - OK`);
+  }
+}
+
 console.log('\n  Freshness (Claude):');
 try {
   execSync('bun run scripts/gen-skill-docs.ts --dry-run', { cwd: ROOT, stdio: 'pipe' });
@@ -160,6 +197,20 @@ try {
     console.log(`      ${line}`);
   }
   console.log('      Run: bun run gen:skill-docs --host codex');
+}
+
+console.log('\n  Freshness (Copilot):');
+try {
+  execSync('bun run scripts/gen-skill-docs.ts --host copilot --dry-run', { cwd: ROOT, stdio: 'pipe' });
+  console.log('  ✅ All Copilot generated files are fresh');
+} catch (error: any) {
+  hasErrors = true;
+  const output = error.stdout?.toString() || '';
+  console.log('  ❌ Copilot generated files are stale:');
+  for (const line of output.split('\n').filter((value: string) => value.startsWith('STALE'))) {
+    console.log(`      ${line}`);
+  }
+  console.log('      Run: bun run gen:skill-docs --host copilot');
 }
 
 console.log('');

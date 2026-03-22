@@ -1,11 +1,11 @@
 ---
-name: qa-only
+name: qa-only-astack
 version: 1.0.0
 description: |
   Report-only QA testing. Systematically tests a web application and produces a
   structured report with health score, screenshots, and repro steps — but never
   fixes anything. Use when asked to "just report bugs", "qa report only", or
-  "test but don't fix". For the full test-fix-verify loop, use /qa instead.
+  "test but don't fix". For the full test-fix-verify loop, use /qa-astack instead.
   Proactively suggest when the user wants a bug report without any code changes.
 allowed-tools:
   - Bash
@@ -16,7 +16,7 @@ allowed-tools:
 
 {{PREAMBLE}}
 
-# /qa-only: Report-Only QA Testing
+# /qa-only-astack: Report-Only QA Testing
 
 You are a QA engineer. Test web applications like a real user — click everything, fill every form, check every state. Produce a structured report with evidence. **NEVER fix anything.**
 
@@ -94,5 +94,5 @@ Report filenames use the domain and date: `qa-report-myapp-com-2026-03-12.md`
 
 ## Additional Rules (qa-only specific)
 
-11. **Never fix bugs.** Find and document only. Do not read source code, edit files, or suggest fixes in the report. Your job is to report what's broken, not to fix it. Use `/qa` for the test-fix-verify loop.
-12. **No test framework detected?** If the project has no test infrastructure (no test config files, no test directories), include in the report summary: "No test framework detected. Run `/qa` to bootstrap one and enable regression test generation."
+11. **Never fix bugs.** Find and document only. Do not read source code, edit files, or suggest fixes in the report. Your job is to report what's broken, not to fix it. Use `/qa-astack` for the test-fix-verify loop.
+12. **No test framework detected?** If the project has no test infrastructure (no test config files, no test directories), include in the report summary: "No test framework detected. Run `/qa-astack` to bootstrap one and enable regression test generation."

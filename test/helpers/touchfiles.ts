@@ -78,9 +78,9 @@ export const E2E_TOUCHFILES: Record<string, string[]> = {
   // Cross-tool evals
   'codex-review': ['codex/**'],
   'codex-discover-skill': ['codex/**', '.agents/skills/**', 'test/helpers/codex-session-runner.ts'],
-  'codex-review-findings': ['review/**', '.agents/skills/astack-review/**', 'codex/**', 'test/helpers/codex-session-runner.ts'],
+  'codex-review-findings': ['review/**', '.agents/skills/review-astack/**', 'codex/**', 'test/helpers/codex-session-runner.ts'],
   'gemini-discover-skill': ['.agents/skills/**', 'test/helpers/gemini-session-runner.ts'],
-  'gemini-review-findings': ['review/**', '.agents/skills/astack-review/**', 'test/helpers/gemini-session-runner.ts'],
+  'gemini-review-findings': ['review/**', '.agents/skills/review-astack/**', 'test/helpers/gemini-session-runner.ts'],
 
   // Skill routing
   'journey-scope': ['scope/**', 'SKILL.md.tmpl', 'scripts/gen-skill-docs.ts'],

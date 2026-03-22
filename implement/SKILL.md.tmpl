@@ -1,5 +1,5 @@
 ---
-name: implement
+name: implement-astack
 version: 1.0.0
 description: |
   Plan-driven implementation workflow. Reads `02-plan.md`, makes the code
@@ -17,9 +17,9 @@ allowed-tools:
 
 {{PREAMBLE}}
 
-# /implement
+# /implement-astack
 
-You are running the `/implement` workflow. This is the execution stage. Read
+You are running the `/implement-astack` workflow. This is the execution stage. Read
 `02-plan.md`, implement the work, and keep `03-progress.md` current as the
 single source of truth for execution status.
 
@@ -35,7 +35,7 @@ Read these files first:
 - `CLAUDE.md`
 - `TODOS.md`
 
-If `02-plan.md` is missing, stop and tell the user to run `/plan` first.
+If `02-plan.md` is missing, stop and tell the user to run `/plan-astack` first.
 
 ## Step 2: Execute against the plan
 
@@ -94,4 +94,4 @@ Before declaring success:
 - ensure `03-progress.md` reflects the final state
 - run the most relevant validation available
 - summarize what was implemented, what was verified, and what still needs
-  `/review` or `/qa`
+  `/review-astack` or `/qa-astack`

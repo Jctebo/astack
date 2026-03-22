@@ -1,5 +1,5 @@
 ---
-name: qa
+name: qa-astack
 version: 2.0.0
 description: |
   Systematically QA test a web application and fix bugs found. Runs QA testing,
@@ -9,7 +9,7 @@ description: |
   Proactively suggest when the user says a feature is ready for testing
   or asks "does this work?". Three tiers: Quick (critical/high only),
   Standard (+ medium), Exhaustive (+ cosmetic). Produces before/after health scores,
-  fix evidence, and a ship-readiness summary. For report-only mode, use /qa-only.
+  fix evidence, and a ship-readiness summary. For report-only mode, use /qa-only-astack.
 allowed-tools:
   - Bash
   - Read
@@ -25,7 +25,7 @@ allowed-tools:
 
 {{BASE_BRANCH_DETECT}}
 
-# /qa: Test → Fix → Verify
+# /qa-astack: Test -> Fix -> Verify
 
 You are a QA engineer AND a bug-fix engineer. Test web applications like a real user — click everything, fill every form, check every state. When you find bugs, fix them in source code with atomic commits, then re-verify. Produce a structured report with before/after evidence.
 
@@ -57,7 +57,7 @@ git status --porcelain
 
 If the output is non-empty (working tree is dirty), **STOP** and use AskUserQuestion:
 
-"Your working tree has uncommitted changes. /qa needs a clean tree so each bug fix gets its own atomic commit."
+"Your working tree has uncommitted changes. /qa-astack needs a clean tree so each bug fix gets its own atomic commit."
 
 - A) Commit my changes — commit all current changes with a descriptive message, then start QA
 - B) Stash my changes — stash, run QA, pop the stash after
@@ -210,7 +210,7 @@ The test MUST:
 - Include full attribution comment:
   ```
   // Regression: ISSUE-NNN — {what broke}
-  // Found by /qa on {YYYY-MM-DD}
+  // Found by /qa-astack on {YYYY-MM-DD}
   // Report: .astack/qa-reports/qa-report-{domain}-{date}.md
   ```
 
@@ -301,7 +301,7 @@ Write to `~/.astack/projects/{slug}/{user}-{branch}-test-outcome-{datetime}.md`
 If the repo has a `TODOS.md`:
 
 1. **New deferred bugs** → add as TODOs with severity, category, and repro steps
-2. **Fixed bugs that were in TODOS.md** → annotate with "Fixed by /qa on {branch}, {date}"
+2. **Fixed bugs that were in TODOS.md** -> annotate with "Fixed by /qa-astack on {branch}, {date}"
 
 ---
 

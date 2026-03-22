@@ -1,5 +1,5 @@
 ---
-name: scope
+name: scope-astack
 version: 1.0.0
 description: |
   Scope discovery and product framing. Combines the old brainstorming and
@@ -43,14 +43,14 @@ _SESSION_ID="$$-$(date +%s)"
 echo "TELEMETRY: ${_TEL:-off}"
 echo "TEL_PROMPTED: $_TEL_PROMPTED"
 mkdir -p ~/.astack/analytics
-echo '{"skill":"scope","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.astack/analytics/skill-usage.jsonl 2>/dev/null || true
+echo '{"skill":"scope-astack","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.astack/analytics/skill-usage.jsonl 2>/dev/null || true
 for _PF in ~/.astack/analytics/.pending-*; do [ -f "$_PF" ] && ~/.claude/skills/astack/bin/astack-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true; break; done
 ```
 
 If `PROACTIVE` is `"false"`, do not proactively suggest astack skills — only invoke
 them when the user explicitly asks. The user opted out of proactive suggestions.
 
-If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/astack/astack-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running astack v{to} (just updated!)" and continue.
+If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/astack-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running astack v{to} (just updated!)" and continue.
 
 If `LAKE_INTRO` is `no`: Before continuing, introduce the Completeness Principle.
 Tell the user: "astack follows the **Boil the Lake** principle — always do the complete
@@ -224,9 +224,9 @@ success/error/abort, and `USED_BROWSE` with true/false based on whether `$B` was
 If you cannot determine the outcome, use "unknown". This runs in the background and
 never blocks the user.
 
-# /scope
+# /scope-astack
 
-You are running the `/scope` workflow. This is a **plan-mode artifact skill**.
+You are running the `/scope-astack` workflow. This is a **plan-mode artifact skill**.
 Your job is to understand the problem before implementation starts and produce
 one canonical repo-root document: `00-scope.md`.
 
@@ -283,7 +283,7 @@ scope, audience, success criteria, or wedge. Good prompts include:
 - What is explicitly out of scope for this iteration?
 
 If the user is unclear or still exploring, keep pushing until the core problem,
-audience, and wedge are concrete enough to hand to `/research`.
+audience, and wedge are concrete enough to hand to `/research-astack`.
 
 ## Step 3: Produce the scope artifact
 
@@ -321,7 +321,7 @@ Write or update `00-scope.md` in the repo root with this structure:
 - Top unresolved questions or assumptions
 
 ## Recommended Next Step
-- What `/research` should validate next
+- What `/research-astack` should validate next
 ```
 
 Requirements:
@@ -337,4 +337,4 @@ After writing `00-scope.md`:
 
 - Summarize the final scope in 5-10 bullets.
 - Call out the biggest unresolved risk.
-- Recommend `/research` as the next step.
+- Recommend `/research-astack` as the next step.

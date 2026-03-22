@@ -1,5 +1,5 @@
 ---
-name: ship
+name: ship-astack
 version: 1.0.0
 description: |
   Ship workflow: detect + merge base branch, run tests, review diff, bump VERSION, update CHANGELOG, commit, push, create PR. Use when asked to "ship", "deploy", "push to main", "create a PR", or "merge and push".
@@ -40,14 +40,14 @@ _SESSION_ID="$$-$(date +%s)"
 echo "TELEMETRY: ${_TEL:-off}"
 echo "TEL_PROMPTED: $_TEL_PROMPTED"
 mkdir -p ~/.astack/analytics
-echo '{"skill":"ship","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.astack/analytics/skill-usage.jsonl 2>/dev/null || true
+echo '{"skill":"ship-astack","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.astack/analytics/skill-usage.jsonl 2>/dev/null || true
 for _PF in ~/.astack/analytics/.pending-*; do [ -f "$_PF" ] && ~/.claude/skills/astack/bin/astack-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true; break; done
 ```
 
 If `PROACTIVE` is `"false"`, do not proactively suggest astack skills — only invoke
 them when the user explicitly asks. The user opted out of proactive suggestions.
 
-If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/astack/astack-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running astack v{to} (just updated!)" and continue.
+If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/astack-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running astack v{to} (just updated!)" and continue.
 
 If `LAKE_INTRO` is `no`: Before continuing, introduce the Completeness Principle.
 Tell the user: "astack follows the **Boil the Lake** principle — always do the complete
@@ -242,7 +242,7 @@ branch name wherever the instructions say "the base branch."
 
 # Ship: Fully Automated Ship Workflow
 
-You are running the `/ship` workflow. This is a **non-interactive, fully automated** workflow. Do NOT ask for confirmation at any step. The user said `/ship` which means DO IT. Run straight through and output the PR URL at the end.
+You are running the `/ship-astack` workflow. This is a **non-interactive, fully automated** workflow. Do NOT ask for confirmation at any step. The user said `/ship-astack` which means DO IT. Run straight through and output the PR URL at the end.
 
 **Only stop for:**
 - On the base branch (abort)
@@ -313,7 +313,7 @@ Interpretation:
 - **Plan Artifact** is the only default ship gate.
 - `00-scope.md` and `01-research.md` are helpful context, but they do not block
   shipping on their own.
-- `03-progress.md` is recommended whenever `/implement` has been used.
+- `03-progress.md` is recommended whenever `/implement-astack` has been used.
 - Design and Codex reviews are informative, not blocking, unless the user says
   otherwise.
 
@@ -332,11 +332,11 @@ If the Plan Artifact is NOT "READY":
 2. **If no override exists,** use AskUserQuestion:
    - Show that `02-plan.md` is missing or stale relative to the branch work
    - RECOMMENDATION: Choose C if the change is obviously trivial (< 20 lines, typo fix, config-only); Choose B for larger changes
-   - Options: A) Ship anyway  B) Abort — run /plan first  C) Change is too small to need a formal plan
+   - Options: A) Ship anyway  B) Abort — run /plan-astack first  C) Change is too small to need a formal plan
    - If `00-scope.md` or `01-research.md` is missing, mention it as informational context but do NOT block on those files specifically
-   - For Design Review: run `source <(~/.claude/skills/astack/bin/astack-diff-scope <base> 2>/dev/null)`. If `SCOPE_FRONTEND=true` and no design review (design-review-lite or `/design-review`) exists in the dashboard, mention: "Design Review not run — this PR changes frontend code. The lite design check will run automatically in Step 3.5, but consider running /design-review for a full visual audit post-implementation." Still never block.
+   - For Design Review: run `source <(~/.claude/skills/astack/bin/astack-diff-scope <base> 2>/dev/null)`. If `SCOPE_FRONTEND=true` and no design review (design-review-lite or `/design-review-astack`) exists in the dashboard, mention: "Design Review not run — this PR changes frontend code. The lite design check will run automatically in Step 3.5, but consider running /design-review-astack for a full visual audit post-implementation." Still never block.
 
-3. **If the user chooses A or C,** persist the decision so future `/ship` runs on this branch skip the gate:
+3. **If the user chooses A or C,** persist the decision so future `/ship-astack` runs on this branch skip the gate:
    ```bash
    source <(~/.claude/skills/astack/bin/astack-slug 2>/dev/null)
    echo '{"skill":"ship-review-override","timestamp":"'"$(date -u +%Y-%m-%dT%H:%M:%SZ)"'","decision":"USER_CHOICE"}' >> ~/.astack/projects/$SLUG/$BRANCH-reviews.jsonl
@@ -576,7 +576,7 @@ Map runner → test file: `post_generation_eval_runner.rb` → `post_generation_
 
 **3. Run affected suites at `EVAL_JUDGE_TIER=full`:**
 
-`/ship` is a pre-merge gate, so always use full tier (Sonnet structural + Opus persona judges).
+`/ship-astack` is a pre-merge gate, so always use full tier (Sonnet structural + Opus persona judges).
 
 ```bash
 EVAL_JUDGE_TIER=full EVAL_VERBOSE=1 bin/test-lane --eval test/evals/<suite>_eval_test.rb 2>&1 | tee /tmp/ship_evals.txt
@@ -591,12 +591,12 @@ If multiple suites need to run, run them sequentially (each needs a test lane). 
 
 **5. Save eval output** — include eval results and cost dashboard in the PR body (Step 8).
 
-**Tier reference (for context — /ship always uses `full`):**
+**Tier reference (for context — /ship-astack always uses `full`):**
 | Tier | When | Speed (cached) | Cost |
 |------|------|----------------|------|
 | `fast` (Haiku) | Dev iteration, smoke tests | ~5s (14x faster) | ~$0.07/run |
 | `standard` (Sonnet) | Default dev, `bin/test-lane --eval` | ~17s (4x faster) | ~$0.37/run |
-| `full` (Opus persona) | **`/ship` and pre-merge** | ~72s (baseline) | ~$1.27/run |
+| `full` (Opus persona) | **`/ship-astack` and pre-merge** | ~72s (baseline) | ~$1.27/run |
 
 ---
 
@@ -771,7 +771,7 @@ source <(~/.claude/skills/astack/bin/astack-diff-scope <base> 2>/dev/null)
 4. **Apply the design checklist** against the changed files. For each item:
    - **[HIGH] mechanical CSS fix** (`outline: none`, `!important`, `font-size < 16px`): classify as AUTO-FIX
    - **[HIGH/MEDIUM] design judgment needed**: classify as ASK
-   - **[LOW] intent-based detection**: present as "Possible — verify visually or run /design-review"
+   - **[LOW] intent-based detection**: present as "Possible — verify visually or run /design-review-astack"
 
 5. **Include findings** in the review output under a "Design Review" header, following the output format in the checklist. Design findings merge with code review findings into the same Fix-First flow.
 
@@ -798,7 +798,7 @@ Substitute: TIMESTAMP = ISO 8601 datetime, STATUS = "clean" if 0 findings or "is
    - If 3 or fewer ASK items, you may use individual AskUserQuestion calls instead
 
 7. **After all fixes (auto + user-approved):**
-   - If ANY fixes were applied: commit fixed files by name (`git add <fixed-files> && git commit -m "fix: pre-landing review fixes"`), then **STOP** and tell the user to run `/ship` again to re-test.
+   - If ANY fixes were applied: commit fixed files by name (`git add <fixed-files> && git commit -m "fix: pre-landing review fixes"`), then **STOP** and tell the user to run `/ship-astack` again to re-test.
    - If no fixes applied (all ASK items skipped, or no issues found): continue to Step 4.
 
 8. Output summary: `Pre-Landing Review: N issues — M auto-fixed, K asked (J fixed, L skipped)`
@@ -848,7 +848,7 @@ For each classified comment:
 
 ---
 
-## Step 3.8: Codex review
+## Step 5.7: Codex review
 
 Check if the Codex CLI is available and read the user's Codex review preference:
 
@@ -927,7 +927,7 @@ A) Investigate and fix now (recommended)
 B) Ship anyway — these issues may cause production problems
 ```
 
-If the user chooses A: read the Codex findings carefully and work to address them. After fixing, re-run tests (Step 3) since code has changed. Then re-run `codex review` to verify the gate is now PASS.
+If the user chooses A: read the Codex findings carefully and work to address them. Then re-run `codex review` to verify the gate is now PASS.
 
 If the user chooses B: continue to the next step.
 
@@ -958,6 +958,16 @@ cat "$TMPERR_ADV"
 ```
 
 Present the full output verbatim under a `CODEX SAYS (adversarial challenge):` header. This is informational — it never blocks shipping. If the adversarial command timed out or returned no output, note this to the user and continue.
+
+**Cross-model analysis:** After both Codex outputs are presented, compare Codex's findings with your own review findings from the earlier review steps and output:
+
+```
+CROSS-MODEL ANALYSIS:
+  Both found: [findings that overlap between Claude and Codex]
+  Only Codex found: [findings unique to Codex]
+  Only Claude found: [findings unique to Claude's review]
+  Agreement rate: X% (N/M total unique findings overlap)
+```
 
 **Cleanup:** Run `rm -f "$TMPERR" "$TMPERR_ADV"` after processing.
 
@@ -1176,13 +1186,13 @@ EOF
 
 ---
 
-## Step 8.5: Auto-invoke /document-release
+## Step 8.5: Auto-invoke /document-release-astack
 
 After the PR is created, automatically sync project documentation. Read the
 `document-release/SKILL.md` skill file (adjacent to this skill's directory) and
 execute its full workflow:
 
-1. Read the `/document-release` skill: `cat ${CLAUDE_SKILL_DIR}/../document-release/SKILL.md`
+1. Read the `/document-release-astack` skill: `cat ${CLAUDE_SKILL_DIR}/../document-release/SKILL.md`
 2. Follow its instructions — it reads all .md files in the project, cross-references
    the diff, and updates anything that drifted (README, ARCHITECTURE, CONTRIBUTING,
    CLAUDE.md, TODOS, etc.)
@@ -1193,7 +1203,7 @@ execute its full workflow:
 4. If no docs needed updating, say "Documentation is current — no updates needed."
 
 This step is automatic. Do not ask the user for confirmation. The goal is zero-friction
-doc updates — the user runs `/ship` and documentation stays current without a separate command.
+doc updates — the user runs `/ship-astack` and documentation stays current without a separate command.
 
 ---
 
@@ -1210,4 +1220,4 @@ doc updates — the user runs `/ship` and documentation stays current without a 
 - **Use Greptile reply templates from greptile-triage.md.** Every reply includes evidence (inline diff, code references, re-rank suggestion). Never post vague replies.
 - **Never push without fresh verification evidence.** If code changed after Step 3 tests, re-run before pushing.
 - **Step 3.4 generates coverage tests.** They must pass before committing. Never commit failing tests.
-- **The goal is: user says `/ship`, next thing they see is the review + PR URL + auto-synced docs.**
+- **The goal is: user says `/ship-astack`, next thing they see is the review + PR URL + auto-synced docs.**

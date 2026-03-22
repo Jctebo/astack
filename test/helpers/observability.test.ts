@@ -23,9 +23,9 @@ afterEach(() => {
 
 describe('session-runner observability', () => {
   test('sanitizeTestName strips slashes and leading dashes', () => {
-    expect(sanitizeTestName('/scope')).toBe('scope');
+    expect(sanitizeTestName('/scope-astack')).toBe('scope-astack');
     expect(sanitizeTestName('scope-artifact')).toBe('scope-artifact');
-    expect(sanitizeTestName('/qa/deep/test')).toBe('qa-deep-test');
+    expect(sanitizeTestName('/qa-astack/deep/test')).toBe('qa-astack-deep-test');
     expect(sanitizeTestName('///leading')).toBe('leading');
   });
 

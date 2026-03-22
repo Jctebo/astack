@@ -151,8 +151,8 @@ describeE2E('Skill Routing E2E - astack journey', () => {
   testIfSelected('journey-scope', async () => {
     await runRoutingCase({
       testName: 'journey-scope',
-      expectedSkill: 'scope',
-      prompt: 'Use /scope on this idea: we want a lightweight call-note summarizer for a 6-person sales team. Today reps paste notes into Slack and lose follow-ups. The first wedge should help reps capture notes, draft next actions, and keep the team aligned.',
+      expectedSkill: 'scope-astack',
+      prompt: 'Use /scope-astack on this idea: we want a lightweight call-note summarizer for a 6-person sales team. Today reps paste notes into Slack and lose follow-ups. The first wedge should help reps capture notes, draft next actions, and keep the team aligned.',
       setup: (tmpDir) => {
         fs.writeFileSync(path.join(tmpDir, 'README.md'), '# Sales Notes\n');
         commitAll(tmpDir, 'initial');
@@ -163,8 +163,8 @@ describeE2E('Skill Routing E2E - astack journey', () => {
   testIfSelected('journey-research', async () => {
     await runRoutingCase({
       testName: 'journey-research',
-      expectedSkill: 'research',
-      prompt: 'Use /research before we plan this feature. I want you to map what already exists in the repo, what we can reuse, and what constraints matter.',
+      expectedSkill: 'research-astack',
+      prompt: 'Use /research-astack before we plan this feature. I want you to map what already exists in the repo, what we can reuse, and what constraints matter.',
       setup: (tmpDir) => {
         fs.mkdirSync(path.join(tmpDir, 'src'), { recursive: true });
         fs.writeFileSync(path.join(tmpDir, '00-scope.md'), '# Scope\n\n## Problem\n- Reps lose follow-ups.\n\n## Audience\n- Small sales team\n');
@@ -178,8 +178,8 @@ describeE2E('Skill Routing E2E - astack journey', () => {
   testIfSelected('journey-plan', async () => {
     await runRoutingCase({
       testName: 'journey-plan',
-      expectedSkill: 'plan',
-      prompt: 'Use /plan to turn the scoped and researched work into the final implementation plan before coding starts.',
+      expectedSkill: 'plan-astack',
+      prompt: 'Use /plan-astack to turn the scoped and researched work into the final implementation plan before coding starts.',
       setup: (tmpDir) => {
         fs.writeFileSync(path.join(tmpDir, '00-scope.md'), '# Scope\n\n## Problem\n- Reps lose follow-ups.\n');
         fs.writeFileSync(path.join(tmpDir, '01-research.md'), '# Research\n\n## Current System Map\n- `src/notes.ts`\n\n## Recommended Direction\n- Extend note summarization into action extraction.\n');
@@ -193,8 +193,8 @@ describeE2E('Skill Routing E2E - astack journey', () => {
   testIfSelected('journey-implement', async () => {
     await runRoutingCase({
       testName: 'journey-implement',
-      expectedSkill: 'implement',
-      prompt: 'Use /implement to build the approved plan and keep progress current.',
+      expectedSkill: 'implement-astack',
+      prompt: 'Use /implement-astack to build the approved plan and keep progress current.',
       setup: (tmpDir) => {
         fs.mkdirSync(path.join(tmpDir, 'src'), { recursive: true });
         fs.writeFileSync(path.join(tmpDir, '02-plan.md'), `# Plan
@@ -226,7 +226,7 @@ describeE2E('Skill Routing E2E - astack journey', () => {
   testIfSelected('journey-debug', async () => {
     await runRoutingCase({
       testName: 'journey-debug',
-      expectedSkill: 'investigate',
+      expectedSkill: 'investigate-astack',
       prompt: 'The API was working yesterday but now GET /api/notes is returning 500s in production. Please debug this failure.',
       setup: (tmpDir) => {
         fs.mkdirSync(path.join(tmpDir, 'src'), { recursive: true });
@@ -240,8 +240,8 @@ describeE2E('Skill Routing E2E - astack journey', () => {
   testIfSelected('journey-qa', async () => {
     await runRoutingCase({
       testName: 'journey-qa',
-      expectedSkill: 'qa',
-      acceptedSkills: ['qa', 'qa-only', 'browse'],
+      expectedSkill: 'qa-astack',
+      acceptedSkills: ['qa-astack', 'qa-only-astack', 'browse-astack'],
       prompt: 'The app is ready for testing. Please test the site end to end, find problems, and fix what you can.',
       setup: (tmpDir) => {
         fs.writeFileSync(path.join(tmpDir, '02-plan.md'), '# Plan\n\n## QA And Test Matrix\n- Home page loads\n- Create note flow works\n');
@@ -255,7 +255,7 @@ describeE2E('Skill Routing E2E - astack journey', () => {
   testIfSelected('journey-code-review', async () => {
     await runRoutingCase({
       testName: 'journey-code-review',
-      expectedSkill: 'review',
+      expectedSkill: 'review-astack',
       prompt: 'I am about to merge this branch. Please review the diff and flag anything risky before it lands.',
       setup: (tmpDir) => {
         fs.writeFileSync(path.join(tmpDir, 'app.ts'), '// base\n');
@@ -271,7 +271,7 @@ describeE2E('Skill Routing E2E - astack journey', () => {
   testIfSelected('journey-ship', async () => {
     await runRoutingCase({
       testName: 'journey-ship',
-      expectedSkill: 'ship',
+      expectedSkill: 'ship-astack',
       prompt: 'The branch looks ready. Please ship it: sync the branch, run the checks, and open the PR flow.',
       setup: (tmpDir) => {
         fs.writeFileSync(path.join(tmpDir, '00-scope.md'), '# Scope\n');
@@ -290,7 +290,7 @@ describeE2E('Skill Routing E2E - astack journey', () => {
   testIfSelected('journey-docs', async () => {
     await runRoutingCase({
       testName: 'journey-docs',
-      expectedSkill: 'document-release',
+      expectedSkill: 'document-release-astack',
       prompt: 'We just shipped the feature. Please update the README and release docs so they match what is live.',
       setup: (tmpDir) => {
         fs.writeFileSync(path.join(tmpDir, 'README.md'), '# Sales Notes\n');
@@ -304,7 +304,7 @@ describeE2E('Skill Routing E2E - astack journey', () => {
   testIfSelected('journey-retro', async () => {
     await runRoutingCase({
       testName: 'journey-retro',
-      expectedSkill: 'retro',
+      expectedSkill: 'retro-astack',
       prompt: 'It is the end of the week. Please run a quick retro on what we shipped and how the team worked.',
       setup: (tmpDir) => {
         fs.writeFileSync(path.join(tmpDir, '00-scope.md'), '# Scope\n');
@@ -319,7 +319,7 @@ describeE2E('Skill Routing E2E - astack journey', () => {
   testIfSelected('journey-design-system', async () => {
     await runRoutingCase({
       testName: 'journey-design-system',
-      expectedSkill: 'design-consultation',
+      expectedSkill: 'design-consultation-astack',
       prompt: 'Before we build the UI, please create the design system and product look for this project.',
       setup: (tmpDir) => {
         fs.writeFileSync(path.join(tmpDir, '00-scope.md'), '# Scope\n\n## Audience\n- Sales reps\n');
@@ -331,7 +331,7 @@ describeE2E('Skill Routing E2E - astack journey', () => {
   testIfSelected('journey-visual-qa', async () => {
     await runRoutingCase({
       testName: 'journey-visual-qa',
-      expectedSkill: 'design-review',
+      expectedSkill: 'design-review-astack',
       prompt: 'The app looks off. Please audit the visual design and polish the inconsistent spacing and hierarchy.',
       setup: (tmpDir) => {
         fs.mkdirSync(path.join(tmpDir, 'src'), { recursive: true });

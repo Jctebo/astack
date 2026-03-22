@@ -11,11 +11,21 @@ fi
 ASTACK_DIR="$(cd "$(dirname "$0")" && pwd)"
 SKILLS_DIR="$(dirname "$ASTACK_DIR")"
 BROWSE_BIN="$ASTACK_DIR/browse/dist/browse"
+if [ ! -e "$BROWSE_BIN" ] && [ -e "$ASTACK_DIR/browse/dist/browse.exe" ]; then
+  BROWSE_BIN="$ASTACK_DIR/browse/dist/browse.exe"
+fi
 
 IS_WINDOWS=0
 case "$(uname -s)" in
   MINGW*|MSYS*|CYGWIN*|Windows_NT) IS_WINDOWS=1 ;;
 esac
+
+if [ "$IS_WINDOWS" -eq 1 ] && ! command -v node >/dev/null 2>&1; then
+  echo "Error: Node.js is required on Windows." >&2
+  echo "astack uses Bun as the primary runtime, but setup needs Node.js on Windows to verify Playwright/Chromium." >&2
+  echo "Install Node.js: https://nodejs.org/" >&2
+  exit 1
+fi
 
 # ─── Parse --host flag ─────────────────────────────────────────
 HOST="claude"
@@ -28,13 +38,14 @@ while [ $# -gt 0 ]; do
 done
 
 case "$HOST" in
-  claude|codex|auto) ;;
-  *) echo "Unknown --host value: $HOST (expected claude, codex, or auto)" >&2; exit 1 ;;
+  claude|codex|copilot|auto) ;;
+  *) echo "Unknown --host value: $HOST (expected claude, codex, copilot, or auto)" >&2; exit 1 ;;
 esac
 
 # For auto: detect which agents are installed
 INSTALL_CLAUDE=0
 INSTALL_CODEX=0
+INSTALL_COPILOT=0
 if [ "$HOST" = "auto" ]; then
   command -v claude >/dev/null 2>&1 && INSTALL_CLAUDE=1
   command -v codex >/dev/null 2>&1 && INSTALL_CODEX=1
@@ -46,6 +57,8 @@ elif [ "$HOST" = "claude" ]; then
   INSTALL_CLAUDE=1
 elif [ "$HOST" = "codex" ]; then
   INSTALL_CODEX=1
+elif [ "$HOST" = "copilot" ]; then
+  INSTALL_COPILOT=1
 fi
 
 ensure_playwright_browser() {
@@ -157,7 +170,7 @@ link_claude_skill_dirs() {
 }
 
 # ─── Helper: link generated Codex skills into a skills parent directory ──
-# Installs from .agents/skills/astack-* (the generated Codex-format skills)
+# Installs from generated .agents/skills/* directories (the Codex-format skills)
 # instead of source dirs (which have Claude paths).
 link_codex_skill_dirs() {
   local astack_dir="$1"
@@ -170,9 +183,12 @@ link_codex_skill_dirs() {
     return 1
   fi
 
-  for skill_dir in "$agents_dir"/astack*/; do
+  for skill_dir in "$agents_dir"/*/; do
     if [ -f "$skill_dir/SKILL.md" ]; then
       skill_name="$(basename "$skill_dir")"
+      if [ "$skill_name" = "astack" ]; then
+        continue
+      fi
       target="$skills_dir/$skill_name"
       # Create or update symlink
       if [ -L "$target" ] || [ ! -e "$target" ]; then
@@ -184,27 +200,74 @@ link_codex_skill_dirs() {
   if [ ${#linked[@]} -gt 0 ]; then
     echo "  linked skills: ${linked[*]}"
   fi
+
+  for legacy_target in "$skills_dir"/astack-*; do
+    [ -e "$legacy_target" ] || continue
+    legacy_name="$(basename "$legacy_target")"
+    if [ ! -e "$agents_dir/$legacy_name/SKILL.md" ]; then
+      rm -rf "$legacy_target"
+    fi
+  done
 }
 
-# ─── Helper: create .agents/skills/astack/ sidecar symlinks ──────────
-# Codex/Gemini/Cursor read skills from .agents/skills/. We link runtime
-# assets (bin/, browse/dist/, review/, qa/, etc.) so skill templates can
-# resolve paths like $SKILL_ROOT/review/design-checklist.md.
-create_agents_sidecar() {
-  local repo_root="$1"
-  local agents_astack="$repo_root/.agents/skills/astack"
-  mkdir -p "$agents_astack"
+link_copilot_skill_dirs() {
+  local astack_dir="$1"
+  local skills_dir="$2"
+  local copilot_dir="$astack_dir/.copilot/skills"
+  local linked=()
 
-  # Sidecar directories that skills reference at runtime
-  for asset in bin browse review qa; do
-    local src="$ASTACK_DIR/$asset"
-    local dst="$agents_astack/$asset"
-    if [ -d "$src" ] || [ -f "$src" ]; then
-      if [ -L "$dst" ] || [ ! -e "$dst" ]; then
-        ln -snf "$src" "$dst"
+  if [ ! -d "$copilot_dir" ]; then
+    echo "  warning: no .copilot/skills/ directory found — run 'bun run gen:skill-docs --host copilot' first" >&2
+    return 1
+  fi
+
+  for skill_dir in "$copilot_dir"/*/; do
+    if [ -f "$skill_dir/SKILL.md" ]; then
+      skill_name="$(basename "$skill_dir")"
+      if [ "$skill_name" = "astack" ]; then
+        continue
+      fi
+      target="$skills_dir/$skill_name"
+      if [ -L "$target" ] || [ ! -e "$target" ]; then
+        ln -snf "$skill_dir" "$target"
+        linked+=("$skill_name")
       fi
     fi
   done
+  if [ ${#linked[@]} -gt 0 ]; then
+    echo "  linked skills: ${linked[*]}"
+  fi
+
+  for legacy_target in "$skills_dir"/astack-*; do
+    [ -e "$legacy_target" ] || continue
+    legacy_name="$(basename "$legacy_target")"
+    if [ ! -e "$copilot_dir/$legacy_name/SKILL.md" ]; then
+      rm -rf "$legacy_target"
+    fi
+  done
+}
+
+# ─── Helper: create a slim astack runtime root without nested skill dirs ──
+# Codex recursively discovers SKILL.md files under ~/.codex/skills. If the root
+# astack install points at the whole repo, every source skill folder shows up a
+# second time. Keep the root install to runtime-only assets.
+create_runtime_root() {
+  local source_skill_md="$1"
+  local target_root="$2"
+  mkdir -p "$target_root"
+
+  cp "$source_skill_md" "$target_root/SKILL.md"
+
+  local bin_dst="$target_root/bin"
+  if [ -L "$bin_dst" ] || [ ! -e "$bin_dst" ]; then
+    ln -snf "$ASTACK_DIR/bin" "$bin_dst"
+  fi
+
+  mkdir -p "$target_root/browse"
+  local browse_dist_dst="$target_root/browse/dist"
+  if [ -L "$browse_dist_dst" ] || [ ! -e "$browse_dist_dst" ]; then
+    ln -snf "$ASTACK_DIR/browse/dist" "$browse_dist_dst"
+  fi
 }
 
 # 4. Install for Claude (default)
@@ -227,10 +290,15 @@ if [ "$INSTALL_CODEX" -eq 1 ]; then
   CODEX_ASTACK="$CODEX_SKILLS/astack"
   mkdir -p "$CODEX_SKILLS"
 
-  # Symlink astack source for runtime assets (bin/, browse/dist/)
-  if [ -L "$CODEX_ASTACK" ] || [ ! -e "$CODEX_ASTACK" ]; then
-    ln -snf "$ASTACK_DIR" "$CODEX_ASTACK"
+  # Install a slim astack runtime root instead of symlinking the full repo.
+  # This prevents Codex from discovering every source skill twice.
+  if [ -e "$CODEX_ASTACK/setup" ] && [ -e "$CODEX_ASTACK/package.json" ]; then
+    rm -rf "$CODEX_ASTACK"
+  elif [ -L "$CODEX_ASTACK" ] && [ "$(readlink "$CODEX_ASTACK" 2>/dev/null)" = "$ASTACK_DIR" ]; then
+    rm -f "$CODEX_ASTACK"
   fi
+  mkdir -p "$CODEX_ASTACK"
+  create_runtime_root "$ASTACK_DIR/.agents/skills/astack/SKILL.md" "$CODEX_ASTACK"
   # Install generated Codex-format skills (not Claude source dirs)
   link_codex_skill_dirs "$ASTACK_DIR" "$CODEX_SKILLS"
 
@@ -247,10 +315,35 @@ if [ "$INSTALL_CODEX" -eq 1 ]; then
   else
     REPO_ROOT="$ASTACK_DIR"
   fi
-  create_agents_sidecar "$REPO_ROOT"
+  create_runtime_root "$ASTACK_DIR/.agents/skills/astack/SKILL.md" "$REPO_ROOT/.agents/skills/astack"
 fi
 
-# 7. First-time welcome + legacy cleanup
+# 7. Install for Copilot
+if [ "$INSTALL_COPILOT" -eq 1 ]; then
+  COPILOT_SKILLS="$HOME/.copilot/skills"
+  COPILOT_ASTACK="$COPILOT_SKILLS/astack"
+  mkdir -p "$COPILOT_SKILLS"
+
+  if [ ! -f "$ASTACK_DIR/.copilot/skills/astack/SKILL.md" ]; then
+    echo "astack setup failed: Copilot generated skills are missing. Run 'bun run gen:skill-docs --host copilot' or 'bun run build' first." >&2
+    exit 1
+  fi
+
+  if [ -e "$COPILOT_ASTACK/setup" ] && [ -e "$COPILOT_ASTACK/package.json" ]; then
+    rm -rf "$COPILOT_ASTACK"
+  elif [ -L "$COPILOT_ASTACK" ] && [ "$(readlink "$COPILOT_ASTACK" 2>/dev/null)" = "$ASTACK_DIR" ]; then
+    rm -f "$COPILOT_ASTACK"
+  fi
+  mkdir -p "$COPILOT_ASTACK"
+  create_runtime_root "$ASTACK_DIR/.copilot/skills/astack/SKILL.md" "$COPILOT_ASTACK"
+  link_copilot_skill_dirs "$ASTACK_DIR" "$COPILOT_SKILLS"
+
+  echo "astack ready (copilot)."
+  echo "  browse: $BROWSE_BIN"
+  echo "  copilot skills: $COPILOT_SKILLS"
+fi
+
+# 8. First-time welcome + legacy cleanup
 if [ ! -d "$HOME/.astack" ]; then
   mkdir -p "$HOME/.astack"
   echo "  Welcome! Run /astack-upgrade anytime to stay current."

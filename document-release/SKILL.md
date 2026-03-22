@@ -1,5 +1,5 @@
 ---
-name: document-release
+name: document-release-astack
 version: 1.0.0
 description: |
   Post-ship documentation update. Reads all project docs, cross-references the
@@ -42,14 +42,14 @@ _SESSION_ID="$$-$(date +%s)"
 echo "TELEMETRY: ${_TEL:-off}"
 echo "TEL_PROMPTED: $_TEL_PROMPTED"
 mkdir -p ~/.astack/analytics
-echo '{"skill":"document-release","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.astack/analytics/skill-usage.jsonl 2>/dev/null || true
+echo '{"skill":"document-release-astack","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.astack/analytics/skill-usage.jsonl 2>/dev/null || true
 for _PF in ~/.astack/analytics/.pending-*; do [ -f "$_PF" ] && ~/.claude/skills/astack/bin/astack-telemetry-log --event-type skill_run --skill _pending_finalize --outcome unknown --session-id "$_SESSION_ID" 2>/dev/null || true; break; done
 ```
 
 If `PROACTIVE` is `"false"`, do not proactively suggest astack skills — only invoke
 them when the user explicitly asks. The user opted out of proactive suggestions.
 
-If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/astack/astack-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running astack v{to} (just updated!)" and continue.
+If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/astack-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running astack v{to} (just updated!)" and continue.
 
 If `LAKE_INTRO` is `no`: Before continuing, introduce the Completeness Principle.
 Tell the user: "astack follows the **Boil the Lake** principle — always do the complete
@@ -244,7 +244,7 @@ branch name wherever the instructions say "the base branch."
 
 # Document Release: Post-Ship Documentation Update
 
-You are running the `/document-release` workflow. This runs **after `/ship`** (code committed, PR
+You are running the `/document-release-astack` workflow. This runs **after `/ship-astack`** (code committed, PR
 exists or about to exist) but **before the PR merges**. Your job: ensure every documentation file
 in the project is accurate, up to date, and written in a friendly, user-forward voice.
 
@@ -389,7 +389,7 @@ preserved them. This skill must NEVER do that.
 **Rules:**
 1. Read the entire CHANGELOG.md first. Understand what is already there.
 2. Only modify wording within existing entries. Never delete, reorder, or replace entries.
-3. Never regenerate a CHANGELOG entry from scratch. The entry was written by `/ship` from the
+3. Never regenerate a CHANGELOG entry from scratch. The entry was written by `/ship-astack` from the
    actual diff and commit history. It is the source of truth. You are polishing prose, not
    rewriting history.
 4. If an entry looks wrong or incomplete, use AskUserQuestion — do NOT silently fix it.
@@ -426,7 +426,7 @@ After auditing each file individually, do a cross-doc consistency pass:
 
 ## Step 7: TODOS.md Cleanup
 
-This is a second pass that complements `/ship`'s Step 5.5. Read `review/TODOS-format.md` (if
+This is a second pass that complements `/ship-astack`'s Step 5.5. Read `review/TODOS-format.md` (if
 available) for the canonical TODO item format.
 
 If TODOS.md does not exist, skip this step.
@@ -523,7 +523,7 @@ gh pr view --json body -q .body > /tmp/astack-pr-body-$$.md
    updated content. If it does not contain one, append a `## Documentation` section at the end.
 
 3. The Documentation section should include a **doc diff preview** — for each file modified,
-   describe what specifically changed (e.g., "README.md: added /document-release to skills
+   describe what specifically changed (e.g., "README.md: added /document-release-astack to skills
    table, updated skill count from 9 to 10").
 
 4. Write the updated body back:
@@ -561,7 +561,7 @@ Where status is one of:
 - Current — no changes needed
 - Voice polished — wording adjusted
 - Not bumped — user chose to skip
-- Already bumped — version was set by /ship
+- Already bumped — version was set by /ship-astack
 - Skipped — file does not exist
 
 ---

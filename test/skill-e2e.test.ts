@@ -170,7 +170,7 @@ Report the observed structure and whether the annotated screenshot was created.`
       commitAll(tmpDir, 'initial');
 
       const result = await runSkillTest({
-        prompt: 'Use /scope. We are building an internal note summarizer for a 6-person sales team. Reps currently paste raw call notes into Slack, next steps get lost, and managers cannot see follow-ups. The first wedge should turn one call note into a short summary plus explicit next actions.',
+        prompt: 'Use /scope-astack. We are building an internal note summarizer for a 6-person sales team. Reps currently paste raw call notes into Slack, next steps get lost, and managers cannot see follow-ups. The first wedge should turn one call note into a short summary plus explicit next actions.',
         workingDirectory: tmpDir,
         maxTurns: 8,
         allowedTools: ['Skill', 'Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep'],
@@ -203,7 +203,7 @@ Report the observed structure and whether the annotated screenshot was created.`
       commitAll(tmpDir, 'initial');
 
       const result = await runSkillTest({
-        prompt: 'Use /research to map the repo and document what we can reuse before planning. Focus on how note summarization currently works and what constraints matter.',
+        prompt: 'Use /research-astack to map the repo and document what we can reuse before planning. Focus on how note summarization currently works and what constraints matter.',
         workingDirectory: tmpDir,
         maxTurns: 8,
         allowedTools: ['Skill', 'Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep'],
@@ -237,7 +237,7 @@ Report the observed structure and whether the annotated screenshot was created.`
       commitAll(tmpDir, 'initial');
 
       const result = await runSkillTest({
-        prompt: 'Use /plan to create the final implementation plan for note summaries with action extraction.',
+        prompt: 'Use /plan-astack to create the final implementation plan for note summaries with action extraction.',
         workingDirectory: tmpDir,
         maxTurns: 8,
         allowedTools: ['Skill', 'Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep'],
@@ -291,7 +291,7 @@ Report the observed structure and whether the annotated screenshot was created.`
       commitAll(tmpDir, 'initial');
 
       const result = await runSkillTest({
-        prompt: 'Use /implement to build the approved plan and keep progress updated.',
+        prompt: 'Use /implement-astack to build the approved plan and keep progress updated.',
         workingDirectory: tmpDir,
         maxTurns: 10,
         allowedTools: ['Skill', 'Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep'],

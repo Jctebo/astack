@@ -56,12 +56,12 @@ afterEach(() => {
 describe('astack-telemetry-log', () => {
   slowTest('appends valid JSONL when tier=anonymous', () => {
     setConfig('telemetry', 'anonymous');
-    runScript('astack-telemetry-log', ['--skill', 'qa', '--duration', '142', '--outcome', 'success', '--session-id', 'test-123']);
+    runScript('astack-telemetry-log', ['--skill', 'qa-astack', '--duration', '142', '--outcome', 'success', '--session-id', 'test-123']);
 
     const events = parseJsonl();
     expect(events).toHaveLength(1);
     expect(events[0].v).toBe(1);
-    expect(events[0].skill).toBe('qa');
+    expect(events[0].skill).toBe('qa-astack');
     expect(events[0].duration_s).toBe(142);
     expect(events[0].outcome).toBe('success');
     expect(events[0].session_id).toBe('test-123');
@@ -72,19 +72,19 @@ describe('astack-telemetry-log', () => {
 
   slowTest('produces no output when tier=off', () => {
     setConfig('telemetry', 'off');
-    runScript('astack-telemetry-log', ['--skill', 'ship', '--duration', '30', '--outcome', 'success', '--session-id', 'test-456']);
+    runScript('astack-telemetry-log', ['--skill', 'ship-astack', '--duration', '30', '--outcome', 'success', '--session-id', 'test-456']);
     expect(readJsonl()).toHaveLength(0);
   });
 
   slowTest('defaults to off for invalid tier value', () => {
     setConfig('telemetry', 'invalid_value');
-    runScript('astack-telemetry-log', ['--skill', 'ship', '--duration', '30', '--outcome', 'success', '--session-id', 'test-789']);
+    runScript('astack-telemetry-log', ['--skill', 'ship-astack', '--duration', '30', '--outcome', 'success', '--session-id', 'test-789']);
     expect(readJsonl()).toHaveLength(0);
   });
 
   slowTest('includes installation_id for community tier', () => {
     setConfig('telemetry', 'community');
-    runScript('astack-telemetry-log', ['--skill', 'review', '--duration', '100', '--outcome', 'success', '--session-id', 'comm-123']);
+    runScript('astack-telemetry-log', ['--skill', 'review-astack', '--duration', '100', '--outcome', 'success', '--session-id', 'comm-123']);
 
     const events = parseJsonl();
     expect(events).toHaveLength(1);
@@ -93,7 +93,7 @@ describe('astack-telemetry-log', () => {
 
   slowTest('installation_id is null for anonymous tier', () => {
     setConfig('telemetry', 'anonymous');
-    runScript('astack-telemetry-log', ['--skill', 'qa', '--duration', '50', '--outcome', 'success', '--session-id', 'anon-123']);
+    runScript('astack-telemetry-log', ['--skill', 'qa-astack', '--duration', '50', '--outcome', 'success', '--session-id', 'anon-123']);
 
     const events = parseJsonl();
     expect(events[0].installation_id).toBeNull();
@@ -101,7 +101,7 @@ describe('astack-telemetry-log', () => {
 
   slowTest('includes error_class when provided', () => {
     setConfig('telemetry', 'anonymous');
-    runScript('astack-telemetry-log', ['--skill', 'browse', '--duration', '10', '--outcome', 'error', '--error-class', 'timeout', '--session-id', 'err-123']);
+    runScript('astack-telemetry-log', ['--skill', 'browse-astack', '--duration', '10', '--outcome', 'error', '--error-class', 'timeout', '--session-id', 'err-123']);
 
     const events = parseJsonl();
     expect(events[0].error_class).toBe('timeout');
@@ -110,7 +110,7 @@ describe('astack-telemetry-log', () => {
 
   slowTest('handles missing duration gracefully', () => {
     setConfig('telemetry', 'anonymous');
-    runScript('astack-telemetry-log', ['--skill', 'qa', '--outcome', 'success', '--session-id', 'nodur-123']);
+    runScript('astack-telemetry-log', ['--skill', 'qa-astack', '--outcome', 'success', '--session-id', 'nodur-123']);
 
     const events = parseJsonl();
     expect(events[0].duration_s).toBeNull();
@@ -126,7 +126,7 @@ describe('astack-telemetry-log', () => {
 
   slowTest('includes local-only fields (_repo_slug, _branch)', () => {
     setConfig('telemetry', 'anonymous');
-    runScript('astack-telemetry-log', ['--skill', 'qa', '--duration', '50', '--outcome', 'success', '--session-id', 'local-123']);
+    runScript('astack-telemetry-log', ['--skill', 'qa-astack', '--duration', '50', '--outcome', 'success', '--session-id', 'local-123']);
 
     const events = parseJsonl();
     expect(events[0]).toHaveProperty('_repo_slug');
@@ -138,7 +138,7 @@ describe('astack-telemetry-log', () => {
     if (fs.existsSync(analyticsDir)) fs.rmSync(analyticsDir, { recursive: true });
 
     setConfig('telemetry', 'anonymous');
-    runScript('astack-telemetry-log', ['--skill', 'qa', '--duration', '50', '--outcome', 'success', '--session-id', 'mkdir-123']);
+    runScript('astack-telemetry-log', ['--skill', 'qa-astack', '--duration', '50', '--outcome', 'success', '--session-id', 'mkdir-123']);
 
     expect(fs.existsSync(analyticsDir)).toBe(true);
     expect(readJsonl()).toHaveLength(1);
@@ -156,14 +156,14 @@ describe('.pending marker', () => {
       '{"skill":"old-skill","ts":"2026-03-18T00:00:00Z","session_id":"old-123","astack_version":"0.6.4"}',
     );
 
-    runScript('astack-telemetry-log', ['--skill', 'qa', '--duration', '50', '--outcome', 'success', '--session-id', 'new-456']);
+    runScript('astack-telemetry-log', ['--skill', 'qa-astack', '--duration', '50', '--outcome', 'success', '--session-id', 'new-456']);
 
     const events = parseJsonl();
     expect(events).toHaveLength(2);
     expect(events[0].skill).toBe('old-skill');
     expect(events[0].outcome).toBe('unknown');
     expect(events[0].session_id).toBe('old-123');
-    expect(events[1].skill).toBe('qa');
+    expect(events[1].skill).toBe('qa-astack');
     expect(events[1].outcome).toBe('success');
   });
 
@@ -175,7 +175,7 @@ describe('.pending marker', () => {
     const pendingPath = path.join(analyticsDir, '.pending-stale-session');
     fs.writeFileSync(pendingPath, '{"skill":"stale","ts":"2026-03-18T00:00:00Z","session_id":"stale-session","astack_version":"v"}');
 
-    runScript('astack-telemetry-log', ['--skill', 'qa', '--duration', '50', '--outcome', 'success', '--session-id', 'new-456']);
+    runScript('astack-telemetry-log', ['--skill', 'qa-astack', '--duration', '50', '--outcome', 'success', '--session-id', 'new-456']);
     expect(fs.existsSync(pendingPath)).toBe(false);
   });
 
@@ -189,11 +189,11 @@ describe('.pending marker', () => {
       '{"skill":"in-flight","ts":"2026-03-18T00:00:00Z","session_id":"same-session","astack_version":"v"}',
     );
 
-    runScript('astack-telemetry-log', ['--skill', 'qa', '--duration', '50', '--outcome', 'success', '--session-id', 'same-session']);
+    runScript('astack-telemetry-log', ['--skill', 'qa-astack', '--duration', '50', '--outcome', 'success', '--session-id', 'same-session']);
 
     const events = parseJsonl();
     expect(events).toHaveLength(1);
-    expect(events[0].skill).toBe('qa');
+    expect(events[0].skill).toBe('qa-astack');
   });
 
   slowTest('tier=off still clears own session pending', () => {
@@ -204,7 +204,7 @@ describe('.pending marker', () => {
     const pendingPath = path.join(analyticsDir, '.pending-off-123');
     fs.writeFileSync(pendingPath, '{"skill":"stale","ts":"2026-03-18T00:00:00Z","session_id":"off-123","astack_version":"v"}');
 
-    runScript('astack-telemetry-log', ['--skill', 'qa', '--duration', '50', '--outcome', 'success', '--session-id', 'off-123']);
+    runScript('astack-telemetry-log', ['--skill', 'qa-astack', '--duration', '50', '--outcome', 'success', '--session-id', 'off-123']);
 
     expect(fs.existsSync(pendingPath)).toBe(false);
     expect(readJsonl()).toHaveLength(0);
@@ -219,13 +219,13 @@ describe('astack-analytics', () => {
 
   slowTest('renders usage dashboard with events', () => {
     setConfig('telemetry', 'anonymous');
-    runScript('astack-telemetry-log', ['--skill', 'qa', '--duration', '120', '--outcome', 'success', '--session-id', 'a-1']);
-    runScript('astack-telemetry-log', ['--skill', 'qa', '--duration', '60', '--outcome', 'success', '--session-id', 'a-2']);
-    runScript('astack-telemetry-log', ['--skill', 'ship', '--duration', '30', '--outcome', 'error', '--error-class', 'timeout', '--session-id', 'a-3']);
+    runScript('astack-telemetry-log', ['--skill', 'qa-astack', '--duration', '120', '--outcome', 'success', '--session-id', 'a-1']);
+    runScript('astack-telemetry-log', ['--skill', 'qa-astack', '--duration', '60', '--outcome', 'success', '--session-id', 'a-2']);
+    runScript('astack-telemetry-log', ['--skill', 'ship-astack', '--duration', '30', '--outcome', 'error', '--error-class', 'timeout', '--session-id', 'a-3']);
 
     const output = runScript('astack-analytics', ['all']);
-    expect(output).toContain('/qa');
-    expect(output).toContain('/ship');
+    expect(output).toContain('/qa-astack');
+    expect(output).toContain('/ship-astack');
     expect(output).toContain('2 runs');
     expect(output).toContain('1 runs');
     expect(output).toContain('Success rate: 66%');
@@ -234,10 +234,10 @@ describe('astack-analytics', () => {
 
   slowTest('filters by time window', () => {
     setConfig('telemetry', 'anonymous');
-    runScript('astack-telemetry-log', ['--skill', 'qa', '--duration', '60', '--outcome', 'success', '--session-id', 't-1']);
+    runScript('astack-telemetry-log', ['--skill', 'qa-astack', '--duration', '60', '--outcome', 'success', '--session-id', 't-1']);
 
     const output7d = runScript('astack-analytics', ['7d']);
-    expect(output7d).toContain('/qa');
+    expect(output7d).toContain('/qa-astack');
     expect(output7d).toContain('last 7 days');
   });
 });

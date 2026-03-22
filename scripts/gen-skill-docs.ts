@@ -20,15 +20,17 @@ const DRY_RUN = process.argv.includes('--dry-run');
 
 // ─── Template Context ───────────────────────────────────────
 
-type Host = 'claude' | 'codex';
+type Host = 'claude' | 'codex' | 'copilot';
+const COPILOT_WORKFLOW_DIRS = new Set(['', '.', 'scope', 'research', 'plan', 'implement']);
 
 const HOST_ARG = process.argv.find(a => a.startsWith('--host'));
 const HOST: Host = (() => {
   if (!HOST_ARG) return 'claude';
   const val = HOST_ARG.includes('=') ? HOST_ARG.split('=')[1] : process.argv[process.argv.indexOf(HOST_ARG) + 1];
   if (val === 'codex' || val === 'agents') return 'codex';
+  if (val === 'copilot') return 'copilot';
   if (val === 'claude') return 'claude';
-  throw new Error(`Unknown host: ${val}. Use claude, codex, or agents.`);
+  throw new Error(`Unknown host: ${val}. Use claude, codex, copilot, or agents.`);
 })();
 
 interface HostPaths {
@@ -50,6 +52,12 @@ const HOST_PATHS: Record<Host, HostPaths> = {
     localSkillRoot: '.agents/skills/astack',
     binDir: '~/.codex/skills/astack/bin',
     browseDir: '~/.codex/skills/astack/browse/dist',
+  },
+  copilot: {
+    skillRoot: '~/.copilot/skills/astack',
+    localSkillRoot: '.copilot/skills/astack',
+    binDir: '~/.copilot/skills/astack/bin',
+    browseDir: '~/.copilot/skills/astack/browse/dist',
   },
 };
 
@@ -168,10 +176,19 @@ for _PF in ~/.astack/analytics/.pending-*; do [ -f "$_PF" ] && ${ctx.paths.binDi
 }
 
 function generateUpgradeCheck(ctx: TemplateContext): string {
+  if (ctx.host === 'copilot') {
+    return `If \`PROACTIVE\` is \`"false"\`, do not proactively suggest astack skills â€” only invoke
+them when the user explicitly asks. The user opted out of proactive suggestions.`;
+  }
+
+  const upgradeSkillRoot = ctx.host === 'codex'
+    ? '~/.codex/skills/astack-upgrade'
+    : '~/.claude/skills/astack-upgrade';
+
   return `If \`PROACTIVE\` is \`"false"\`, do not proactively suggest astack skills — only invoke
 them when the user explicitly asks. The user opted out of proactive suggestions.
 
-If output shows \`UPGRADE_AVAILABLE <old> <new>\`: read \`${ctx.paths.skillRoot}/astack-upgrade/SKILL.md\` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If \`JUST_UPGRADED <from> <to>\`: tell user "Running astack v{to} (just updated!)" and continue.`;
+If output shows \`UPGRADE_AVAILABLE <old> <new>\`: read \`${upgradeSkillRoot}/SKILL.md\` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If \`JUST_UPGRADED <from> <to>\`: tell user "Running astack v{to} (just updated!)" and continue.`;
 }
 
 function generateLakeIntro(): string {
@@ -418,7 +435,7 @@ function generateQAMethodology(_ctx: TemplateContext): string {
 
 ### Diff-aware (automatic when on a feature branch with no URL)
 
-This is the **primary mode** for developers verifying their work. When the user says \`/qa\` without a URL and the repo is on a feature branch, automatically:
+This is the **primary mode** for developers verifying their work. When the user says \`/qa-astack\` without a URL and the repo is on a feature branch, automatically:
 
 1. **Analyze the branch diff** to understand what changed:
    \`\`\`bash
@@ -434,7 +451,7 @@ This is the **primary mode** for developers verifying their work. When the user 
    - API endpoints → test them directly with \`$B js "await fetch('/api/...')"\`
    - Static pages (markdown, HTML) → navigate to them directly
 
-   **If no obvious pages/routes are identified from the diff:** Do not skip browser testing. The user invoked /qa because they want browser-based verification. Fall back to Quick mode — navigate to the homepage, follow the top 5 navigation targets, check console for errors, and test any interactive elements found. Backend, config, and infrastructure changes affect app behavior — always verify the app still works.
+   **If no obvious pages/routes are identified from the diff:** Do not skip browser testing. The user invoked /qa-astack because they want browser-based verification. Fall back to Quick mode — navigate to the homepage, follow the top 5 navigation targets, check console for errors, and test any interactive elements found. Backend, config, and infrastructure changes affect app behavior — always verify the app still works.
 
 3. **Detect the running app** — check common local dev ports:
    \`\`\`bash
@@ -690,7 +707,7 @@ Minimum 0 per category.
 9. **Never delete output files.** Screenshots and reports accumulate — that's intentional.
 10. **Use \`snapshot -C\` for tricky UIs.** Finds clickable divs that the accessibility tree misses.
 11. **Show screenshots to the user.** After every \`$B screenshot\`, \`$B snapshot -a -o\`, or \`$B responsive\` command, use the Read tool on the output file(s) so the user can see them inline. For \`responsive\` (3 files), Read all three. This is critical — without it, screenshots are invisible to the user.
-12. **Never refuse to use the browser.** When the user invokes /qa or /qa-only, they are requesting browser-based testing. Never suggest evals, unit tests, or other alternatives as a substitute. Even if the diff appears to have no UI changes, backend changes affect app behavior — always open the browser and test.`;
+12. **Never refuse to use the browser.** When the user invokes /qa-astack or /qa-only-astack, they are requesting browser-based testing. Never suggest evals, unit tests, or other alternatives as a substitute. Even if the diff appears to have no UI changes, backend changes affect app behavior — always open the browser and test.`;
 }
 
 function generateDesignReviewLite(_ctx: TemplateContext): string {
@@ -715,7 +732,7 @@ source <(~/.claude/skills/astack/bin/astack-diff-scope <base> 2>/dev/null)
 4. **Apply the design checklist** against the changed files. For each item:
    - **[HIGH] mechanical CSS fix** (\`outline: none\`, \`!important\`, \`font-size < 16px\`): classify as AUTO-FIX
    - **[HIGH/MEDIUM] design judgment needed**: classify as ASK
-   - **[LOW] intent-based detection**: present as "Possible — verify visually or run /design-review"
+   - **[LOW] intent-based detection**: present as "Possible — verify visually or run /design-review-astack"
 
 5. **Include findings** in the review output under a "Design Review" header, following the output format in the checklist. Design findings merge with code review findings into the same Fix-First flow.
 
@@ -819,7 +836,7 @@ After the first navigation, check if the URL changed to a login-like path:
 \`\`\`bash
 $B url
 \`\`\`
-If URL contains \`/login\`, \`/signin\`, \`/auth\`, or \`/sso\`: the site requires authentication. AskUserQuestion: "This site requires authentication. Want to import cookies from your browser? Run \`/setup-browser-cookies\` first if needed."
+If URL contains \`/login\`, \`/signin\`, \`/auth\`, or \`/sso\`: the site requires authentication. AskUserQuestion: "This site requires authentication. Want to import cookies from your browser? Run \`/setup-browser-cookies-astack\` first if needed."
 
 ### Design Audit Checklist (10 categories, ~80 items)
 
@@ -1101,7 +1118,7 @@ Interpretation:
 - **Plan Artifact** is the only default ship gate.
 - \`00-scope.md\` and \`01-research.md\` are helpful context, but they do not block
   shipping on their own.
-- \`03-progress.md\` is recommended whenever \`/implement\` has been used.
+- \`03-progress.md\` is recommended whenever \`/implement-astack\` has been used.
 - Design and Codex reviews are informative, not blocking, unless the user says
   otherwise.
 
@@ -1411,7 +1428,7 @@ If they approve or say "good enough," proceed.
 
 Reference the wireframe screenshot in the design doc's "Recommended Approach" section.
 The screenshot file at \`/tmp/astack-sketch.png\` can be referenced by downstream skills
-(\`/plan\`, \`/design-review\`) to see what was originally envisioned.`;
+(\`/plan-astack\`, \`/design-review-astack\`) to see what was originally envisioned.`;
 }
 
 function generateCodexReviewStep(ctx: TemplateContext): string {
@@ -1566,11 +1583,10 @@ const RESOLVERS: Record<string, (ctx: TemplateContext) => string> = {
 
 // ─── Codex Helpers ───────────────────────────────────────────
 
-function codexSkillName(skillDir: string): string {
+function hostedSkillName(skillDir: string, skillName: string): string {
   if (skillDir === '.' || skillDir === '') return 'astack';
   // Don't double-prefix: astack-upgrade → astack-upgrade (not astack-astack-upgrade)
-  if (skillDir.startsWith('astack-')) return skillDir;
-  return `astack-${skillDir}`;
+  return skillName;
 }
 
 /**
@@ -1673,17 +1689,19 @@ function processTemplate(tmplPath: string, host: Host = 'claude'): { outputPath:
   // Determine skill directory relative to ROOT
   const skillDir = path.relative(ROOT, path.dirname(tmplPath));
 
-  // For codex host, route output to .agents/skills/{codexSkillName}/SKILL.md
-  if (host === 'codex') {
-    const codexName = codexSkillName(skillDir === '.' ? '' : skillDir);
-    const outputDir = path.join(ROOT, '.agents', 'skills', codexName);
+  // Extract skill name from frontmatter for TemplateContext and hosted output naming
+  const nameMatch = tmplContent.match(/^name:\s*(.+)$/m);
+  const skillName = nameMatch ? nameMatch[1].trim() : path.basename(path.dirname(tmplPath));
+
+  // For Codex/Copilot hosts, route output to host-specific generated skill directories.
+  if (host === 'codex' || host === 'copilot') {
+    const hostName = hostedSkillName(skillDir === '.' ? '' : skillDir, skillName);
+    const outputDir = host === 'codex'
+      ? path.join(ROOT, '.agents', 'skills', hostName)
+      : path.join(ROOT, '.copilot', 'skills', hostName);
     fs.mkdirSync(outputDir, { recursive: true });
     outputPath = path.join(outputDir, 'SKILL.md');
   }
-
-  // Extract skill name from frontmatter for TemplateContext
-  const nameMatch = tmplContent.match(/^name:\s*(.+)$/m);
-  const skillName = nameMatch ? nameMatch[1].trim() : path.basename(path.dirname(tmplPath));
 
   // Extract benefits-from list from frontmatter (inline YAML: benefits-from: [a, b])
   const benefitsMatch = tmplContent.match(/^benefits-from:\s*\[([^\]]*)\]/m);
@@ -1706,8 +1724,8 @@ function processTemplate(tmplPath: string, host: Host = 'claude'): { outputPath:
     throw new Error(`Unresolved placeholders in ${relTmplPath}: ${remaining.join(', ')}`);
   }
 
-  // For codex host: transform frontmatter and replace Claude-specific paths
-  if (host === 'codex') {
+  // For non-Claude hosts: transform frontmatter and replace Claude-specific paths.
+  if (host !== 'claude') {
     // Extract hook safety prose BEFORE transforming frontmatter (which strips hooks)
     const safetyProse = extractHookSafetyProse(tmplContent);
 
@@ -1723,8 +1741,10 @@ function processTemplate(tmplPath: string, host: Host = 'claude'): { outputPath:
     // Replace remaining hardcoded Claude paths with host-appropriate paths
     content = content.replace(/~\/\.claude\/skills\/astack/g, ctx.paths.skillRoot);
     content = content.replace(/\.claude\/skills\/astack/g, ctx.paths.localSkillRoot);
-    content = content.replace(/\.claude\/skills\/review/g, '.agents/skills/astack/review');
-    content = content.replace(/\.claude\/skills/g, '.agents/skills');
+    const hostSkillParent = ctx.paths.skillRoot.replace(/\/astack$/, '');
+    const hostLocalParent = ctx.paths.localSkillRoot.replace(/\/astack$/, '');
+    content = content.replace(/~\/\.claude\/skills/g, hostSkillParent);
+    content = content.replace(/\.claude\/skills/g, hostLocalParent);
   }
 
   // Prepend generated header (after frontmatter)
@@ -1755,15 +1775,60 @@ function findTemplates(): string[] {
   return templates;
 }
 
-let hasChanges = false;
+function activeTemplatesForHost(host: Host): string[] {
+  return findTemplates().filter((tmplPath) => {
+    if (host === 'codex') {
+      const dir = path.basename(path.dirname(tmplPath));
+      if (dir === 'codex') return false;
+    }
 
-for (const tmplPath of findTemplates()) {
-  // Skip /codex skill for codex host (self-referential — it's a Claude wrapper around codex exec)
-  if (HOST === 'codex') {
-    const dir = path.basename(path.dirname(tmplPath));
-    if (dir === 'codex') continue;
+    if (host === 'copilot') {
+      const dir = path.relative(ROOT, path.dirname(tmplPath));
+      if (!COPILOT_WORKFLOW_DIRS.has(dir)) return false;
+    }
+
+    return true;
+  });
+}
+
+function expectedHostedSkillNames(host: Host): Set<string> {
+  const names = new Set<string>();
+
+  for (const tmplPath of activeTemplatesForHost(host)) {
+    const tmplContent = fs.readFileSync(tmplPath, 'utf-8');
+    const skillDir = path.relative(ROOT, path.dirname(tmplPath));
+    const nameMatch = tmplContent.match(/^name:\s*(.+)$/m);
+    const skillName = nameMatch ? nameMatch[1].trim() : path.basename(path.dirname(tmplPath));
+    names.add(hostedSkillName(skillDir === '.' ? '' : skillDir, skillName));
   }
 
+  return names;
+}
+
+function cleanupHostedSkillDirs(host: Host): void {
+  if (host === 'claude' || DRY_RUN) return;
+
+  const hostDir = host === 'codex'
+    ? path.join(ROOT, '.agents', 'skills')
+    : path.join(ROOT, '.copilot', 'skills');
+
+  if (!fs.existsSync(hostDir)) return;
+
+  const expected = expectedHostedSkillNames(host);
+  for (const entry of fs.readdirSync(hostDir, { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    if (!expected.has(entry.name)) {
+      fs.rmSync(path.join(hostDir, entry.name), { recursive: true, force: true });
+    }
+  }
+}
+
+let hasChanges = false;
+
+cleanupHostedSkillDirs(HOST);
+
+for (const tmplPath of activeTemplatesForHost(HOST)) {
+  // Skip /codex-astack skill for codex host (self-referential — it's a Claude wrapper around codex exec)
   const { outputPath, content } = processTemplate(tmplPath, HOST);
   const relOutput = path.relative(ROOT, outputPath);
 

@@ -54,7 +54,7 @@ if (!evalsEnabled) {
 // Codex E2E touchfiles — keyed by test name, same pattern as E2E_TOUCHFILES
 const CODEX_E2E_TOUCHFILES: Record<string, string[]> = {
   'codex-discover-skill':    ['codex/**', '.agents/skills/**', 'test/helpers/codex-session-runner.ts'],
-  'codex-review-findings':   ['review/**', '.agents/skills/astack-review/**', 'codex/**', 'test/helpers/codex-session-runner.ts'],
+  'codex-review-findings':   ['review/**', '.agents/skills/review-astack/**', 'codex/**', 'test/helpers/codex-session-runner.ts'],
 };
 
 let selectedTests: string[] | null = null; // null = run all
@@ -120,15 +120,15 @@ afterAll(async () => {
 describeCodex('Codex E2E', () => {
 
   testIfSelected('codex-discover-skill', async () => {
-    // Install astack-review skill to a temp HOME and ask Codex to list skills
-    const skillDir = path.join(ROOT, '.agents', 'skills', 'astack-review');
+    // Install review-astack skill to a temp HOME and ask Codex to list skills
+    const skillDir = path.join(ROOT, '.agents', 'skills', 'review-astack');
 
     const result = await runCodexSkill({
       skillDir,
       prompt: 'List any skills or instructions you have available. Just list the names.',
       timeoutMs: 60_000,
       cwd: ROOT,
-      skillName: 'astack-review',
+      skillName: 'review-astack',
     });
 
     logCodexCost('codex-discover-skill', result);
@@ -147,15 +147,15 @@ describeCodex('Codex E2E', () => {
   }, 120_000);
 
   testIfSelected('codex-review-findings', async () => {
-    // Install astack-review skill and ask Codex to review the current repo
-    const skillDir = path.join(ROOT, '.agents', 'skills', 'astack-review');
+    // Install review-astack skill and ask Codex to review the current repo
+    const skillDir = path.join(ROOT, '.agents', 'skills', 'review-astack');
 
     const result = await runCodexSkill({
       skillDir,
-      prompt: 'Run the astack-review skill on this repository. Review the current branch diff and report your findings.',
+      prompt: 'Run the review-astack skill on this repository. Review the current branch diff and report your findings.',
       timeoutMs: 540_000,
       cwd: ROOT,
-      skillName: 'astack-review',
+      skillName: 'review-astack',
     });
 
     logCodexCost('codex-review-findings', result);

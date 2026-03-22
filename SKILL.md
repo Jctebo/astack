@@ -10,24 +10,24 @@ description: |
 
   astack also includes development workflow skills. When you notice the user is at
   these stages, suggest the appropriate skill:
-  - Scoping a new idea or reframing a request → suggest /scope
-  - Mapping the existing system before planning → suggest /research
-  - Locking the implementation plan → suggest /plan
-  - Building an approved plan → suggest /implement
-  - Creating a design system → suggest /design-consultation
-  - Debugging errors → suggest /investigate
-  - Testing the app → suggest /qa
-  - Code review before merge → suggest /review
-  - Visual design audit → suggest /design-review
-  - Ready to deploy / create PR → suggest /ship
-  - Post-ship doc updates → suggest /document-release
-  - Weekly retrospective → suggest /retro
-  - Wanting a second opinion or adversarial code review → suggest /codex
-  - Working with production or live systems → suggest /careful
-  - Want to scope edits to one module/directory → suggest /freeze
-  - Maximum safety mode (destructive warnings + edit restrictions) → suggest /guard
-  - Removing edit restrictions → suggest /unfreeze
-- Upgrading astack to latest version → suggest /astack-upgrade
+  - Scoping a new idea or reframing a request → suggest /scope-astack
+  - Mapping the existing system before planning → suggest /research-astack
+  - Locking the implementation plan → suggest /plan-astack
+  - Building an approved plan → suggest /implement-astack
+  - Creating a design system → suggest /design-consultation-astack
+  - Debugging errors → suggest /investigate-astack
+  - Testing the app → suggest /qa-astack
+  - Code review before merge → suggest /review-astack
+  - Visual design audit → suggest /design-review-astack
+  - Ready to deploy / create PR → suggest /ship-astack
+  - Post-ship doc updates → suggest /document-release-astack
+  - Weekly retrospective → suggest /retro-astack
+  - Wanting a second opinion or adversarial code review → suggest /codex-astack
+  - Working with production or live systems → suggest /careful-astack
+  - Want to scope edits to one module/directory → suggest /freeze-astack
+  - Maximum safety mode (destructive warnings + edit restrictions) → suggest /guard-astack
+  - Removing edit restrictions → suggest /unfreeze-astack
+- Upgrading astack to latest version → suggest /astack-upgrade-astack
 
   If the user pushes back on skill suggestions ("stop suggesting things",
   "I don't need suggestions", "too aggressive"):
@@ -78,7 +78,7 @@ for _PF in ~/.astack/analytics/.pending-*; do [ -f "$_PF" ] && ~/.claude/skills/
 If `PROACTIVE` is `"false"`, do not proactively suggest astack skills — only invoke
 them when the user explicitly asks. The user opted out of proactive suggestions.
 
-If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/astack/astack-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running astack v{to} (just updated!)" and continue.
+If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/astack-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running astack v{to} (just updated!)" and continue.
 
 If `LAKE_INTRO` is `no`: Before continuing, introduce the Completeness Principle.
 Tell the user: "astack follows the **Boil the Lake** principle — always do the complete

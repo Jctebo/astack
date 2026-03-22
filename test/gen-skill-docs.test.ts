@@ -6,6 +6,7 @@ import { SNAPSHOT_FLAGS } from '../browse/src/snapshot';
 
 const ROOT = path.resolve(import.meta.dir, '..');
 const AGENTS_DIR = path.join(ROOT, '.agents', 'skills');
+const COPILOT_DIR = path.join(ROOT, '.copilot', 'skills');
 const WORKFLOW_SKILLS = ['scope', 'research', 'plan', 'implement'] as const;
 const RETIRED_SKILLS = ['office-hours', 'plan-ceo-review', 'plan-eng-review', 'plan-design-review'] as const;
 const BUN = process.execPath;
@@ -27,12 +28,21 @@ function discoverCodexSkills() {
   return fs.readdirSync(AGENTS_DIR, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name)
-    .filter((name) => name === 'astack' || name.startsWith('astack-'))
+    .filter((name) => fs.existsSync(path.join(AGENTS_DIR, name, 'SKILL.md')))
+    .sort();
+}
+
+function discoverCopilotSkills() {
+  return fs.readdirSync(COPILOT_DIR, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .filter((name) => fs.existsSync(path.join(COPILOT_DIR, name, 'SKILL.md')))
     .sort();
 }
 
 const ALL_SKILLS = discoverTemplates();
 const CODEX_SKILLS = discoverCodexSkills();
+const COPILOT_SKILLS = discoverCopilotSkills();
 
 describe('gen-skill-docs', () => {
   test('root generated SKILL.md contains all browse command categories', () => {
@@ -89,10 +99,10 @@ describe('gen-skill-docs', () => {
 
   test('root skill suggests the new astack workflow', () => {
     const content = fs.readFileSync(path.join(ROOT, 'SKILL.md'), 'utf-8');
-    expect(content).toContain('suggest /scope');
-    expect(content).toContain('suggest /research');
-    expect(content).toContain('suggest /plan');
-    expect(content).toContain('suggest /implement');
+    expect(content).toContain('suggest /scope-astack');
+    expect(content).toContain('suggest /research-astack');
+    expect(content).toContain('suggest /plan-astack');
+    expect(content).toContain('suggest /implement-astack');
   });
 
   test('review and ship align to plan artifacts', () => {
@@ -128,15 +138,14 @@ describe('gen-skill-docs', () => {
 describe('Codex generation (--host codex)', () => {
   test('codex output exists for root and astack workflow skills', () => {
     expect(fs.existsSync(path.join(AGENTS_DIR, 'astack', 'SKILL.md'))).toBe(true);
-    expect(fs.existsSync(path.join(AGENTS_DIR, 'astack-scope', 'SKILL.md'))).toBe(true);
-    expect(fs.existsSync(path.join(AGENTS_DIR, 'astack-research', 'SKILL.md'))).toBe(true);
-    expect(fs.existsSync(path.join(AGENTS_DIR, 'astack-plan', 'SKILL.md'))).toBe(true);
-    expect(fs.existsSync(path.join(AGENTS_DIR, 'astack-implement', 'SKILL.md'))).toBe(true);
+    expect(fs.existsSync(path.join(AGENTS_DIR, 'scope-astack', 'SKILL.md'))).toBe(true);
+    expect(fs.existsSync(path.join(AGENTS_DIR, 'research-astack', 'SKILL.md'))).toBe(true);
+    expect(fs.existsSync(path.join(AGENTS_DIR, 'plan-astack', 'SKILL.md'))).toBe(true);
+    expect(fs.existsSync(path.join(AGENTS_DIR, 'implement-astack', 'SKILL.md'))).toBe(true);
   });
 
   test('active codex skills use astack names and contain no Claude paths', () => {
     for (const skillName of CODEX_SKILLS) {
-      expect(skillName.startsWith('astack')).toBe(true);
       const content = fs.readFileSync(path.join(AGENTS_DIR, skillName, 'SKILL.md'), 'utf-8');
       expect(content).not.toContain('.claude/skills');
       expect(content).not.toContain('~/.claude/');
@@ -159,6 +168,49 @@ describe('Codex generation (--host codex)', () => {
     const output = result.stdout.toString().replaceAll('\\', '/');
     for (const skillName of CODEX_SKILLS) {
       expect(output).toContain(`FRESH: .agents/skills/${skillName}/SKILL.md`);
+    }
+    expect(output).not.toContain('STALE');
+  });
+});
+
+describe('Copilot generation (--host copilot)', () => {
+  test('copilot output exists for root and astack workflow skills', () => {
+    expect(fs.existsSync(path.join(COPILOT_DIR, 'astack', 'SKILL.md'))).toBe(true);
+    expect(fs.existsSync(path.join(COPILOT_DIR, 'scope-astack', 'SKILL.md'))).toBe(true);
+    expect(fs.existsSync(path.join(COPILOT_DIR, 'research-astack', 'SKILL.md'))).toBe(true);
+    expect(fs.existsSync(path.join(COPILOT_DIR, 'plan-astack', 'SKILL.md'))).toBe(true);
+    expect(fs.existsSync(path.join(COPILOT_DIR, 'implement-astack', 'SKILL.md'))).toBe(true);
+  });
+
+  test('copilot output only ships the runtime root plus base workflow skills', () => {
+    expect(COPILOT_SKILLS).toEqual([
+      'astack',
+      'implement-astack',
+      'plan-astack',
+      'research-astack',
+      'scope-astack',
+    ]);
+  });
+
+  test('copilot skills contain no Claude paths', () => {
+    for (const skillName of COPILOT_SKILLS) {
+      const content = fs.readFileSync(path.join(COPILOT_DIR, skillName, 'SKILL.md'), 'utf-8');
+      expect(content).not.toContain('.claude/skills');
+      expect(content).not.toContain('~/.claude/');
+    }
+  });
+
+  test('Copilot dry-run freshness passes', () => {
+    const result = Bun.spawnSync([BUN, 'run', 'scripts/gen-skill-docs.ts', '--host', 'copilot', '--dry-run'], {
+      cwd: ROOT,
+      stdout: 'pipe',
+      stderr: 'pipe',
+    });
+
+    expect(result.exitCode).toBe(0);
+    const output = result.stdout.toString().replaceAll('\\', '/');
+    for (const skillName of COPILOT_SKILLS) {
+      expect(output).toContain(`FRESH: .copilot/skills/${skillName}/SKILL.md`);
     }
     expect(output).not.toContain('STALE');
   });
