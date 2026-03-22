@@ -52,16 +52,25 @@ astack/
 
 ## Workflow artifacts
 
-astack uses four canonical repo-root artifacts:
+astack uses a release-folder artifact contract:
 
-- `00-scope.md`
-- `01-research.md`
-- `02-plan.md`
-- `03-progress.md`
+- `docs/releases/VERSION`
+- `docs/releases/RELEASE_LOG.md`
+- `docs/releases/<version>-<slug>.md`
+
+The versioned release artifact contains the workflow sections:
+
+- `Scope`
+- `Research`
+- `Plan`
+- `Progress`
+- `QA`
+- `Release Notes`
 
 These replace the older hidden planning files under `~/.astack/projects/` for
-the main implementation lifecycle. Skills that plan, review, QA, and ship
-should treat them as the source of truth.
+the main implementation lifecycle. Skills that plan, review, QA, ship, and
+document releases should treat the active release artifact as the source of
+truth.
 
 Host-specific install and naming rules live in `docs/host-support.md`.
 

@@ -188,11 +188,11 @@ Look for `/scope-astack` output:
 
 ```bash
 source <(~/.claude/skills/astack/bin/astack-slug 2>/dev/null)
-ls 00-scope.md 2>/dev/null
+ls docs/releases/*.md 2>/dev/null
 ls .context/*scope* .context/attachments/*scope* 2>/dev/null
 ```
 
-If `00-scope.md` or scoped context exists, read it — the product context is pre-filled.
+If a release artifact with a `Scope` section or scoped context exists, read it — the product context is pre-filled.
 
 If the codebase is empty and purpose is unclear, say: *"I don't have a clear picture of what you're building yet. Want to start with `/scope-astack`? Once we know the product direction, we can set up the design system."*
 
@@ -231,7 +231,7 @@ Ask the user a single question that covers everything you need to know. Pre-fill
 3. "Want me to research what top products in your space are doing for design, or should I work from my design knowledge?"
 4. **Explicitly say:** "At any point you can just drop into chat and we'll talk through anything — this isn't a rigid form, it's a conversation."
 
-If the README or `00-scope.md` gives you enough context, pre-fill and confirm: *"From what I can see, this is [X] for [Y] in the [Z] space. Sound right? And would you like me to research what's out there in this space, or should I work from what I know?"*
+If the README or release artifact `Scope` section gives you enough context, pre-fill and confirm: *"From what I can see, this is [X] for [Y] in the [Z] space. Sound right? And would you like me to research what's out there in this space, or should I work from what I know?"*
 
 ---
 

@@ -110,7 +110,7 @@ describe('eval-store observability', () => {
       cost_usd: 0.1,
       exit_reason: 'timeout',
       timeout_at_turn: 5,
-      last_tool_call: 'Write(02-plan.md)',
+      last_tool_call: 'Write(docs/releases/0.0.1.0-sales-notes.md)',
     });
 
     const partial = JSON.parse(fs.readFileSync(path.join(evalDir, '_partial-e2e.json'), 'utf-8'));
@@ -119,7 +119,7 @@ describe('eval-store observability', () => {
     expect(partial.passed).toBe(1);
     expect(partial.failed).toBe(1);
     expect(partial.tests[1].exit_reason).toBe('timeout');
-    expect(partial.tests[1].last_tool_call).toBe('Write(02-plan.md)');
+    expect(partial.tests[1].last_tool_call).toBe('Write(docs/releases/0.0.1.0-sales-notes.md)');
   });
 
   test('finalize() preserves partial file alongside final output', async () => {
@@ -153,7 +153,7 @@ describe('eval-watch dashboard', () => {
       status: 'running',
       turn: 4,
       toolCount: 3,
-      lastTool: 'Write(02-plan.md)',
+      lastTool: 'Write(docs/releases/0.0.1.0-sales-notes.md)',
       lastToolAt: new Date().toISOString(),
       elapsedSec: 285,
     };
@@ -173,7 +173,7 @@ describe('eval-watch dashboard', () => {
     expect(output).toContain('research-artifact');
     expect(output).toContain('plan-artifact');
     expect(output).toContain('turn 4');
-    expect(output).toContain('Write(02-plan.md)');
+    expect(output).toContain('Write(docs/releases/0.0.1.0-sales-notes.md)');
     expect(output).not.toContain('STALE');
   });
 

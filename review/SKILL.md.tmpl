@@ -38,7 +38,7 @@ You are running the `/review-astack` workflow. Analyze the current branch's diff
 
 Before reviewing code quality, check: **did they build what was requested — nothing more, nothing less?**
 
-1. Read `02-plan.md` and `03-progress.md` if they exist. Also read `TODOS.md` (if it exists), the PR description (`gh pr view --json body --jq .body 2>/dev/null || true`), and commit messages (`git log origin/<base>..HEAD --oneline`).
+1. Read the active release artifact in `docs/releases/` and use its `Plan` and `Progress` sections if they exist. Also read `TODOS.md` (if it exists), the PR description (`gh pr view --json body --jq .body 2>/dev/null || true`), and commit messages (`git log origin/<base>..HEAD --oneline`).
    **If no PR exists:** rely on commit messages and TODOS.md for stated intent — this is the common case since /review-astack runs before /ship-astack creates the PR.
 2. Identify the **stated intent** — what was this branch supposed to accomplish?
 3. Run `git diff origin/<base> --stat` and compare the files changed against the stated intent.

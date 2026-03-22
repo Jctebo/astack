@@ -407,11 +407,12 @@ mkdir -p .astack/qa-reports/screenshots
 
 Before falling back to git diff heuristics, check for richer planning context:
 
-1. Read `02-plan.md` if it exists. Treat its `QA And Test Matrix` section as the
-   primary test input.
-2. Read `03-progress.md` if it exists. Use it to see what was actually built,
-   what changed from the plan, and what still looks risky.
-3. If either file is missing or thin, fall back to branch diff analysis.
+1. Read the active release artifact in `docs/releases/` if it exists. Treat its
+   `Plan` section's `QA And Test Matrix` as the primary test input.
+2. Read its `Progress` section if it exists. Use it to see what was actually
+   built, what changed from the plan, and what still looks risky.
+3. If the release artifact or either section is missing or thin, fall back to
+   branch diff analysis.
 
 ---
 

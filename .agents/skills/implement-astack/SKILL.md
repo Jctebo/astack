@@ -1,18 +1,10 @@
 ---
 name: implement-astack
-version: 1.0.0
 description: |
-  Plan-driven implementation workflow. Reads `02-plan.md`, makes the code
-  changes, keeps `03-progress.md` current, and verifies the work. Use when the
-  plan is approved and it is time to build.
-allowed-tools:
-  - Bash
-  - Read
-  - Write
-  - Edit
-  - Grep
-  - Glob
-  - AskUserQuestion
+  Plan-driven implementation workflow. Reads the `Plan` section in the active
+  release artifact, makes the code changes, keeps the `Progress` section
+  current, and verifies the work. Use when the plan is approved and it is time
+  to build.
 ---
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
@@ -155,63 +147,62 @@ RECOMMENDATION: [what the user should do next]
 # /implement-astack
 
 You are running the `/implement-astack` workflow. This is the execution stage. Read
-`02-plan.md`, implement the work, and keep `03-progress.md` current as the
-single source of truth for execution status.
+the `Plan` section in the active release artifact, implement the work, and keep
+the `Progress` section current as the single source of truth for execution
+status.
 
 ## Step 1: Load the plan
 
 Read these files first:
 
-- `02-plan.md`
-- `03-progress.md`
-- `00-scope.md`
-- `01-research.md`
+- the selected release artifact in `docs/releases/`
 - `README.md`
 - `CLAUDE.md`
 - `TODOS.md`
 
-If `02-plan.md` is missing, stop and tell the user to run `/plan-astack` first.
+If the selected release artifact has no `Plan` section, stop and tell the user
+to run `/plan-astack` first.
 
 ## Step 2: Execute against the plan
 
 Rules:
 
-- Follow `02-plan.md` as the source of truth.
+- Follow the `Plan` section as the source of truth.
 - Reuse existing code and patterns when the plan says to.
 - Keep the diff focused.
-- If reality forces a deviation from the plan, record it in `03-progress.md`
-  before finishing.
+- If reality forces a deviation from the plan, record it in the `Progress`
+  section before finishing.
 - Run relevant tests/checks as you go instead of batching all validation to the
   end.
 
-## Step 3: Maintain `03-progress.md`
+## Step 3: Maintain the `Progress` section
 
-Write or update `03-progress.md` in the repo root throughout the workflow with
-this structure:
+Write or update the `Progress` section in the selected release artifact
+throughout the workflow with this structure:
 
 ```markdown
-# Progress
+## Progress
 
-## Status
+### Status
 - overall status
 
-## Checklist
+### Checklist
 - [ ] item from plan
 - [x] item completed
 
-## Completed Work
+### Completed Work
 - what changed
 
-## Deviations
-- where implementation differs from `02-plan.md`
+### Deviations
+- where implementation differs from the `Plan` section
 
-## Blockers
+### Blockers
 - current blockers, if any
 
-## Verification
+### Verification
 - tests, checks, manual verification run
 
-## Follow-Ups
+### Follow-Ups
 - work intentionally left for later
 ```
 
@@ -226,7 +217,7 @@ Requirements:
 Before declaring success:
 
 - ensure the code matches the plan or the recorded deviations
-- ensure `03-progress.md` reflects the final state
+- ensure the `Progress` section reflects the final state
 - run the most relevant validation available
 - summarize what was implemented, what was verified, and what still needs
   `/review-astack` or `/qa-astack`

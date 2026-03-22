@@ -65,6 +65,14 @@ function installSkills(tmpDir: string) {
   }
 }
 
+function setupReleaseArtifacts(tmpDir: string, artifactName: string, sections: string[]) {
+  const releasesDir = path.join(tmpDir, 'docs', 'releases');
+  fs.mkdirSync(releasesDir, { recursive: true });
+  fs.writeFileSync(path.join(releasesDir, 'VERSION'), '0.0.1.0\n');
+  fs.writeFileSync(path.join(releasesDir, 'RELEASE_LOG.md'), '# Release Log\n');
+  fs.writeFileSync(path.join(releasesDir, artifactName), `# Release\n\n${sections.join('\n\n')}\n`);
+}
+
 function setupBrowseShims(dir: string) {
   const binDir = path.join(dir, 'browse', 'dist');
   fs.mkdirSync(binDir, { recursive: true });
@@ -166,6 +174,14 @@ Report the observed structure and whether the annotated screenshot was created.`
     try {
       initGitRepo(tmpDir);
       installSkills(tmpDir);
+      setupReleaseArtifacts(tmpDir, '0.0.1.0-sales-notes.md', [
+        '## Scope\n',
+        '## Research\n',
+        '## Plan\n',
+        '## Progress\n',
+        '## QA\n',
+        '## Release Notes\n',
+      ]);
       fs.writeFileSync(path.join(tmpDir, 'README.md'), '# Sales Notes\n');
       commitAll(tmpDir, 'initial');
 
@@ -182,11 +198,11 @@ Report the observed structure and whether the annotated screenshot was created.`
       logCost('scope-artifact', result);
       recordE2E('scope-artifact', 'Skill E2E tests', result);
 
-      const artifact = fs.readFileSync(path.join(tmpDir, '00-scope.md'), 'utf-8');
-      expect(artifact).toContain('# Scope');
-      expect(artifact).toContain('## Problem');
-      expect(artifact).toContain('## Narrow Wedge');
-      expect(artifact).toContain('## Recommended Next Step');
+      const artifact = fs.readFileSync(path.join(tmpDir, 'docs', 'releases', '0.0.1.0-sales-notes.md'), 'utf-8');
+      expect(artifact).toContain('## Scope');
+      expect(artifact).toContain('### Problem');
+      expect(artifact).toContain('### Narrow Wedge');
+      expect(artifact).toContain('### Recommended Next Step');
     } finally {
       fs.rmSync(tmpDir, { recursive: true, force: true });
     }
@@ -198,7 +214,9 @@ Report the observed structure and whether the annotated screenshot was created.`
       initGitRepo(tmpDir);
       installSkills(tmpDir);
       fs.mkdirSync(path.join(tmpDir, 'src'), { recursive: true });
-      fs.writeFileSync(path.join(tmpDir, '00-scope.md'), '# Scope\n\n## Problem\n- Reps lose follow-ups.\n');
+      setupReleaseArtifacts(tmpDir, '0.0.1.0-sales-notes.md', [
+        '## Scope\n\n### Problem\n- Reps lose follow-ups.\n',
+      ]);
       fs.writeFileSync(path.join(tmpDir, 'src', 'notes.ts'), 'export function summarizeNotes(input: string) { return input.trim(); }\n');
       commitAll(tmpDir, 'initial');
 
@@ -215,11 +233,11 @@ Report the observed structure and whether the annotated screenshot was created.`
       logCost('research-artifact', result);
       recordE2E('research-artifact', 'Skill E2E tests', result);
 
-      const artifact = fs.readFileSync(path.join(tmpDir, '01-research.md'), 'utf-8');
-      expect(artifact).toContain('# Research');
-      expect(artifact).toContain('## Current System Map');
-      expect(artifact).toContain('## Reuse Opportunities');
-      expect(artifact).toContain('## Recommended Direction');
+      const artifact = fs.readFileSync(path.join(tmpDir, 'docs', 'releases', '0.0.1.0-sales-notes.md'), 'utf-8');
+      expect(artifact).toContain('## Research');
+      expect(artifact).toContain('### Current System Map');
+      expect(artifact).toContain('### Reuse Opportunities');
+      expect(artifact).toContain('### Recommended Direction');
     } finally {
       fs.rmSync(tmpDir, { recursive: true, force: true });
     }
@@ -231,8 +249,10 @@ Report the observed structure and whether the annotated screenshot was created.`
       initGitRepo(tmpDir);
       installSkills(tmpDir);
       fs.mkdirSync(path.join(tmpDir, 'src'), { recursive: true });
-      fs.writeFileSync(path.join(tmpDir, '00-scope.md'), '# Scope\n\n## Problem\n- Reps lose follow-ups.\n');
-      fs.writeFileSync(path.join(tmpDir, '01-research.md'), '# Research\n\n## Recommended Direction\n- Extend note summarization into action extraction.\n');
+      setupReleaseArtifacts(tmpDir, '0.0.1.0-sales-notes.md', [
+        '## Scope\n\n### Problem\n- Reps lose follow-ups.\n',
+        '## Research\n\n### Recommended Direction\n- Extend note summarization into action extraction.\n',
+      ]);
       fs.writeFileSync(path.join(tmpDir, 'src', 'notes.ts'), 'export function summarizeNotes(input: string) { return input.trim(); }\n');
       commitAll(tmpDir, 'initial');
 
@@ -249,11 +269,11 @@ Report the observed structure and whether the annotated screenshot was created.`
       logCost('plan-artifact', result);
       recordE2E('plan-artifact', 'Skill E2E tests', result);
 
-      const artifact = fs.readFileSync(path.join(tmpDir, '02-plan.md'), 'utf-8');
-      expect(artifact).toContain('# Plan');
-      expect(artifact).toContain('## Architecture');
-      expect(artifact).toContain('## Implementation Outline');
-      expect(artifact).toContain('## QA And Test Matrix');
+      const artifact = fs.readFileSync(path.join(tmpDir, 'docs', 'releases', '0.0.1.0-sales-notes.md'), 'utf-8');
+      expect(artifact).toContain('## Plan');
+      expect(artifact).toContain('### Architecture');
+      expect(artifact).toContain('### Implementation Phases');
+      expect(artifact).toContain('### QA And Test Matrix');
     } finally {
       fs.rmSync(tmpDir, { recursive: true, force: true });
     }
@@ -267,27 +287,29 @@ Report the observed structure and whether the annotated screenshot was created.`
       fs.mkdirSync(path.join(tmpDir, 'src'), { recursive: true });
       fs.writeFileSync(path.join(tmpDir, 'package.json'), JSON.stringify({ name: 'sales-notes', scripts: { test: 'bun test' } }, null, 2));
       fs.writeFileSync(path.join(tmpDir, 'src', 'notes.ts'), 'export function summarizeNotes(input: string) { return { summary: input.trim(), actions: [] as string[] }; }\n');
-      fs.writeFileSync(path.join(tmpDir, '02-plan.md'), `# Plan
+      setupReleaseArtifacts(tmpDir, '0.0.1.0-sales-notes.md', [
+        `## Plan
 
-## Summary
+### Summary
 - Add action extraction to note summaries
 
-## What Already Exists
+### What Already Exists
 - \`src/notes.ts\`
 
-## Architecture
+### Architecture
 - A small utility returns \`summary\` and \`actions\`
 
-## Implementation Outline
+### Concrete Changes
 - Update \`src/notes.ts\`
 - Add a simple regression test
 
-## QA And Test Matrix
+### QA And Test Matrix
 - A note with "follow up" yields one action item
 
-## Not In Scope
+### Not In Scope
 - CRM sync
-`);
+`,
+      ]);
       commitAll(tmpDir, 'initial');
 
       const result = await runSkillTest({
@@ -303,11 +325,11 @@ Report the observed structure and whether the annotated screenshot was created.`
       logCost('implement-progress', result);
       recordE2E('implement-progress', 'Skill E2E tests', result);
 
-      const progress = fs.readFileSync(path.join(tmpDir, '03-progress.md'), 'utf-8');
-      expect(progress).toContain('# Progress');
-      expect(progress).toContain('## Checklist');
-      expect(progress).toContain('## Completed Work');
-      expect(progress).toContain('## Verification');
+      const progress = fs.readFileSync(path.join(tmpDir, 'docs', 'releases', '0.0.1.0-sales-notes.md'), 'utf-8');
+      expect(progress).toContain('## Progress');
+      expect(progress).toContain('### Checklist');
+      expect(progress).toContain('### Completed Work');
+      expect(progress).toContain('### Verification');
     } finally {
       fs.rmSync(tmpDir, { recursive: true, force: true });
     }

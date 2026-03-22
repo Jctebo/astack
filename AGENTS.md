@@ -12,10 +12,10 @@ GitHub Copilot support is also available as a system-level install in
 
 | Skill | What it does |
 |-------|--------------|
-| `/scope-astack` | Scope discovery and product framing. Writes `00-scope.md`. |
-| `/research-astack` | Repository and dependency research. Writes `01-research.md`. |
-| `/plan-astack` | Unified engineering and design planning. Writes `02-plan.md`. |
-| `/implement-astack` | Plan-driven implementation. Updates `03-progress.md`. |
+| `/scope-astack` | Scope discovery and product framing. Updates the `Scope` section in the active release artifact. |
+| `/research-astack` | Repository and dependency research. Updates the `Research` section in the active release artifact. |
+| `/plan-astack` | Unified engineering and design planning. Updates the `Plan` section in the active release artifact. |
+| `/implement-astack` | Plan-driven implementation. Updates the `Progress` section in the active release artifact. |
 | `/review-astack` | Pre-landing PR review against the plan and diff. |
 | `/investigate-astack` | Systematic root-cause debugging. |
 | `/design-consultation-astack` | Create a design system from scratch. |
@@ -49,8 +49,9 @@ bun run skill:check
 ## Key conventions
 
 - Edit `.tmpl` files, then regenerate the committed `SKILL.md` outputs.
-- The numbered repo-root artifacts are the workflow source of truth:
-  `00-scope.md`, `01-research.md`, `02-plan.md`, `03-progress.md`.
-- `/review-astack`, `/qa-astack`, `/ship-astack`, and `/document-release-astack` should align with those
-  artifacts instead of hidden sidecar planning files.
+- The release-folder artifacts are the workflow source of truth:
+  `docs/releases/VERSION`, `docs/releases/RELEASE_LOG.md`, and
+  `docs/releases/<version>-<slug>.md`.
+- `/review-astack`, `/qa-astack`, `/ship-astack`, and `/document-release-astack` should align with the
+  active release artifact instead of hidden sidecar planning files.
 - Durable host behavior belongs in `docs/host-support.md`, not ad hoc workflow folders under `enhancement/`.

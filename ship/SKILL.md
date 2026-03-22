@@ -2,7 +2,11 @@
 name: ship-astack
 version: 1.0.0
 description: |
-  Ship workflow: detect + merge base branch, run tests, review diff, bump VERSION, update CHANGELOG, commit, push, create PR. Use when asked to "ship", "deploy", "push to main", "create a PR", or "merge and push".
+  Ship workflow: detect + merge base branch, run tests, review diff, update
+  `docs/releases/VERSION`, append `docs/releases/RELEASE_LOG.md`, mark the
+  active release artifact as shipped, commit, push, and create PR. Use when
+  asked to "ship", "deploy", "push to main", "create a PR", or "merge and
+  push".
   Proactively suggest when the user says code is ready or asks about deploying.
 allowed-tools:
   - Bash
@@ -188,7 +192,7 @@ You are running the `/ship-astack` workflow. This is a **non-interactive, fully 
 **Never stop for:**
 - Uncommitted changes (always include them)
 - Version bump choice (auto-pick MICRO or PATCH — see Step 4)
-- CHANGELOG content (auto-generate from diff)
+- release log content (auto-generate from diff)
 - Commit message approval (auto-commit)
 - Multi-file changesets (auto-split into bisectable commits)
 - TODOS.md completed-item detection (auto-mark)
@@ -213,10 +217,10 @@ Before shipping, check the canonical workflow artifacts and any available review
 signals.
 
 ```bash
-[ -f 00-scope.md ] && echo "SCOPE:present" || echo "SCOPE:missing"
-[ -f 01-research.md ] && echo "RESEARCH:present" || echo "RESEARCH:missing"
-[ -f 02-plan.md ] && echo "PLAN:present" || echo "PLAN:missing"
-[ -f 03-progress.md ] && echo "PROGRESS:present" || echo "PROGRESS:missing"
+[ -f docs/releases/VERSION ] && echo "VERSION_TRACKER:present" || echo "VERSION_TRACKER:missing"
+[ -f docs/releases/RELEASE_LOG.md ] && echo "RELEASE_LOG:present" || echo "RELEASE_LOG:missing"
+ACTIVE_RELEASE=$(find docs/releases -maxdepth 1 -type f -name "*.md" ! -name "RELEASE_LOG.md" | head -n 1)
+[ -n "$ACTIVE_RELEASE" ] && echo "ACTIVE_RELEASE:present:$ACTIVE_RELEASE" || echo "ACTIVE_RELEASE:missing"
 ~/.claude/skills/astack/bin/astack-review-read 2>/dev/null || true
 ```
 
@@ -228,28 +232,28 @@ Display:
 +====================================================================+
 | Signal            | Status     | Required | Notes                  |
 |-------------------|------------|----------|------------------------|
-| Scope             | present    | no       | `00-scope.md`        |
-| Research          | present    | no       | `01-research.md`     |
-| Plan Artifact     | READY      | YES      | `02-plan.md`         |
-| Progress Artifact | present    | no       | `03-progress.md`     |
+| Version Tracker   | present    | YES      | `docs/releases/VERSION` |
+| Release Log       | present    | YES      | `docs/releases/RELEASE_LOG.md` |
+| Active Release    | READY      | YES      | `docs/releases/<version>-<slug>.md` |
 | Design Review     | optional   | no       | UI changes only        |
 | Codex Review      | optional   | no       | if CLI is available    |
 +--------------------------------------------------------------------+
-| VERDICT: READY WHEN `02-plan.md` EXISTS OR OVERRIDE IS ACCEPTED  |
+| VERDICT: READY WHEN THE ACTIVE RELEASE ARTIFACT IS READY OR OVERRIDE IS ACCEPTED |
 +====================================================================+
 ```
 
 Interpretation:
 
-- **Plan Artifact** is the only default ship gate.
-- `00-scope.md` and `01-research.md` are helpful context, but they do not block
-  shipping on their own.
-- `03-progress.md` is recommended whenever `/implement-astack` has been used.
+- **Active Release** is the default ship gate and should contain the current
+  workflow sections, including `Plan` and `Progress`.
+- `docs/releases/VERSION` and `docs/releases/RELEASE_LOG.md` are required
+  release artifacts for the new archival workflow.
 - Design and Codex reviews are informative, not blocking, unless the user says
   otherwise.
 
-If `02-plan.md` exists but the branch diff clearly moved beyond it, call that
-out as "stale plan artifact" rather than "ready."
+If the active release artifact exists but its `Plan` section clearly no longer
+matches the branch diff, call that out as "stale release artifact" rather than
+"ready."
 
 If the Plan Artifact is NOT "READY":
 
@@ -261,10 +265,10 @@ If the Plan Artifact is NOT "READY":
    If an override exists, display the dashboard and note "Planning gate previously accepted — continuing." Do NOT ask again.
 
 2. **If no override exists,** use AskUserQuestion:
-   - Show that `02-plan.md` is missing or stale relative to the branch work
+   - Show that the active release artifact or its `Plan` section is missing or stale relative to the branch work
    - RECOMMENDATION: Choose C if the change is obviously trivial (< 20 lines, typo fix, config-only); Choose B for larger changes
    - Options: A) Ship anyway  B) Abort — run /plan-astack first  C) Change is too small to need a formal plan
-   - If `00-scope.md` or `01-research.md` is missing, mention it as informational context but do NOT block on those files specifically
+   - If the active release artifact is missing `Scope` or `Research`, mention that as informational context but do NOT block on those sections specifically
    - For Design Review: run `source <(~/.claude/skills/astack/bin/astack-diff-scope <base> 2>/dev/null)`. If `SCOPE_FRONTEND=true` and no design review (design-review-lite or `/design-review-astack`) exists in the dashboard, mention: "Design Review not run — this PR changes frontend code. The lite design check will run automatically in Step 3.5, but consider running /design-review-astack for a full visual audit post-implementation." Still never block.
 
 3. **If the user chooses A or C,** persist the decision so future `/ship-astack` runs on this branch skip the gate:
@@ -284,7 +288,7 @@ Fetch and merge the base branch into the feature branch so tests run against the
 git fetch origin <base> && git merge origin/<base> --no-edit
 ```
 
-**If there are merge conflicts:** Try to auto-resolve if they are simple (VERSION, schema.rb, CHANGELOG ordering). If conflicts are complex or ambiguous, **STOP** and show them.
+**If there are merge conflicts:** Try to auto-resolve if they are simple (`docs/releases/VERSION`, schema.rb, `docs/releases/RELEASE_LOG.md` ordering). If conflicts are complex or ambiguous, **STOP** and show them.
 
 **If already up to date:** Continue silently.
 
@@ -906,7 +910,7 @@ CROSS-MODEL ANALYSIS:
 
 ## Step 4: Version bump (auto-decide)
 
-1. Read the current `VERSION` file (4-digit format: `MAJOR.MINOR.PATCH.MICRO`)
+1. Read the current `docs/releases/VERSION` file (4-digit format: `MAJOR.MINOR.PATCH.MICRO`)
 
 2. **Auto-decide the bump level based on the diff:**
    - Count lines changed (`git diff origin/<base>...HEAD --stat | tail -1`)
@@ -919,19 +923,19 @@ CROSS-MODEL ANALYSIS:
    - Bumping a digit resets all digits to its right to 0
    - Example: `0.19.1.0` + PATCH → `0.19.2.0`
 
-4. Write the new version to the `VERSION` file.
+4. Write the new version to `docs/releases/VERSION`.
 
 ---
 
-## Step 5: CHANGELOG (auto-generate)
+## Step 5: Release Log (auto-generate)
 
-1. Read `CHANGELOG.md` header to know the format.
+1. Read `docs/releases/RELEASE_LOG.md` header to know the format.
 
 2. Auto-generate the entry from **ALL commits on the branch** (not just recent ones):
    - Use `git log <base>..HEAD --oneline` to see every commit being shipped
    - Use `git diff <base>...HEAD` to see the full diff against the base branch
-   - The CHANGELOG entry must be comprehensive of ALL changes going into the PR
-   - If existing CHANGELOG entries on the branch already cover some commits, replace them with one unified entry for the new version
+   - The release-log entry must be comprehensive of ALL changes going into the PR
+   - If existing release-log entries on the branch already cover some commits, replace them with one unified entry for the new version
    - Categorize changes into applicable sections:
      - `### Added` — new features
      - `### Changed` — changes to existing functionality
@@ -942,6 +946,27 @@ CROSS-MODEL ANALYSIS:
    - Format: `## [X.Y.Z.W] - YYYY-MM-DD`
 
 **Do NOT ask the user to describe changes.** Infer from the diff and commit history.
+
+---
+
+## Step 5.25: Finalize The Active Release Artifact
+
+Update the active `docs/releases/<version>-<slug>.md` artifact so it becomes the
+canonical shipped record for this enhancement.
+
+1. Read the full file before editing.
+2. Update metadata fields such as version, status, and last-updated date to
+   reflect the shipped state.
+3. Rewrite workflow sections into archival, past-tense prose where needed:
+   - `Scope`: preserve the original intent, but clarify it as the shipped scope
+   - `Research`: describe what informed the implementation
+   - `Plan`: describe the implementation plan that guided the work
+   - `Progress`: convert in-flight notes into a concise summary of what was
+     implemented and verified
+   - `QA`: summarize the testing that was actually run
+   - `Release Notes`: align with the final `docs/releases/RELEASE_LOG.md` entry
+4. Do not delete historical context. Consolidate it into a readable shipped
+   record instead of leaving chatty, present-tense work notes behind.
 
 ---
 
@@ -987,7 +1012,7 @@ For each TODO item, check if the changes in this PR complete it by:
 
 **Be conservative:** Only mark a TODO as completed if there is clear evidence in the diff. If uncertain, leave it alone.
 
-**4. Move completed items** to the `## Completed` section at the bottom. Append: `**Completed:** vX.Y.Z (YYYY-MM-DD)`
+**4. Move completed items** to the `## Completed` section at the bottom. Append: `**Completed:** vX.Y.Z.W (YYYY-MM-DD)`
 
 **5. Output summary:**
 - `TODOS.md: N items marked complete (item1, item2, ...). M items remaining.`
@@ -1010,7 +1035,7 @@ Save this summary — it goes into the PR body in Step 8.
    - **Infrastructure:** migrations, config changes, route additions
    - **Models & services:** new models, services, concerns (with their tests)
    - **Controllers & views:** controllers, views, JS/React components (with their tests)
-   - **VERSION + CHANGELOG + TODOS.md:** always in the final commit
+   - **docs/releases/VERSION + docs/releases/RELEASE_LOG.md + docs/releases/<version>-<slug>.md + TODOS.md:** always in the final commit
 
 3. **Rules for splitting:**
    - A model and its test file go in the same commit
@@ -1025,11 +1050,11 @@ Save this summary — it goes into the PR body in Step 8.
 5. Compose each commit message:
    - First line: `<type>: <summary>` (type = feat/fix/chore/refactor/docs)
    - Body: brief description of what this commit contains
-   - Only the **final commit** (VERSION + CHANGELOG) gets the version tag and co-author trailer:
+   - Only the **final commit** (`docs/releases/VERSION` + `docs/releases/RELEASE_LOG.md` + finalized release artifact) gets the version tag and co-author trailer:
 
 ```bash
 git commit -m "$(cat <<'EOF'
-chore: bump version and changelog (vX.Y.Z.W)
+chore: finalize release docs (vX.Y.Z.W)
 
 Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>
 EOF
@@ -1044,7 +1069,7 @@ EOF
 
 Before pushing, re-verify if code changed during Steps 4-6:
 
-1. **Test verification:** If ANY code changed after Step 3's test run (fixes from review findings, CHANGELOG edits don't count), re-run the test suite. Paste fresh output. Stale output from Step 3 is NOT acceptable.
+1. **Test verification:** If ANY code changed after Step 3's test run (fixes from review findings, release-log edits don't count), re-run the test suite. Paste fresh output. Stale output from Step 3 is NOT acceptable.
 
 2. **Build verification:** If the project has a build step, run it. Paste output.
 
@@ -1077,7 +1102,7 @@ Create a pull request using `gh`:
 ```bash
 gh pr create --base <base> --title "<type>: <summary>" --body "$(cat <<'EOF'
 ## Summary
-<bullet points from CHANGELOG>
+<bullet points from the release log entry>
 
 ## Test Coverage
 <coverage diagram from Step 3.4, or "All new code paths have test coverage.">
@@ -1144,8 +1169,8 @@ doc updates — the user runs `/ship-astack` and documentation stays current wit
 - **Never skip the pre-landing review.** If checklist.md is unreadable, stop.
 - **Never force push.** Use regular `git push` only.
 - **Never ask for trivial confirmations** (e.g., "ready to push?", "create PR?"). DO stop for: version bumps (MINOR/MAJOR), pre-landing review findings (ASK items), Codex critical findings ([P1]), and the one-time Codex adoption prompt.
-- **Always use the 4-digit version format** from the VERSION file.
-- **Date format in CHANGELOG:** `YYYY-MM-DD`
+- **Always use the 4-digit version format** from `docs/releases/VERSION`.
+- **Date format in `docs/releases/RELEASE_LOG.md`:** `YYYY-MM-DD`
 - **Split commits for bisectability** — each commit = one logical change.
 - **TODOS.md completion detection must be conservative.** Only mark items as completed when the diff clearly shows the work is done.
 - **Use Greptile reply templates from greptile-triage.md.** Every reply includes evidence (inline diff, code references, re-rank suggestion). Never post vague replies.

@@ -1,20 +1,11 @@
 ---
 name: research-astack
-version: 1.0.0
 description: |
-  Repository and dependency research for implementation planning. Reads
-  `00-scope.md`, maps the current system, identifies reusable code and external
-  constraints, and writes `01-research.md`. Use when asked to "research this",
-  "map the codebase", or "figure out what already exists before we plan".
-allowed-tools:
-  - Bash
-  - Read
-  - Grep
-  - Glob
-  - Write
-  - Edit
-  - AskUserQuestion
-  - WebSearch
+  Repository and dependency research for implementation planning. Reads the
+  `Scope` section in the active release artifact, maps the current system,
+  identifies reusable code and external constraints, and updates the
+  `Research` section. Use when asked to "research this", "map the codebase", or
+  "figure out what already exists before we plan".
 ---
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
@@ -158,7 +149,7 @@ RECOMMENDATION: [what the user should do next]
 
 You are running the `/research-astack` workflow. This is a **plan-mode research pass**
 that turns the scoped request into implementation context. Your only durable
-output is `01-research.md`.
+output is the selected release artifact in `docs/releases/`.
 
 ## Hard Gates
 
@@ -172,9 +163,11 @@ output is `01-research.md`.
 
 ## Step 1: Read the scope
 
-Read `00-scope.md` first. If it does not exist, say so explicitly and either:
+Resolve the active release artifact in `docs/releases/` first, then read its
+`Scope` section. If no artifact or `Scope` section exists, say so explicitly and
+either:
 
-- use the user’s request as a temporary scope input, or
+- use the user's request as a temporary scope input, or
 - recommend running `/scope-astack` first if the request is still ambiguous.
 
 Then read, if present:
@@ -183,8 +176,8 @@ Then read, if present:
 - `CLAUDE.md`
 - `TODOS.md`
 - `DESIGN.md`
-- `01-research.md`
-- `02-plan.md`
+- `docs/releases/RELEASE_LOG.md`
+- the selected release artifact
 
 ## Step 2: Research the implementation landscape
 
@@ -206,43 +199,44 @@ forward distilled findings that planning will need.
 When important ambiguity remains, ask focused questions. Otherwise discover
 facts through reading and inspection before asking.
 
-## Step 3: Write `01-research.md`
+## Step 3: Write the `Research` section
 
-Write or update `01-research.md` in the repo root with this structure:
+Write or update the `Research` section in the selected release artifact with
+this structure:
 
 ```markdown
-# Research
+## Research
 
-## Scope Baseline
+### Scope Baseline
 - Short summary of the scoped task
 
-## Relevant Files
+### Relevant Files
 - Exact file paths
 - Why each file matters
 
-## Current System Map
+### Current System Map
 - Key files, modules, flows, and ownership boundaries
 
-## Reuse Opportunities
+### Reuse Opportunities
 - Existing code or patterns we should build on
 
-## External References
+### External References
 - Libraries, APIs, docs, or standards that matter
 
-## Constraints
+### Constraints
 - Technical, product, platform, or dependency constraints
 
-## Risks
+### Risks
 - High-risk areas or likely integration failures
 
-## Assumptions To Validate
+### Assumptions To Validate
 - Facts we are not fully certain about yet
 - Questions a human should confirm before planning
 
-## Unknowns
+### Unknowns
 - Open questions that planning must resolve
 
-## Recommended Direction
+### Recommended Direction
 - Best path into `/plan-astack`
 ```
 
@@ -253,11 +247,12 @@ Requirements:
 - Keep it implementation-oriented.
 - Distinguish facts from inference.
 - Do not paste raw code unless a tiny excerpt is necessary to explain a risk.
-- If a prior `01-research.md` exists, update it instead of duplicating it.
+- Preserve the rest of the selected release artifact unchanged.
+- If a prior `Research` section exists, update it instead of duplicating it.
 
 ## Step 4: Handoff
 
-After writing `01-research.md`:
+After writing the `Research` section:
 
 - Summarize the top reuse opportunities.
 - Call out the most important risk.
