@@ -84,6 +84,14 @@ function installSkills(tmpDir: string) {
   }
 }
 
+function setupReleaseArtifacts(tmpDir: string, artifactName: string, sections: string[]) {
+  const releasesDir = path.join(tmpDir, 'docs', 'releases');
+  fs.mkdirSync(releasesDir, { recursive: true });
+  fs.writeFileSync(path.join(releasesDir, 'VERSION'), '0.0.1.0\n');
+  fs.writeFileSync(path.join(releasesDir, 'RELEASE_LOG.md'), '# Release Log\n');
+  fs.writeFileSync(path.join(releasesDir, artifactName), `# Release\n\n${sections.join('\n\n')}\n`);
+}
+
 function logCost(label: string, result: SkillTestResult) {
   const { estimatedCost, estimatedTokens, turnsUsed } = result.costEstimate;
   const durationSec = Math.round(result.duration / 1000);
@@ -167,7 +175,9 @@ describeE2E('Skill Routing E2E - astack journey', () => {
       prompt: 'Use /research-astack before we plan this feature. I want you to map what already exists in the repo, what we can reuse, and what constraints matter.',
       setup: (tmpDir) => {
         fs.mkdirSync(path.join(tmpDir, 'src'), { recursive: true });
-        fs.writeFileSync(path.join(tmpDir, '00-scope.md'), '# Scope\n\n## Problem\n- Reps lose follow-ups.\n\n## Audience\n- Small sales team\n');
+        setupReleaseArtifacts(tmpDir, '0.0.1.0-sales-notes.md', [
+          '# Scope\n\n## Problem\n- Reps lose follow-ups.\n\n## Audience\n- Small sales team\n',
+        ]);
         fs.writeFileSync(path.join(tmpDir, 'src', 'notes.ts'), 'export function summarizeNotes(input: string) { return input.trim(); }\n');
         fs.writeFileSync(path.join(tmpDir, 'README.md'), '# Sales Notes\n');
         commitAll(tmpDir, 'initial');
@@ -181,8 +191,10 @@ describeE2E('Skill Routing E2E - astack journey', () => {
       expectedSkill: 'plan-astack',
       prompt: 'Use /plan-astack to turn the scoped and researched work into the final implementation plan before coding starts.',
       setup: (tmpDir) => {
-        fs.writeFileSync(path.join(tmpDir, '00-scope.md'), '# Scope\n\n## Problem\n- Reps lose follow-ups.\n');
-        fs.writeFileSync(path.join(tmpDir, '01-research.md'), '# Research\n\n## Current System Map\n- `src/notes.ts`\n\n## Recommended Direction\n- Extend note summarization into action extraction.\n');
+        setupReleaseArtifacts(tmpDir, '0.0.1.0-sales-notes.md', [
+          '# Scope\n\n## Problem\n- Reps lose follow-ups.\n',
+          '## Research\n\n### Current System Map\n- `src/notes.ts`\n\n### Recommended Direction\n- Extend note summarization into action extraction.\n',
+        ]);
         fs.mkdirSync(path.join(tmpDir, 'src'), { recursive: true });
         fs.writeFileSync(path.join(tmpDir, 'src', 'notes.ts'), 'export function summarizeNotes(input: string) { return input.trim(); }\n');
         commitAll(tmpDir, 'initial');
@@ -197,24 +209,26 @@ describeE2E('Skill Routing E2E - astack journey', () => {
       prompt: 'Use /implement-astack to build the approved plan and keep progress current.',
       setup: (tmpDir) => {
         fs.mkdirSync(path.join(tmpDir, 'src'), { recursive: true });
-        fs.writeFileSync(path.join(tmpDir, '02-plan.md'), `# Plan
+        setupReleaseArtifacts(tmpDir, '0.0.1.0-sales-notes.md', [
+          `## Plan
 
-## Summary
+### Summary
 - Add structured action extraction for note summaries
 
-## What Already Exists
+### What Already Exists
 - \`src/notes.ts\`
 
-## Implementation Outline
+### Concrete Changes
 - Update \`src/notes.ts\` to return a summary and action list
 - Add a simple test file
 
-## QA And Test Matrix
+### QA And Test Matrix
 - Verify a note with an action item returns that action
 
-## Not In Scope
+### Not In Scope
 - CRM sync
-`);
+`,
+        ]);
         fs.writeFileSync(path.join(tmpDir, 'src', 'notes.ts'), 'export function summarizeNotes(input: string) { return { summary: input.trim(), actions: [] as string[] }; }\n');
         fs.writeFileSync(path.join(tmpDir, 'package.json'), JSON.stringify({ name: 'sales-notes', scripts: { test: 'bun test' } }, null, 2));
         commitAll(tmpDir, 'initial');
@@ -244,7 +258,9 @@ describeE2E('Skill Routing E2E - astack journey', () => {
       acceptedSkills: ['qa-astack', 'qa-only-astack', 'browse-astack'],
       prompt: 'The app is ready for testing. Please test the site end to end, find problems, and fix what you can.',
       setup: (tmpDir) => {
-        fs.writeFileSync(path.join(tmpDir, '02-plan.md'), '# Plan\n\n## QA And Test Matrix\n- Home page loads\n- Create note flow works\n');
+        setupReleaseArtifacts(tmpDir, '0.0.1.0-sales-notes.md', [
+          '## Plan\n\n### QA And Test Matrix\n- Home page loads\n- Create note flow works\n',
+        ]);
         fs.mkdirSync(path.join(tmpDir, 'src'), { recursive: true });
         fs.writeFileSync(path.join(tmpDir, 'src', 'index.html'), '<html><body><h1>Sales Notes</h1></body></html>');
         commitAll(tmpDir, 'initial');
@@ -261,7 +277,9 @@ describeE2E('Skill Routing E2E - astack journey', () => {
         fs.writeFileSync(path.join(tmpDir, 'app.ts'), '// base\n');
         commitAll(tmpDir, 'initial');
         git(tmpDir, ['checkout', '-b', 'feature/actions']);
-        fs.writeFileSync(path.join(tmpDir, '02-plan.md'), '# Plan\n\n## Summary\n- Add action extraction\n');
+        setupReleaseArtifacts(tmpDir, '0.0.1.0-sales-notes.md', [
+          '## Plan\n\n### Summary\n- Add action extraction\n',
+        ]);
         fs.writeFileSync(path.join(tmpDir, 'app.ts'), 'export function saveNote(sql: any, body: string) { return sql(`insert into notes values (${body})`); }\n');
         commitAll(tmpDir, 'feat: add note persistence');
       },
@@ -274,10 +292,13 @@ describeE2E('Skill Routing E2E - astack journey', () => {
       expectedSkill: 'ship-astack',
       prompt: 'The branch looks ready. Please ship it: sync the branch, run the checks, and open the PR flow.',
       setup: (tmpDir) => {
-        fs.writeFileSync(path.join(tmpDir, '00-scope.md'), '# Scope\n');
-        fs.writeFileSync(path.join(tmpDir, '01-research.md'), '# Research\n');
-        fs.writeFileSync(path.join(tmpDir, '02-plan.md'), '# Plan\n');
-        fs.writeFileSync(path.join(tmpDir, '03-progress.md'), '# Progress\n');
+        setupReleaseArtifacts(tmpDir, '0.0.1.0-sales-notes.md', [
+          '## Scope\n',
+          '## Research\n',
+          '## Plan\n',
+          '## Progress\n',
+          '## Release Notes\n',
+        ]);
         fs.writeFileSync(path.join(tmpDir, 'app.ts'), '// base\n');
         commitAll(tmpDir, 'initial');
         git(tmpDir, ['checkout', '-b', 'feature/actions']);
@@ -294,8 +315,11 @@ describeE2E('Skill Routing E2E - astack journey', () => {
       prompt: 'We just shipped the feature. Please update the README and release docs so they match what is live.',
       setup: (tmpDir) => {
         fs.writeFileSync(path.join(tmpDir, 'README.md'), '# Sales Notes\n');
-        fs.writeFileSync(path.join(tmpDir, '02-plan.md'), '# Plan\n');
-        fs.writeFileSync(path.join(tmpDir, '03-progress.md'), '# Progress\n');
+        setupReleaseArtifacts(tmpDir, '0.0.1.0-sales-notes.md', [
+          '## Plan\n',
+          '## Progress\n',
+          '## Release Notes\n',
+        ]);
         commitAll(tmpDir, 'initial');
       },
     });
@@ -307,10 +331,13 @@ describeE2E('Skill Routing E2E - astack journey', () => {
       expectedSkill: 'retro-astack',
       prompt: 'It is the end of the week. Please run a quick retro on what we shipped and how the team worked.',
       setup: (tmpDir) => {
-        fs.writeFileSync(path.join(tmpDir, '00-scope.md'), '# Scope\n');
-        fs.writeFileSync(path.join(tmpDir, '01-research.md'), '# Research\n');
-        fs.writeFileSync(path.join(tmpDir, '02-plan.md'), '# Plan\n');
-        fs.writeFileSync(path.join(tmpDir, '03-progress.md'), '# Progress\n');
+        setupReleaseArtifacts(tmpDir, '0.0.1.0-sales-notes.md', [
+          '## Scope\n',
+          '## Research\n',
+          '## Plan\n',
+          '## Progress\n',
+          '## Release Notes\n',
+        ]);
         commitAll(tmpDir, 'initial');
       },
     });
@@ -322,7 +349,9 @@ describeE2E('Skill Routing E2E - astack journey', () => {
       expectedSkill: 'design-consultation-astack',
       prompt: 'Before we build the UI, please create the design system and product look for this project.',
       setup: (tmpDir) => {
-        fs.writeFileSync(path.join(tmpDir, '00-scope.md'), '# Scope\n\n## Audience\n- Sales reps\n');
+        setupReleaseArtifacts(tmpDir, '0.0.1.0-sales-notes.md', [
+          '# Scope\n\n## Audience\n- Sales reps\n',
+        ]);
         commitAll(tmpDir, 'initial');
       },
     });

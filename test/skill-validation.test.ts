@@ -75,10 +75,10 @@ describe('astack workflow structure', () => {
   });
 
   test('new workflow descriptions advertise the correct artifact contract', () => {
-    expect(read('scope/SKILL.md')).toContain('00-scope.md');
-    expect(read('research/SKILL.md')).toContain('01-research.md');
-    expect(read('plan/SKILL.md')).toContain('02-plan.md');
-    expect(read('implement/SKILL.md')).toContain('03-progress.md');
+    expect(read('scope/SKILL.md')).toContain('docs/releases/');
+    expect(read('research/SKILL.md')).toContain('Research');
+    expect(read('plan/SKILL.md')).toContain('Plan');
+    expect(read('implement/SKILL.md')).toContain('Progress');
   });
 
   test('root astack skill points to the new planning flow', () => {
@@ -93,24 +93,23 @@ describe('astack workflow structure', () => {
     expect(content).not.toContain('/plan-design-review');
   });
 
-  test('review, qa, and ship read plan artifacts instead of hidden astack project files', () => {
+  test('review, qa, and ship read release artifacts instead of hidden astack project files', () => {
     const review = read('review/SKILL.md');
     const qa = read('qa/SKILL.md');
     const qaOnly = read('qa-only/SKILL.md');
     const ship = read('ship/SKILL.md');
 
-    expect(review).toContain('02-plan.md');
-    expect(review).toContain('03-progress.md');
+    expect(review).toContain('Plan');
+    expect(review).toContain('Progress');
 
-    expect(qa).toContain('02-plan.md');
-    expect(qa).toContain('03-progress.md');
-    expect(qaOnly).toContain('02-plan.md');
-    expect(qaOnly).toContain('03-progress.md');
+    expect(qa).toContain('docs/releases/');
+    expect(qa).toContain('Progress');
+    expect(qaOnly).toContain('docs/releases/');
+    expect(qaOnly).toContain('Progress');
 
-    expect(ship).toContain('00-scope.md');
-    expect(ship).toContain('01-research.md');
-    expect(ship).toContain('02-plan.md');
-    expect(ship).toContain('03-progress.md');
+    expect(ship).toContain('docs/releases/VERSION');
+    expect(ship).toContain('docs/releases/RELEASE_LOG.md');
+    expect(ship).toContain('docs/releases/<version>-<slug>.md');
   });
 });
 

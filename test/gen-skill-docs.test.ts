@@ -85,16 +85,17 @@ describe('gen-skill-docs', () => {
     }
   });
 
-  test('workflow skills write the canonical numbered artifacts', () => {
+  test('workflow skills write to the canonical release artifacts', () => {
     const scopeContent = fs.readFileSync(path.join(ROOT, 'scope', 'SKILL.md'), 'utf-8');
     const researchContent = fs.readFileSync(path.join(ROOT, 'research', 'SKILL.md'), 'utf-8');
     const planContent = fs.readFileSync(path.join(ROOT, 'plan', 'SKILL.md'), 'utf-8');
     const implementContent = fs.readFileSync(path.join(ROOT, 'implement', 'SKILL.md'), 'utf-8');
 
-    expect(scopeContent).toContain('00-scope.md');
-    expect(researchContent).toContain('01-research.md');
-    expect(planContent).toContain('02-plan.md');
-    expect(implementContent).toContain('03-progress.md');
+    expect(scopeContent).toContain('docs/releases/');
+    expect(scopeContent).toContain('Scope');
+    expect(researchContent).toContain('Research');
+    expect(planContent).toContain('Plan');
+    expect(implementContent).toContain('Progress');
   });
 
   test('root skill suggests the new astack workflow', () => {
@@ -105,18 +106,17 @@ describe('gen-skill-docs', () => {
     expect(content).toContain('suggest /implement-astack');
   });
 
-  test('review and ship align to plan artifacts', () => {
+  test('review and ship align to release artifacts', () => {
     const reviewContent = fs.readFileSync(path.join(ROOT, 'review', 'SKILL.md'), 'utf-8');
     const shipContent = fs.readFileSync(path.join(ROOT, 'ship', 'SKILL.md'), 'utf-8');
 
-    expect(reviewContent).toContain('02-plan.md');
-    expect(reviewContent).toContain('03-progress.md');
+    expect(reviewContent).toContain('Plan');
+    expect(reviewContent).toContain('Progress');
 
     expect(shipContent).toContain('PLAN AND REVIEW READINESS DASHBOARD');
-    expect(shipContent).toContain('00-scope.md');
-    expect(shipContent).toContain('01-research.md');
-    expect(shipContent).toContain('02-plan.md');
-    expect(shipContent).toContain('03-progress.md');
+    expect(shipContent).toContain('docs/releases/VERSION');
+    expect(shipContent).toContain('docs/releases/RELEASE_LOG.md');
+    expect(shipContent).toContain('docs/releases/<version>-<slug>.md');
   });
 
   test('Claude dry-run freshness passes', () => {

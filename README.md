@@ -5,16 +5,18 @@ delivery workflow:
 
 **scope -> research -> plan -> implement -> review -> qa -> ship -> retro**
 
-The planning path is now built around four canonical commands:
+The planning path is now built around one canonical release artifact model:
 
-- `/scope-astack` writes `00-scope.md`
-- `/research-astack` writes `01-research.md`
-- `/plan-astack` writes `02-plan.md`
-- `/implement-astack` updates `03-progress.md`
+- `/scope-astack` updates the `Scope` section
+- `/research-astack` updates the `Research` section
+- `/plan-astack` updates the `Plan` section
+- `/implement-astack` updates the `Progress` section
 
-Those four repo-root artifacts are the source of truth for the whole sprint.
-Operational skills like `/review-astack`, `/qa-astack`, `/ship-astack`, and `/document-release-astack`
-consume them instead of relying on hidden per-branch planning files.
+Those workflow sections live in `docs/releases/<version>-<slug>.md`, alongside
+`docs/releases/VERSION` and `docs/releases/RELEASE_LOG.md`. Operational skills
+like `/review-astack`, `/qa-astack`, `/ship-astack`, and
+`/document-release-astack` consume the active release artifact instead of
+relying on hidden per-branch planning files.
 
 The shape of that core workflow was informed in part by HumanLayer's
 "Advanced Context Engineering for Coding Agents" DeepWiki, especially the
@@ -24,7 +26,7 @@ and
 https://deepwiki.com/humanlayer/advanced-context-engineering-for-coding-agents/3.2-planning-phase
 
 In astack, that influence shows up mainly in the explicit research-before-plan
-split, the review gate between those phases, and the use of durable repo-root
+split, the review gate between those phases, and the use of durable release
 artifacts to compact context for implementation.
 
 ## What astack is for
@@ -63,9 +65,10 @@ For per-skill workflow details, see [docs/skills.md](docs/skills.md).
 
 Use `/scope-astack` when the request is still fuzzy or needs a stronger wedge. It
 combines the old brainstorming and founder-review stages into one plan-mode
-step and writes `00-scope.md`.
+step and updates the `Scope` section in the active release artifact at
+`docs/releases/<version>-<slug>.md`.
 
-`00-scope.md` captures:
+The `Scope` section captures:
 
 - problem framing
 - audience
@@ -78,11 +81,11 @@ step and writes `00-scope.md`.
 
 ### 2. `/research-astack`
 
-Use `/research-astack` after scope is settled. It reads `00-scope.md`, maps the
-current system, identifies reuse opportunities, checks relevant docs, and
-writes `01-research.md`.
+Use `/research-astack` after scope is settled. It reads the active release
+artifact's `Scope` section, maps the current system, identifies reuse
+opportunities, checks relevant docs, and updates the `Research` section.
 
-`01-research.md` captures:
+The `Research` section captures:
 
 - current system map
 - reusable code and patterns
@@ -96,9 +99,10 @@ writes `01-research.md`.
 
 Use `/plan-astack` when we are ready to lock the implementation spec. It combines the
 old engineering review, plan-mode design review, and implementation planning
-into one plan-mode pass that writes `02-plan.md`.
+into one plan-mode pass that updates the `Plan` section in the active release
+artifact.
 
-`02-plan.md` captures:
+The `Plan` section captures:
 
 - summary
 - what already exists
@@ -112,10 +116,11 @@ into one plan-mode pass that writes `02-plan.md`.
 
 ### 4. `/implement-astack`
 
-Use `/implement-astack` once the plan is approved. It reads `02-plan.md`, makes the
-code changes, and maintains `03-progress.md` throughout execution.
+Use `/implement-astack` once the plan is approved. It reads the active release
+artifact's `Plan` section, makes the code changes, and maintains the
+`Progress` section throughout execution.
 
-`03-progress.md` tracks:
+The `Progress` section tracks:
 
 - status
 - checklist completion
@@ -129,11 +134,16 @@ code changes, and maintains `03-progress.md` throughout execution.
 
 After implementation:
 
-- `/review-astack` checks the diff against `02-plan.md` and `03-progress.md`
-- `/qa-astack` and `/qa-only-astack` use the QA matrix in `02-plan.md`
-- `/ship-astack` verifies code, docs, and progress are aligned before opening a PR
-- `/document-release-astack` syncs project docs to what actually shipped
-- `/retro-astack` uses the numbered docs as sprint context
+- `/review-astack` checks the diff against the active release artifact's `Plan`
+  and `Progress` sections
+- `/qa-astack` and `/qa-only-astack` use the QA matrix in the active release
+  artifact's `Plan` section
+- `/ship-astack` verifies code, docs, and progress are aligned, updates
+  `docs/releases/VERSION`, appends `docs/releases/RELEASE_LOG.md`, and turns the
+  active release artifact into a shipped record before opening a PR
+- `/document-release-astack` syncs project docs to what actually shipped and
+  rewrites the active release artifact into polished past-tense archival form
+- `/retro-astack` uses release artifacts and commit history as sprint context
 
 ## Install
 

@@ -4,8 +4,10 @@ version: 1.0.0
 description: |
   Post-ship documentation update. Reads all project docs, cross-references the
   diff, updates README/ARCHITECTURE/CONTRIBUTING/CLAUDE.md to match what shipped,
-  polishes CHANGELOG voice, cleans up TODOS, and optionally bumps VERSION. Use when
-  asked to "update the docs", "sync documentation", or "post-ship docs".
+  polishes `docs/releases/RELEASE_LOG.md`, cleans up TODOS, updates the active
+  release artifact into a past-tense archival record, and optionally bumps
+  `docs/releases/VERSION`. Use when asked to "update the docs", "sync
+  documentation", or "post-ship docs".
   Proactively suggest after a PR is merged or code is shipped.
 allowed-tools:
   - Bash
@@ -193,14 +195,14 @@ subjective decisions.
 - Adding items to tables/lists
 - Updating paths, counts, version numbers
 - Fixing stale cross-references
-- CHANGELOG voice polish (minor wording adjustments)
+- release-log voice polish (minor wording adjustments)
 - Marking TODOS complete
 - Cross-doc factual inconsistencies (e.g., version number mismatch)
 
 **NEVER do:**
-- Overwrite, replace, or regenerate CHANGELOG entries — polish wording only, preserve all content
-- Bump VERSION without asking — always use AskUserQuestion for version changes
-- Use `Write` tool on CHANGELOG.md — always use `Edit` with exact `old_string` matches
+- Overwrite, replace, or regenerate `docs/releases/RELEASE_LOG.md` entries — polish wording only, preserve all content
+- Bump `docs/releases/VERSION` without asking — always use AskUserQuestion for version changes
+- Use `Write` tool on `docs/releases/RELEASE_LOG.md` — always use `Edit` with exact `old_string` matches
 
 ---
 
@@ -308,34 +310,34 @@ Apply approved changes immediately after each answer.
 
 ---
 
-## Step 5: CHANGELOG Voice Polish
+## Step 5: Release Log Voice Polish
 
-**CRITICAL — NEVER CLOBBER CHANGELOG ENTRIES.**
+**CRITICAL — NEVER CLOBBER RELEASE LOG ENTRIES.**
 
-This step polishes voice. It does NOT rewrite, replace, or regenerate CHANGELOG content.
+This step polishes voice. It does NOT rewrite, replace, or regenerate release-log content.
 
-A real incident occurred where an agent replaced existing CHANGELOG entries when it should have
+A real incident occurred where an agent replaced existing release-log entries when it should have
 preserved them. This skill must NEVER do that.
 
 **Rules:**
-1. Read the entire CHANGELOG.md first. Understand what is already there.
+1. Read the entire `docs/releases/RELEASE_LOG.md` first. Understand what is already there.
 2. Only modify wording within existing entries. Never delete, reorder, or replace entries.
-3. Never regenerate a CHANGELOG entry from scratch. The entry was written by `/ship-astack` from the
+3. Never regenerate a release-log entry from scratch. The entry was written by `/ship-astack` from the
    actual diff and commit history. It is the source of truth. You are polishing prose, not
    rewriting history.
 4. If an entry looks wrong or incomplete, use AskUserQuestion — do NOT silently fix it.
-5. Use Edit tool with exact `old_string` matches — never use Write to overwrite CHANGELOG.md.
+5. Use Edit tool with exact `old_string` matches — never use Write to overwrite `docs/releases/RELEASE_LOG.md`.
 
-**If CHANGELOG was not modified in this branch:** skip this step.
+**If `docs/releases/RELEASE_LOG.md` was not modified in this branch:** skip this step.
 
-**If CHANGELOG was modified in this branch**, review the entry for voice:
+**If `docs/releases/RELEASE_LOG.md` was modified in this branch**, review the entry for voice:
 
 - **Sell test:** Would a user reading each bullet think "oh nice, I want to try that"? If not,
   rewrite the wording (not the content).
 - Lead with what the user can now **do** — not implementation details.
 - "You can now..." not "Refactored the..."
 - Flag and rewrite any entry that reads like a commit message.
-- Internal/contributor changes belong in a separate "### For contributors" subsection.
+- Internal/contributor changes belong in a separate "### For contributors" subsection when the release log format already includes one.
 - Auto-fix minor voice adjustments. Use AskUserQuestion if a rewrite would alter meaning.
 
 ---
@@ -346,7 +348,7 @@ After auditing each file individually, do a cross-doc consistency pass:
 
 1. Does the README's feature/capability list match what CLAUDE.md (or project instructions) describes?
 2. Does ARCHITECTURE's component list match CONTRIBUTING's project structure description?
-3. Does CHANGELOG's latest version match the VERSION file?
+3. Does the latest `docs/releases/RELEASE_LOG.md` entry match `docs/releases/VERSION`?
 4. **Discoverability:** Is every documentation file reachable from README.md or CLAUDE.md? If
    ARCHITECTURE.md exists but neither README nor CLAUDE.md links to it, flag it. Every doc
    should be discoverable from one of the two entry-point files.
@@ -377,41 +379,41 @@ If TODOS.md does not exist, skip this step.
 
 ---
 
-## Step 8: VERSION Bump Question
+## Step 8: Version Tracker Bump Question
 
-**CRITICAL — NEVER BUMP VERSION WITHOUT ASKING.**
+**CRITICAL — NEVER BUMP `docs/releases/VERSION` WITHOUT ASKING.**
 
-1. **If VERSION does not exist:** Skip silently.
+1. **If `docs/releases/VERSION` does not exist:** Skip silently.
 
-2. Check if VERSION was already modified on this branch:
+2. Check if `docs/releases/VERSION` was already modified on this branch:
 
 ```bash
-git diff <base>...HEAD -- VERSION
+git diff <base>...HEAD -- docs/releases/VERSION
 ```
 
-3. **If VERSION was NOT bumped:** Use AskUserQuestion:
+3. **If `docs/releases/VERSION` was NOT bumped:** Use AskUserQuestion:
    - RECOMMENDATION: Choose C (Skip) because docs-only changes rarely warrant a version bump
    - A) Bump PATCH (X.Y.Z+1) — if doc changes ship alongside code changes
    - B) Bump MINOR (X.Y+1.0) — if this is a significant standalone release
    - C) Skip — no version bump needed
 
-4. **If VERSION was already bumped:** Do NOT skip silently. Instead, check whether the bump
+4. **If `docs/releases/VERSION` was already bumped:** Do NOT skip silently. Instead, check whether the bump
    still covers the full scope of changes on this branch:
 
-   a. Read the CHANGELOG entry for the current VERSION. What features does it describe?
+   a. Read the `docs/releases/RELEASE_LOG.md` entry for the current version. What features does it describe?
    b. Read the full diff (`git diff <base>...HEAD --stat` and `git diff <base>...HEAD --name-only`).
       Are there significant changes (new features, new skills, new commands, major refactors)
-      that are NOT mentioned in the CHANGELOG entry for the current version?
-   c. **If the CHANGELOG entry covers everything:** Skip — output "VERSION: Already bumped to
+      that are NOT mentioned in the release-log entry for the current version?
+   c. **If the release-log entry covers everything:** Skip — output "VERSION: Already bumped to
       vX.Y.Z, covers all changes."
    d. **If there are significant uncovered changes:** Use AskUserQuestion explaining what the
       current version covers vs what's new, and ask:
       - RECOMMENDATION: Choose A because the new changes warrant their own version
       - A) Bump to next patch (X.Y.Z+1) — give the new changes their own version
-      - B) Keep current version — add new changes to the existing CHANGELOG entry
+      - B) Keep current version — add new changes to the existing release-log entry
       - C) Skip — leave version as-is, handle later
 
-   The key insight: a VERSION bump set for "feature A" should not silently absorb "feature B"
+   The key insight: a version bump set for "feature A" should not silently absorb "feature B"
    if feature B is substantial enough to deserve its own version entry.
 
 ---
@@ -482,9 +484,9 @@ Documentation health:
   README.md       [status] ([details])
   ARCHITECTURE.md [status] ([details])
   CONTRIBUTING.md [status] ([details])
-  CHANGELOG.md    [status] ([details])
-  TODOS.md        [status] ([details])
-  VERSION         [status] ([details])
+  docs/releases/RELEASE_LOG.md [status] ([details])
+  TODOS.md                    [status] ([details])
+  docs/releases/VERSION       [status] ([details])
 ```
 
 Where status is one of:
@@ -500,8 +502,8 @@ Where status is one of:
 ## Important Rules
 
 - **Read before editing.** Always read the full content of a file before modifying it.
-- **Never clobber CHANGELOG.** Polish wording only. Never delete, replace, or regenerate entries.
-- **Never bump VERSION silently.** Always ask. Even if already bumped, check whether it covers the full scope of changes.
+- **Never clobber `docs/releases/RELEASE_LOG.md`.** Polish wording only. Never delete, replace, or regenerate entries.
+- **Never bump `docs/releases/VERSION` silently.** Always ask. Even if already bumped, check whether it covers the full scope of changes.
 - **Be explicit about what changed.** Every edit gets a one-line summary.
 - **Generic heuristics, not project-specific.** The audit checks work on any repo.
 - **Discoverability matters.** Every doc file should be reachable from README or CLAUDE.md.

@@ -4,9 +4,9 @@ version: 1.0.0
 description: |
   Unified planning review. Combines engineering review, design review, and
   implementation planning into one plan-mode skill that resolves decisions and
-  writes `02-plan.md`. Use when asked to "make the plan", "review the
-  architecture", "lock the implementation plan", or "finalize what we should
-  build".
+  updates the `Plan` section in the active release artifact. Use when asked to
+  "make the plan", "review the architecture", "lock the implementation plan",
+  or "finalize what we should build".
 allowed-tools:
   - Read
   - Write
@@ -157,8 +157,8 @@ RECOMMENDATION: [what the user should do next]
 # /plan-astack
 
 You are running the `/plan-astack` workflow. This is the final plan-mode stage before
-implementation. Your job is to turn `00-scope.md` and `01-research.md` into one
-decision-complete implementation spec: `02-plan.md`.
+implementation. Your job is to turn the `Scope` and `Research` sections in the
+active release artifact into one decision-complete `Plan` section.
 
 ## Hard Gates
 
@@ -166,15 +166,14 @@ decision-complete implementation spec: `02-plan.md`.
 - Do NOT leave important technical or UX choices implicit.
 - Do NOT include verbose exploration logs or rejected alternatives unless they
   are critical context for the chosen plan.
-- Your only durable output is `02-plan.md`.
+- Your only durable output is the selected release artifact in `docs/releases/`.
 
 ## Step 1: Gather the planning inputs
 
 Read these files first if they exist:
 
-- `00-scope.md`
-- `01-research.md`
-- `02-plan.md`
+- `docs/releases/RELEASE_LOG.md`
+- the selected release artifact
 - `DESIGN.md`
 - `README.md`
 - `CLAUDE.md`
@@ -183,9 +182,9 @@ Read these files first if they exist:
 Then inspect the code paths, types, routes, components, and tests most relevant
 to the request.
 
-If `00-scope.md` or `01-research.md` is missing, say so explicitly and proceed
-only if the user has already provided enough context. Otherwise recommend
-running the missing stage first.
+If the selected release artifact is missing a `Scope` or `Research` section,
+say so explicitly and proceed only if the user has already provided enough
+context. Otherwise recommend running the missing stage first.
 
 ## Step 2: Resolve the remaining decisions
 
@@ -209,35 +208,36 @@ Use AskUserQuestion only for real tradeoffs that materially change the build:
 - rollout or compatibility decision
 - test/eval scope when more than one sensible option exists
 
-## Step 3: Write `02-plan.md`
+## Step 3: Write the `Plan` section
 
-Write or update `02-plan.md` in the repo root with this structure:
+Write or update the `Plan` section in the selected release artifact with this
+structure:
 
 ```markdown
-# Plan
+## Plan
 
-## Summary
+### Summary
 - What we are building
 - Why this plan is the chosen approach
 
-## What Already Exists
+### What Already Exists
 - Existing code, patterns, or systems we will reuse
 
-## Architecture
+### Architecture
 - Components, services, data flow, interfaces
 
-## Concrete Changes
+### Concrete Changes
 - Exact file paths to edit
 - Specific functions, classes, components, routes, or interfaces to modify
 - New files, migrations, or tests to add
 
-## UX And States
+### UX And States
 - User journey
 - Loading / empty / success / error states
 - Accessibility or responsive notes if relevant
 
-## Implementation Phases
-### Phase 1: <name>
+### Implementation Phases
+#### Phase 1: <name>
 - Goal
 - Exact files to edit
 - Symbols/interfaces touched
@@ -246,7 +246,7 @@ Write or update `02-plan.md` in the repo root with this structure:
 - Rollback note
 - Dependencies on earlier phases, if any
 
-### Phase N: <name>
+#### Phase N: <name>
 - Goal
 - Exact files to edit
 - Symbols/interfaces touched
@@ -255,24 +255,24 @@ Write or update `02-plan.md` in the repo root with this structure:
 - Rollback note
 - Dependencies on earlier phases, if any
 
-## Failure Modes
+### Failure Modes
 - What can break
 - How we detect it
 - How the user experiences it
 
-## QA And Test Matrix
+### QA And Test Matrix
 - Routes/pages to verify
 - Critical flows
 - Edge cases
 - Regression tests or evals required
 
-## Rollout Notes
+### Rollout Notes
 - Flags, migrations, rollout sequencing, or compatibility notes
 
-## Not In Scope
+### Not In Scope
 - Explicitly deferred work
 
-## Open Questions
+### Open Questions
 - Remaining unknowns, if any
 ```
 
@@ -286,10 +286,11 @@ Additional requirements:
 - The `Concrete Changes` section must use exact file paths whenever possible.
 - Every phase must be independently verifiable and concrete enough for
   `/implement-astack` to execute without guessing.
+- Preserve the rest of the selected release artifact unchanged.
 
 ## Step 4: Handoff
 
-After writing `02-plan.md`:
+After writing the `Plan` section:
 
 - Summarize the plan in implementation order.
 - Call out the highest-risk part of the build.

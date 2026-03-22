@@ -1016,10 +1016,10 @@ Before shipping, check the canonical workflow artifacts and any available review
 signals.
 
 \`\`\`bash
-[ -f 00-scope.md ] && echo "SCOPE:present" || echo "SCOPE:missing"
-[ -f 01-research.md ] && echo "RESEARCH:present" || echo "RESEARCH:missing"
-[ -f 02-plan.md ] && echo "PLAN:present" || echo "PLAN:missing"
-[ -f 03-progress.md ] && echo "PROGRESS:present" || echo "PROGRESS:missing"
+[ -f docs/releases/VERSION ] && echo "VERSION_TRACKER:present" || echo "VERSION_TRACKER:missing"
+[ -f docs/releases/RELEASE_LOG.md ] && echo "RELEASE_LOG:present" || echo "RELEASE_LOG:missing"
+ACTIVE_RELEASE=$(find docs/releases -maxdepth 1 -type f -name "*.md" ! -name "RELEASE_LOG.md" | head -n 1)
+[ -n "$ACTIVE_RELEASE" ] && echo "ACTIVE_RELEASE:present:$ACTIVE_RELEASE" || echo "ACTIVE_RELEASE:missing"
 ~/.claude/skills/astack/bin/astack-review-read 2>/dev/null || true
 \`\`\`
 
@@ -1031,28 +1031,28 @@ Display:
 +====================================================================+
 | Signal            | Status     | Required | Notes                  |
 |-------------------|------------|----------|------------------------|
-| Scope             | present    | no       | \`00-scope.md\`        |
-| Research          | present    | no       | \`01-research.md\`     |
-| Plan Artifact     | READY      | YES      | \`02-plan.md\`         |
-| Progress Artifact | present    | no       | \`03-progress.md\`     |
+| Version Tracker   | present    | YES      | \`docs/releases/VERSION\` |
+| Release Log       | present    | YES      | \`docs/releases/RELEASE_LOG.md\` |
+| Active Release    | READY      | YES      | \`docs/releases/<version>-<slug>.md\` |
 | Design Review     | optional   | no       | UI changes only        |
 | Codex Review      | optional   | no       | if CLI is available    |
 +--------------------------------------------------------------------+
-| VERDICT: READY WHEN \`02-plan.md\` EXISTS OR OVERRIDE IS ACCEPTED  |
+| VERDICT: READY WHEN THE ACTIVE RELEASE ARTIFACT IS READY OR OVERRIDE IS ACCEPTED |
 +====================================================================+
 \`\`\`
 
 Interpretation:
 
-- **Plan Artifact** is the only default ship gate.
-- \`00-scope.md\` and \`01-research.md\` are helpful context, but they do not block
-  shipping on their own.
-- \`03-progress.md\` is recommended whenever \`/implement-astack\` has been used.
+- **Active Release** is the default ship gate and should contain the current
+  workflow sections, including \`Plan\` and \`Progress\`.
+- \`docs/releases/VERSION\` and \`docs/releases/RELEASE_LOG.md\` are required
+  release artifacts for the new archival workflow.
 - Design and Codex reviews are informative, not blocking, unless the user says
   otherwise.
 
-If \`02-plan.md\` exists but the branch diff clearly moved beyond it, call that
-out as "stale plan artifact" rather than "ready."`;
+If the active release artifact exists but its \`Plan\` section clearly no longer
+matches the branch diff, call that out as "stale release artifact" rather than
+"ready."`;
 }
 
 function generateTestBootstrap(_ctx: TemplateContext): string {

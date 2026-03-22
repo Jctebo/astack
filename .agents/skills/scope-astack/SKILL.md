@@ -4,10 +4,11 @@ version: 1.0.0
 description: |
   Scope discovery and product framing. Combines the old brainstorming and
   CEO-review stages into one plan-mode skill that challenges the request,
-  narrows the wedge, and writes `00-scope.md`. Use when asked to "scope this",
-  "think this through", "brainstorm", "reframe the problem", or "is this worth
-  building". Proactively suggest when the user is still deciding what to build
-  or what success should look like.
+  narrows the wedge, and updates the `Scope` section in the active release
+  artifact under `docs/releases/`. Use when asked to "scope this", "think this
+  through", "brainstorm", "reframe the problem", or "is this worth building".
+  Proactively suggest when the user is still deciding what to build or what
+  success should look like.
 allowed-tools:
   - Bash
   - Read
@@ -158,14 +159,14 @@ RECOMMENDATION: [what the user should do next]
 # /scope-astack
 
 You are running the `/scope-astack` workflow. This is a **plan-mode artifact skill**.
-Your job is to understand the problem before implementation starts and produce
-one canonical repo-root document: `00-scope.md`.
+Your job is to understand the problem before implementation starts and update
+the `Scope` section in one canonical release artifact under `docs/releases/`.
 
 ## Hard Gates
 
 - Do NOT write code, scaffold files, or start implementation.
 - Do NOT create additional planning docs unless the user explicitly asks.
-- Your only durable output is `00-scope.md`.
+- Your only durable output is the selected release artifact in `docs/releases/`.
 
 ## Step 1: Ground in the repo
 
@@ -183,14 +184,32 @@ Then read, if present:
 - `CLAUDE.md`
 - `TODOS.md`
 - `DESIGN.md`
-- `00-scope.md`
-- `01-research.md`
-- `02-plan.md`
-- `03-progress.md`
+- `docs/releases/RELEASE_LOG.md`
+- the active release artifact in `docs/releases/`
 
 Use Grep/Glob to inspect the codebase areas most relevant to the request. If
-`00-scope.md` already exists, treat it as the current draft and improve it
-instead of starting from scratch.
+an active release artifact already exists, treat its `Scope` section as the
+current draft and improve it instead of starting from scratch.
+
+## Step 1.5: Resolve the release artifact
+
+Use this release-folder contract:
+
+- `docs/releases/VERSION`
+- `docs/releases/RELEASE_LOG.md`
+- `docs/releases/<version>-<slug>.md`
+
+Resolve the active artifact like this:
+
+- If no version-prefixed enhancement file exists, ask for the enhancement slug,
+  increment `docs/releases/VERSION`, and create
+  `docs/releases/<version>-<slug>.md`.
+- If exactly one version-prefixed enhancement file exists, state which exact
+  file you are updating and proceed.
+- If multiple version-prefixed enhancement files exist, ask which one should be
+  updated.
+
+Ignore `VERSION` and `RELEASE_LOG.md` when selecting the enhancement file.
 
 ## Step 2: Challenge the framing
 
@@ -216,42 +235,43 @@ scope, audience, success criteria, or wedge. Good prompts include:
 If the user is unclear or still exploring, keep pushing until the core problem,
 audience, and wedge are concrete enough to hand to `/research-astack`.
 
-## Step 3: Produce the scope artifact
+## Step 3: Produce the scope section
 
-Write or update `00-scope.md` in the repo root with this structure:
+Write or update the `Scope` section in the selected release artifact with this
+structure:
 
 ```markdown
-# Scope
+## Scope
 
-## Problem
+### Problem
 - What problem are we solving?
 - Why now?
 
-## Audience
+### Audience
 - Primary user
 - Secondary stakeholders
 
-## Current Status Quo
+### Current Status Quo
 - What people do today
 - Why that is insufficient
 
-## Goal
+### Goal
 - Desired outcome
 - Success criteria
 
-## Constraints
+### Constraints
 - Product, technical, team, or timing constraints
 
-## Narrow Wedge
+### Narrow Wedge
 - Smallest valuable version to build first
 
-## Non-Goals
+### Non-Goals
 - Explicitly out of scope items
 
-## Risks And Unknowns
+### Risks And Unknowns
 - Top unresolved questions or assumptions
 
-## Recommended Next Step
+### Recommended Next Step
 - What `/research-astack` should validate next
 ```
 
@@ -260,11 +280,15 @@ Requirements:
 - Keep it concrete and implementation-relevant.
 - Prefer bullets over essays.
 - Include the decisions that would otherwise be lost in chat.
-- If a prior draft exists, preserve useful material and tighten it.
+- Preserve any other sections in the release artifact unchanged.
+- If a prior `Scope` section exists, preserve useful material and tighten it.
+- Ensure the artifact also has top-level `# Release` metadata and section
+  headers for `Scope`, `Research`, `Plan`, `Progress`, `QA`, and `Release Notes`
+  if the file is being created from scratch.
 
 ## Step 4: Handoff
 
-After writing `00-scope.md`:
+After writing the `Scope` section:
 
 - Summarize the final scope in 5-10 bullets.
 - Call out the biggest unresolved risk.

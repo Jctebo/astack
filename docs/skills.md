@@ -9,10 +9,10 @@ For install roots, generated host folders, and Copilot scope, see
 
 | Skill | Purpose | Output |
 |-------|---------|--------|
-| `/scope-astack` | Frame the problem, audience, wedge, and non-goals | `00-scope.md` |
-| `/research-astack` | Map the current system, reuse paths, constraints, and unknowns | `01-research.md` |
-| `/plan-astack` | Produce the implementation spec and QA matrix | `02-plan.md` |
-| `/implement-astack` | Execute the plan and keep progress current | `03-progress.md` |
+| `/scope-astack` | Frame the problem, audience, wedge, and non-goals | `Scope` section in `docs/releases/<version>-<slug>.md` |
+| `/research-astack` | Map the current system, reuse paths, constraints, and unknowns | `Research` section in `docs/releases/<version>-<slug>.md` |
+| `/plan-astack` | Produce the implementation spec and QA matrix | `Plan` section in `docs/releases/<version>-<slug>.md` |
+| `/implement-astack` | Execute the plan and keep progress current | `Progress` section in `docs/releases/<version>-<slug>.md` |
 
 ### `/scope-astack`
 
@@ -31,9 +31,9 @@ It should:
 - read the repo before asking broad questions
 - challenge assumptions one at a time
 - prefer concrete user pain over feature phrasing
-- write `00-scope.md` in the repo root
+- update the `Scope` section in the active release artifact
 
-`00-scope.md` should cover:
+The `Scope` section should cover:
 
 - problem
 - audience
@@ -56,13 +56,13 @@ Use it when:
 
 It should:
 
-- read `00-scope.md` first
+- read the active release artifact's `Scope` section first
 - inspect the relevant code paths and tests
 - identify existing patterns worth reusing
 - consult primary external references when needed
-- write `01-research.md`
+- update the `Research` section
 
-`01-research.md` should cover:
+The `Research` section should cover:
 
 - scope baseline
 - current system map
@@ -86,13 +86,13 @@ Use it when:
 
 It should:
 
-- read `00-scope.md` and `01-research.md`
+- read the active release artifact's `Scope` and `Research` sections
 - make architecture and UX decisions explicit
 - specify loading, empty, success, and error states when UI exists
 - include a concrete QA and test matrix
-- write `02-plan.md`
+- update the `Plan` section
 
-`02-plan.md` should cover:
+The `Plan` section should cover:
 
 - summary
 - what already exists
@@ -111,18 +111,18 @@ It should:
 
 Use it when:
 
-- `02-plan.md` is approved
+- the active release artifact's `Plan` section is approved
 - it is time to make code changes
 - we want execution tracked against the plan instead of drifting in chat
 
 It should:
 
-- read `02-plan.md` as the source of truth
+- read the `Plan` section as the source of truth
 - implement in focused steps
 - validate as it goes
-- update `03-progress.md` throughout execution
+- update the `Progress` section throughout execution
 
-`03-progress.md` should cover:
+The `Progress` section should cover:
 
 - overall status
 - checklist
@@ -139,15 +139,16 @@ It should:
 Pre-landing code review. It should review the actual diff against the plan and
 execution artifacts:
 
-- `02-plan.md`
-- `03-progress.md`
+- the active release artifact's `Plan` section
+- the active release artifact's `Progress` section
 
 Use it before merge or before `/ship-astack`.
 
 ### `/qa-astack`
 
-Full QA loop: test, fix, verify. It should read the QA matrix in `02-plan.md`
-and the current state in `03-progress.md`.
+Full QA loop: test, fix, verify. It should read the QA matrix in the active
+release artifact's `Plan` section and the current state in its `Progress`
+section.
 
 Use it when:
 
@@ -179,8 +180,8 @@ shipped behavior and astack workflow artifacts.
 
 ### `/retro-astack`
 
-Retrospective workflow. It can use `00-scope.md` through `03-progress.md` as
-sprint context alongside git history.
+Retrospective workflow. It can use the active release artifact as sprint context
+alongside git history.
 
 ## Supporting Skills
 

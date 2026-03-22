@@ -8,7 +8,7 @@ astack combines:
 
 - a persistent fast browser runtime for QA and dogfooding
 - generated skill docs
-- a workflow-first skill system built around repo-root artifacts
+- a workflow-first skill system built around release-folder artifacts
 
 The browser is the runtime piece. The workflow logic is mostly Markdown.
 
@@ -17,22 +17,27 @@ The browser is the runtime piece. The workflow logic is mostly Markdown.
 The planning and delivery loop is artifact-driven:
 
 ```text
-/scope-astack      -> 00-scope.md
-/research-astack   -> 01-research.md
-/plan-astack       -> 02-plan.md
-/implement-astack  -> 03-progress.md
+docs/releases/VERSION
+docs/releases/RELEASE_LOG.md
+docs/releases/<version>-<slug>.md
+  ├─ Scope
+  ├─ Research
+  ├─ Plan
+  ├─ Progress
+  ├─ QA
+  └─ Release Notes
 ```
 
 Downstream skills consume those artifacts:
 
-- `/review-astack` compares the diff to `02-plan.md` and `03-progress.md`
-- `/qa-astack` reads the QA matrix in `02-plan.md`
-- `/ship-astack` checks code, docs, and plan alignment
-- `/document-release-astack` syncs docs to shipped behavior
-- `/retro-astack` uses the numbered docs as sprint context
+- `/review-astack` compares the diff to the active release artifact's `Plan` and `Progress` sections
+- `/qa-astack` reads the QA matrix in the active release artifact's `Plan` section
+- `/ship-astack` updates release-folder versioning and marks the active artifact as shipped
+- `/document-release-astack` syncs docs to shipped behavior and normalizes the artifact into past tense
+- `/retro-astack` uses release artifacts as sprint context
 
-This keeps planning context visible in the repo instead of burying it in hidden
-branch-local state.
+This keeps planning and release context visible in the repo instead of burying
+it in hidden branch-local state.
 
 This artifact-first flow was informed in part by HumanLayer's DeepWiki material
 on research and planning for coding agents, particularly the emphasis on
