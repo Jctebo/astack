@@ -1,10 +1,19 @@
 ---
 name: implement-astack
+version: 1.0.0
 description: |
   Plan-driven implementation workflow. Reads the `Plan` section in the active
   release artifact, makes the code changes, keeps the `Progress` section
   current, and verifies the work. Use when the plan is approved and it is time
   to build.
+allowed-tools:
+  - Bash
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - AskUserQuestion
 ---
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->

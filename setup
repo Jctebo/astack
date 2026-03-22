@@ -258,6 +258,12 @@ create_runtime_root() {
 
   cp "$source_skill_md" "$target_root/SKILL.md"
 
+  if [ "$ASTACK_DIR" != "$target_root" ]; then
+    [ -f "$ASTACK_DIR/VERSION" ] && cp "$ASTACK_DIR/VERSION" "$target_root/VERSION"
+    [ -f "$ASTACK_DIR/CHANGELOG.md" ] && cp "$ASTACK_DIR/CHANGELOG.md" "$target_root/CHANGELOG.md"
+  fi
+  printf '%s\n' "$ASTACK_DIR" > "$target_root/.astack-source-path"
+
   local bin_dst="$target_root/bin"
   if [ -L "$bin_dst" ] || [ ! -e "$bin_dst" ]; then
     ln -snf "$ASTACK_DIR/bin" "$bin_dst"
@@ -292,13 +298,18 @@ if [ "$INSTALL_CODEX" -eq 1 ]; then
 
   # Install a slim astack runtime root instead of symlinking the full repo.
   # This prevents Codex from discovering every source skill twice.
-  if [ -e "$CODEX_ASTACK/setup" ] && [ -e "$CODEX_ASTACK/package.json" ]; then
-    rm -rf "$CODEX_ASTACK"
-  elif [ -L "$CODEX_ASTACK" ] && [ "$(readlink "$CODEX_ASTACK" 2>/dev/null)" = "$ASTACK_DIR" ]; then
-    rm -f "$CODEX_ASTACK"
+  if [ "$ASTACK_DIR" = "$CODEX_ASTACK" ]; then
+    # Legacy in-place Codex install: keep the source checkout at the runtime root.
+    printf '%s\n' "$ASTACK_DIR" > "$CODEX_ASTACK/.astack-source-path"
+  else
+    if [ -e "$CODEX_ASTACK/setup" ] && [ -e "$CODEX_ASTACK/package.json" ]; then
+      rm -rf "$CODEX_ASTACK"
+    elif [ -L "$CODEX_ASTACK" ] && [ "$(readlink "$CODEX_ASTACK" 2>/dev/null)" = "$ASTACK_DIR" ]; then
+      rm -f "$CODEX_ASTACK"
+    fi
+    mkdir -p "$CODEX_ASTACK"
+    create_runtime_root "$ASTACK_DIR/.agents/skills/astack/SKILL.md" "$CODEX_ASTACK"
   fi
-  mkdir -p "$CODEX_ASTACK"
-  create_runtime_root "$ASTACK_DIR/.agents/skills/astack/SKILL.md" "$CODEX_ASTACK"
   # Install generated Codex-format skills (not Claude source dirs)
   link_codex_skill_dirs "$ASTACK_DIR" "$CODEX_SKILLS"
 

@@ -1,11 +1,21 @@
 ---
 name: research-astack
+version: 1.0.0
 description: |
   Repository and dependency research for implementation planning. Reads the
   `Scope` section in the active release artifact, maps the current system,
   identifies reusable code and external constraints, and updates the
   `Research` section. Use when asked to "research this", "map the codebase", or
   "figure out what already exists before we plan".
+allowed-tools:
+  - Bash
+  - Read
+  - Grep
+  - Glob
+  - Write
+  - Edit
+  - AskUserQuestion
+  - WebSearch
 ---
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->

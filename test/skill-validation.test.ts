@@ -138,7 +138,17 @@ describe('generated skill health', () => {
     expect(setup).toContain('create_runtime_root');
     expect(setup).toContain('$HOME/.codex/skills');
     expect(setup).toContain('$HOME/.copilot/skills');
+    expect(setup).toContain('.astack-source-path');
+    expect(setup).toContain('cp "$ASTACK_DIR/VERSION" "$target_root/VERSION"');
     expect(setup).not.toContain('ln -snf "$ASTACK_DIR" "$CODEX_ASTACK"');
+  });
+
+  test('upgrade skill resolves Codex source checkout instead of treating .agents as primary install', () => {
+    const upgrade = read('.agents/skills/astack-upgrade-astack/SKILL.md');
+    expect(upgrade).toContain('.astack-source-path');
+    expect(upgrade).toContain('Source dir: ${SOURCE_DIR:-none}');
+    expect(upgrade).toContain('$HOME/.codex/skills/astack');
+    expect(upgrade).not.toContain('INSTALL_TYPE="global-git"');
   });
 });
 

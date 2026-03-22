@@ -8,7 +8,7 @@ temporary implementation notes that previously lived under `enhancement/`.
 | Host | Install root | Generated source in this repo | Current scope |
 |------|--------------|-------------------------------|---------------|
 | Claude Code | `~/.claude/skills/astack` | source skill folders such as `scope/`, `plan/`, and `ship/` | Full astack skill set |
-| Codex | `~/.codex/skills/astack` | `.agents/skills/` | Full generated astack skill set |
+| Codex | `~/.codex/skills/astack` runtime root backed by the git checkout that ran `setup --host codex` | `.agents/skills/` | Full generated astack skill set |
 | GitHub Copilot | `~/.copilot/skills/astack` | `.copilot/skills/` | Base planning workflow only |
 
 ## Canonical naming
@@ -35,6 +35,8 @@ documented commands users invoke.
   named after the canonical skill `name:`.
 - `setup` installs generated host folders by their actual basename and cleans up
   stale legacy `astack-*` sidecars when needed.
+- Codex runtime roots also record the source checkout path that upgrades should
+  use instead of guessing from repo-local `.agents/skills/astack` copies.
 
 ## GitHub Copilot support boundary
 
