@@ -16,6 +16,17 @@ Those four repo-root artifacts are the source of truth for the whole sprint.
 Operational skills like `/review-astack`, `/qa-astack`, `/ship-astack`, and `/document-release-astack`
 consume them instead of relying on hidden per-branch planning files.
 
+The shape of that core workflow was informed in part by HumanLayer's
+"Advanced Context Engineering for Coding Agents" DeepWiki, especially the
+research and planning phase writeups:
+https://deepwiki.com/humanlayer/advanced-context-engineering-for-coding-agents/3.1-research-phase
+and
+https://deepwiki.com/humanlayer/advanced-context-engineering-for-coding-agents/3.2-planning-phase
+
+In astack, that influence shows up mainly in the explicit research-before-plan
+split, the review gate between those phases, and the use of durable repo-root
+artifacts to compact context for implementation.
+
 ## What astack is for
 
 - Turn vague feature requests into a scoped build plan
@@ -227,6 +238,11 @@ bun run skill:check
 astack is forked from `gstack`. Upstream provenance and license notices are
 preserved, but this repo is the source of truth for astack naming, workflow,
 and upgrades.
+
+The current core workflow was also informed by HumanLayer's DeepWiki material on
+research and planning for coding agents:
+- https://deepwiki.com/humanlayer/advanced-context-engineering-for-coding-agents/3.1-research-phase
+- https://deepwiki.com/humanlayer/advanced-context-engineering-for-coding-agents/3.2-planning-phase
 
 ## License
 

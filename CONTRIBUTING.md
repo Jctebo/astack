@@ -234,6 +234,10 @@ For the durable host and naming contract, see `docs/host-support.md`. Do not
 create new implementation-history folders under `enhancement/`; capture lasting
 behavior in the normal docs instead.
 
+For the thinking behind the repo-root research and planning artifacts, see the
+HumanLayer DeepWiki references credited in README.md. They were one influence on
+astack's current research-before-plan workflow shape.
+
 To add a browse command, add it to `browse/src/commands.ts`. To add a snapshot flag, add it to `SNAPSHOT_FLAGS` in `browse/src/snapshot.ts`. Then rebuild.
 
 ## Multi-host development (Claude + Codex + Copilot)

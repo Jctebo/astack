@@ -34,6 +34,11 @@ Downstream skills consume those artifacts:
 This keeps planning context visible in the repo instead of burying it in hidden
 branch-local state.
 
+This artifact-first flow was informed in part by HumanLayer's DeepWiki material
+on research and planning for coding agents, particularly the emphasis on
+separating repository research from planning and then compacting that context
+into durable artifacts for implementation.
+
 ## Browser daemon
 
 astack keeps a long-lived Chromium session behind the `browse` CLI so agents can
