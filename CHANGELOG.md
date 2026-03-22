@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.9.5.1] - 2026-03-22
+
+### Changed
+
+- Changed generated astack skills so telemetry is no longer part of the default
+  execution contract for Claude, Codex, or Copilot installs.
+- Changed the skill-doc generator to stop emitting telemetry prompts, telemetry
+  preambles, local analytics writes, and end-of-skill telemetry epilogues.
+
+### Fixed
+
+- Fixed Windows and Codex skill runs to avoid telemetry helper execution as a
+  normal part of generated skill usage.
+- Fixed safety-mode skills like `/careful-astack`, `/freeze-astack`,
+  `/guard-astack`, and `/unfreeze-astack` so they no longer append analytics
+  events during ordinary activation or hook handling.
+
 ## [0.9.5.0] - 2026-03-21
 
 ### Added

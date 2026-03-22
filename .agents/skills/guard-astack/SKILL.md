@@ -43,11 +43,6 @@ This is the combination of `/careful-astack` + `/freeze-astack` in a single comm
 and `/freeze-astack` skill directories. Both must be installed (they are installed together
 by the astack setup script).
 
-```bash
-mkdir -p ~/.astack/analytics
-echo '{"skill":"guard","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.astack/analytics/skill-usage.jsonl 2>/dev/null || true
-```
-
 ## Setup
 
 Ask the user which directory to restrict edits to. Use AskUserQuestion:

@@ -15,11 +15,6 @@ allowed-tools:
 
 Remove the edit restriction set by `/freeze-astack`, allowing edits to all directories.
 
-```bash
-mkdir -p ~/.astack/analytics
-echo '{"skill":"unfreeze","ts":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","repo":"'$(basename "$(git rev-parse --show-toplevel 2>/dev/null)" 2>/dev/null || echo "unknown")'"}'  >> ~/.astack/analytics/skill-usage.jsonl 2>/dev/null || true
-```
-
 ## Clear the boundary
 
 ```bash

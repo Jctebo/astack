@@ -5,6 +5,7 @@ browse/dist/
 .claude/skills/
 .context/
 /tmp/
+enhancements/
 *.log
 bun.lock
 *.bun-build
