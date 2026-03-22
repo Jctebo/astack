@@ -255,12 +255,13 @@ create_runtime_root() {
   local source_skill_md="$1"
   local target_root="$2"
   mkdir -p "$target_root"
+  mkdir -p "$target_root/docs/releases"
 
   cp "$source_skill_md" "$target_root/SKILL.md"
 
   if [ "$ASTACK_DIR" != "$target_root" ]; then
-    [ -f "$ASTACK_DIR/VERSION" ] && cp "$ASTACK_DIR/VERSION" "$target_root/VERSION"
-    [ -f "$ASTACK_DIR/CHANGELOG.md" ] && cp "$ASTACK_DIR/CHANGELOG.md" "$target_root/CHANGELOG.md"
+    [ -f "$ASTACK_DIR/docs/releases/VERSION" ] && cp "$ASTACK_DIR/docs/releases/VERSION" "$target_root/docs/releases/VERSION"
+    [ -f "$ASTACK_DIR/docs/releases/RELEASE_LOG.md" ] && cp "$ASTACK_DIR/docs/releases/RELEASE_LOG.md" "$target_root/docs/releases/RELEASE_LOG.md"
   fi
   printf '%s\n' "$ASTACK_DIR" > "$target_root/.astack-source-path"
 

@@ -23,7 +23,8 @@ ANALYTICS_DIR="$STATE_DIR/analytics"
 JSONL_FILE="$ANALYTICS_DIR/skill-usage.jsonl"
 PENDING_DIR="$ANALYTICS_DIR"  # .pending-* files live here
 CONFIG_CMD="$ASTACK_DIR/bin/astack-config"
-VERSION_FILE="$ASTACK_DIR/VERSION"
+VERSION_FILE="$ASTACK_DIR/docs/releases/VERSION"
+LEGACY_VERSION_FILE="$ASTACK_DIR/VERSION"
 
 # ─── Parse flags ─────────────────────────────────────────────
 SKILL=""
@@ -96,7 +97,13 @@ done
 
 # ─── Collect metadata ────────────────────────────────────────
 TS="$(date -u +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u +%Y-%m-%dT%H:%M:%S 2>/dev/null || echo "")"
-ASTACK_VERSION="$(cat "$VERSION_FILE" 2>/dev/null | tr -d '[:space:]' || echo "unknown")"
+if [ -f "$VERSION_FILE" ]; then
+  ASTACK_VERSION="$(cat "$VERSION_FILE" 2>/dev/null | tr -d '[:space:]' || echo "unknown")"
+elif [ -f "$LEGACY_VERSION_FILE" ]; then
+  ASTACK_VERSION="$(cat "$LEGACY_VERSION_FILE" 2>/dev/null | tr -d '[:space:]' || echo "unknown")"
+else
+  ASTACK_VERSION="unknown"
+fi
 OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
 ARCH="$(uname -m)"
 SESSIONS="1"

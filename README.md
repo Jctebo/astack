@@ -18,6 +18,10 @@ like `/review-astack`, `/qa-astack`, `/ship-astack`, and
 `/document-release-astack` consume the active release artifact instead of
 relying on hidden per-branch planning files.
 
+That same `docs/releases/` folder is also the canonical machine-facing release
+contract. astack no longer treats repo-root `VERSION` or `CHANGELOG.md` as the
+source of truth.
+
 The shape of that core workflow was informed in part by HumanLayer's
 "Advanced Context Engineering for Coding Agents" DeepWiki, especially the
 research and planning phase writeups:

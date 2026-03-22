@@ -62,6 +62,12 @@ function writeConfig(content: string) {
   writeFileSync(join(stateDir, 'config.yaml'), content);
 }
 
+function writeVersion(version: string) {
+  const releasesDir = join(astackDir, 'docs', 'releases');
+  mkdirSync(releasesDir, { recursive: true });
+  writeFileSync(join(releasesDir, 'VERSION'), `${version}\n`);
+}
+
 function nowEpoch(): number {
   return Math.floor(Date.now() / 1000);
 }
@@ -76,7 +82,9 @@ describe('astack-update-check', () => {
 
   // ─── Path B: Empty VERSION file ─────────────────────────────
   test('exits 0 with no output when VERSION file is empty', () => {
-    writeFileSync(join(astackDir, 'VERSION'), '');
+    const releasesDir = join(astackDir, 'docs', 'releases');
+    mkdirSync(releasesDir, { recursive: true });
+    writeFileSync(join(releasesDir, 'VERSION'), '');
     const { exitCode, stdout } = run();
     expect(exitCode).toBe(0);
     expect(stdout).toBe('');
@@ -84,7 +92,7 @@ describe('astack-update-check', () => {
 
   // ─── Path C: Just-upgraded marker ───────────────────────────
   test('outputs JUST_UPGRADED and deletes marker', () => {
-    writeFileSync(join(astackDir, 'VERSION'), '0.4.0\n');
+    writeVersion('0.4.0');
     writeFileSync(join(stateDir, 'just-upgraded-from'), '0.3.3\n');
 
     const { exitCode, stdout } = run();
@@ -99,7 +107,7 @@ describe('astack-update-check', () => {
 
   // ─── Path D1: Fresh cache, UP_TO_DATE ───────────────────────
   test('exits silently when cache says UP_TO_DATE and is fresh', () => {
-    writeFileSync(join(astackDir, 'VERSION'), '0.3.3\n');
+    writeVersion('0.3.3');
     writeFileSync(join(stateDir, 'last-update-check'), 'UP_TO_DATE 0.3.3');
 
     const { exitCode, stdout } = run();
@@ -109,7 +117,7 @@ describe('astack-update-check', () => {
 
   // ─── Path D1b: Fresh UP_TO_DATE cache, but local version changed ──
   test('re-checks when UP_TO_DATE cache version does not match local', () => {
-    writeFileSync(join(astackDir, 'VERSION'), '0.4.0\n');
+    writeVersion('0.4.0');
     // Cache says UP_TO_DATE for 0.3.3, but local is now 0.4.0
     writeFileSync(join(stateDir, 'last-update-check'), 'UP_TO_DATE 0.3.3');
     // Remote says 0.5.0 — should detect upgrade
@@ -122,7 +130,7 @@ describe('astack-update-check', () => {
 
   // ─── Path D2: Fresh cache, UPGRADE_AVAILABLE ────────────────
   test('echoes cached UPGRADE_AVAILABLE when cache is fresh', () => {
-    writeFileSync(join(astackDir, 'VERSION'), '0.3.3\n');
+    writeVersion('0.3.3');
     writeFileSync(join(stateDir, 'last-update-check'), 'UPGRADE_AVAILABLE 0.3.3 0.4.0');
 
     const { exitCode, stdout } = run();
@@ -132,7 +140,7 @@ describe('astack-update-check', () => {
 
   // ─── Path D3: Fresh cache, but local version changed ────────
   test('re-checks when local version does not match cached old version', () => {
-    writeFileSync(join(astackDir, 'VERSION'), '0.4.0\n');
+    writeVersion('0.4.0');
     // Cache says 0.3.3 → 0.4.0 but we're already on 0.4.0
     writeFileSync(join(stateDir, 'last-update-check'), 'UPGRADE_AVAILABLE 0.3.3 0.4.0');
     // Remote also says 0.4.0 — should be up to date
@@ -147,7 +155,7 @@ describe('astack-update-check', () => {
 
   // ─── Path E: Versions match (remote fetch) ─────────────────
   test('writes UP_TO_DATE cache when versions match', () => {
-    writeFileSync(join(astackDir, 'VERSION'), '0.3.3\n');
+    writeVersion('0.3.3');
     writeFileSync(join(astackDir, 'REMOTE_VERSION'), '0.3.3\n');
 
     const { exitCode, stdout } = run();
@@ -159,7 +167,7 @@ describe('astack-update-check', () => {
 
   // ─── Path F: Versions differ (remote fetch) ─────────────────
   test('outputs UPGRADE_AVAILABLE when versions differ', () => {
-    writeFileSync(join(astackDir, 'VERSION'), '0.3.3\n');
+    writeVersion('0.3.3');
     writeFileSync(join(astackDir, 'REMOTE_VERSION'), '0.4.0\n');
 
     const { exitCode, stdout } = run();
@@ -171,7 +179,7 @@ describe('astack-update-check', () => {
 
   // ─── Path G: Invalid remote response ────────────────────────
   test('treats invalid remote response as up to date', () => {
-    writeFileSync(join(astackDir, 'VERSION'), '0.3.3\n');
+    writeVersion('0.3.3');
     writeFileSync(join(astackDir, 'REMOTE_VERSION'), '<html>404 Not Found</html>\n');
 
     const { exitCode, stdout } = run();
@@ -183,7 +191,7 @@ describe('astack-update-check', () => {
 
   // ─── Path H: Curl fails (bad URL) ──────────────────────────
   test('exits silently when remote URL is unreachable', () => {
-    writeFileSync(join(astackDir, 'VERSION'), '0.3.3\n');
+    writeVersion('0.3.3');
 
     const { exitCode, stdout } = run({
       ASTACK_REMOTE_URL: 'file:///nonexistent/path/VERSION',
@@ -196,7 +204,7 @@ describe('astack-update-check', () => {
 
   // ─── Path I: Corrupt cache file ─────────────────────────────
   test('falls through to remote fetch when cache is corrupt', () => {
-    writeFileSync(join(astackDir, 'VERSION'), '0.3.3\n');
+    writeVersion('0.3.3');
     writeFileSync(join(stateDir, 'last-update-check'), 'garbage data here');
     // Remote says same version — should end up UP_TO_DATE
     writeFileSync(join(astackDir, 'REMOTE_VERSION'), '0.3.3\n');
@@ -212,7 +220,7 @@ describe('astack-update-check', () => {
   // ─── State dir creation ─────────────────────────────────────
   test('creates state dir if it does not exist', () => {
     const newStateDir = join(stateDir, 'nested', 'dir');
-    writeFileSync(join(astackDir, 'VERSION'), '0.3.3\n');
+    writeVersion('0.3.3');
     writeFileSync(join(astackDir, 'REMOTE_VERSION'), '0.3.3\n');
 
     const { exitCode } = run({ ASTACK_STATE_DIR: newStateDir });
@@ -227,12 +235,12 @@ describe('astack-update-check', () => {
   test('exits 0 with real project VERSION and unreachable remote', () => {
     // Simulate agent context: real VERSION file, network unavailable
     const projectRoot = join(import.meta.dir, '..', '..');
-    const versionFile = join(projectRoot, 'VERSION');
+    const versionFile = join(projectRoot, 'docs', 'releases', 'VERSION');
     if (!existsSync(versionFile)) return; // skip if no VERSION
     const version = readFileSync(versionFile, 'utf-8').trim();
 
     // Copy VERSION into test dir
-    writeFileSync(join(astackDir, 'VERSION'), version + '\n');
+    writeVersion(version);
 
     // Remote is unreachable (simulates offline / CI / sandboxed agent)
     const { exitCode, stdout } = run({
@@ -247,7 +255,7 @@ describe('astack-update-check', () => {
   test('exits 0 when up to date (not exit 1)', () => {
     // Regression test: script previously exited 1 when versions matched.
     // This broke every skill preamble that called it without || true.
-    writeFileSync(join(astackDir, 'VERSION'), '0.3.3\n');
+    writeVersion('0.3.3');
     writeFileSync(join(astackDir, 'REMOTE_VERSION'), '0.3.3\n');
 
     // First call: fetches remote, writes cache
@@ -270,7 +278,7 @@ describe('astack-update-check', () => {
 
   // ─── Snooze tests ───────────────────────────────────────────
   test('snoozed level 1 within 24h → silent (cached path)', () => {
-    writeFileSync(join(astackDir, 'VERSION'), '0.3.3\n');
+    writeVersion('0.3.3');
     writeFileSync(join(stateDir, 'last-update-check'), 'UPGRADE_AVAILABLE 0.3.3 0.4.0');
     writeSnooze('0.4.0', 1, nowEpoch() - 3600); // 1h ago (within 24h)
 
@@ -280,7 +288,7 @@ describe('astack-update-check', () => {
   });
 
   test('snoozed level 1 expired (25h ago) → outputs UPGRADE_AVAILABLE', () => {
-    writeFileSync(join(astackDir, 'VERSION'), '0.3.3\n');
+    writeVersion('0.3.3');
     writeFileSync(join(stateDir, 'last-update-check'), 'UPGRADE_AVAILABLE 0.3.3 0.4.0');
     writeSnooze('0.4.0', 1, nowEpoch() - 90000); // 25h ago
 
@@ -290,7 +298,7 @@ describe('astack-update-check', () => {
   });
 
   test('snoozed level 2 within 48h → silent', () => {
-    writeFileSync(join(astackDir, 'VERSION'), '0.3.3\n');
+    writeVersion('0.3.3');
     writeFileSync(join(stateDir, 'last-update-check'), 'UPGRADE_AVAILABLE 0.3.3 0.4.0');
     writeSnooze('0.4.0', 2, nowEpoch() - 86400); // 24h ago (within 48h)
 
@@ -300,7 +308,7 @@ describe('astack-update-check', () => {
   });
 
   test('snoozed level 2 expired (49h ago) → outputs', () => {
-    writeFileSync(join(astackDir, 'VERSION'), '0.3.3\n');
+    writeVersion('0.3.3');
     writeFileSync(join(stateDir, 'last-update-check'), 'UPGRADE_AVAILABLE 0.3.3 0.4.0');
     writeSnooze('0.4.0', 2, nowEpoch() - 176400); // 49h ago
 
@@ -310,7 +318,7 @@ describe('astack-update-check', () => {
   });
 
   test('snoozed level 3 within 7d → silent', () => {
-    writeFileSync(join(astackDir, 'VERSION'), '0.3.3\n');
+    writeVersion('0.3.3');
     writeFileSync(join(stateDir, 'last-update-check'), 'UPGRADE_AVAILABLE 0.3.3 0.4.0');
     writeSnooze('0.4.0', 3, nowEpoch() - 518400); // 6d ago (within 7d)
 
@@ -320,7 +328,7 @@ describe('astack-update-check', () => {
   });
 
   test('snoozed level 3 expired (8d ago) → outputs', () => {
-    writeFileSync(join(astackDir, 'VERSION'), '0.3.3\n');
+    writeVersion('0.3.3');
     writeFileSync(join(stateDir, 'last-update-check'), 'UPGRADE_AVAILABLE 0.3.3 0.4.0');
     writeSnooze('0.4.0', 3, nowEpoch() - 691200); // 8d ago
 
@@ -330,7 +338,7 @@ describe('astack-update-check', () => {
   });
 
   test('snooze ignored when version differs (new version resets snooze)', () => {
-    writeFileSync(join(astackDir, 'VERSION'), '0.3.3\n');
+    writeVersion('0.3.3');
     writeFileSync(join(stateDir, 'last-update-check'), 'UPGRADE_AVAILABLE 0.3.3 0.5.0');
     // Snoozed for 0.4.0, but remote is now 0.5.0
     writeSnooze('0.4.0', 3, nowEpoch() - 60); // very recent
@@ -341,7 +349,7 @@ describe('astack-update-check', () => {
   });
 
   test('corrupt snooze file → outputs normally', () => {
-    writeFileSync(join(astackDir, 'VERSION'), '0.3.3\n');
+    writeVersion('0.3.3');
     writeFileSync(join(stateDir, 'last-update-check'), 'UPGRADE_AVAILABLE 0.3.3 0.4.0');
     writeFileSync(join(stateDir, 'update-snoozed'), 'garbage');
 
@@ -351,7 +359,7 @@ describe('astack-update-check', () => {
   });
 
   test('non-numeric epoch in snooze file → outputs', () => {
-    writeFileSync(join(astackDir, 'VERSION'), '0.3.3\n');
+    writeVersion('0.3.3');
     writeFileSync(join(stateDir, 'last-update-check'), 'UPGRADE_AVAILABLE 0.3.3 0.4.0');
     writeFileSync(join(stateDir, 'update-snoozed'), '0.4.0 1 abc');
 
@@ -361,7 +369,7 @@ describe('astack-update-check', () => {
   });
 
   test('non-numeric level in snooze file → outputs', () => {
-    writeFileSync(join(astackDir, 'VERSION'), '0.3.3\n');
+    writeVersion('0.3.3');
     writeFileSync(join(stateDir, 'last-update-check'), 'UPGRADE_AVAILABLE 0.3.3 0.4.0');
     writeFileSync(join(stateDir, 'update-snoozed'), `0.4.0 abc ${nowEpoch()}`);
 
@@ -371,7 +379,7 @@ describe('astack-update-check', () => {
   });
 
   test('snooze respected on remote fetch path (no cache)', () => {
-    writeFileSync(join(astackDir, 'VERSION'), '0.3.3\n');
+    writeVersion('0.3.3');
     writeFileSync(join(astackDir, 'REMOTE_VERSION'), '0.4.0\n');
     // No cache file — goes to remote fetch path
     writeSnooze('0.4.0', 1, nowEpoch() - 3600); // 1h ago
@@ -385,7 +393,7 @@ describe('astack-update-check', () => {
   });
 
   test('just-upgraded clears snooze file', () => {
-    writeFileSync(join(astackDir, 'VERSION'), '0.4.0\n');
+    writeVersion('0.4.0');
     writeFileSync(join(stateDir, 'just-upgraded-from'), '0.3.3\n');
     writeSnooze('0.4.0', 2, nowEpoch() - 3600);
 
@@ -397,7 +405,7 @@ describe('astack-update-check', () => {
 
   // ─── Config tests ──────────────────────────────────────────
   test('update_check: false disables all checks', () => {
-    writeFileSync(join(astackDir, 'VERSION'), '0.3.3\n');
+    writeVersion('0.3.3');
     writeFileSync(join(astackDir, 'REMOTE_VERSION'), '0.4.0\n');
     writeConfig('update_check: false\n');
 
@@ -409,7 +417,7 @@ describe('astack-update-check', () => {
   });
 
   test('missing config.yaml does not crash', () => {
-    writeFileSync(join(astackDir, 'VERSION'), '0.3.3\n');
+    writeVersion('0.3.3');
     writeFileSync(join(astackDir, 'REMOTE_VERSION'), '0.4.0\n');
     // No config file — should behave normally
 
@@ -421,7 +429,7 @@ describe('astack-update-check', () => {
   // ─── --force flag tests ──────────────────────────────────────
 
   test('--force busts fresh UP_TO_DATE cache', () => {
-    writeFileSync(join(astackDir, 'VERSION'), '0.3.3\n');
+    writeVersion('0.3.3');
     writeFileSync(join(astackDir, 'REMOTE_VERSION'), '0.4.0\n');
     writeFileSync(join(stateDir, 'last-update-check'), 'UP_TO_DATE 0.3.3');
 
@@ -436,7 +444,7 @@ describe('astack-update-check', () => {
   });
 
   test('--force busts fresh UPGRADE_AVAILABLE cache', () => {
-    writeFileSync(join(astackDir, 'VERSION'), '0.3.3\n');
+    writeVersion('0.3.3');
     writeFileSync(join(astackDir, 'REMOTE_VERSION'), '0.3.3\n');
     writeFileSync(join(stateDir, 'last-update-check'), 'UPGRADE_AVAILABLE 0.3.3 0.4.0');
 
@@ -455,7 +463,7 @@ describe('astack-update-check', () => {
   // ─── Split TTL tests ─────────────────────────────────────────
 
   test('UP_TO_DATE cache expires after 60 min (not 720)', () => {
-    writeFileSync(join(astackDir, 'VERSION'), '0.3.3\n');
+    writeVersion('0.3.3');
     writeFileSync(join(astackDir, 'REMOTE_VERSION'), '0.4.0\n');
     writeFileSync(join(stateDir, 'last-update-check'), 'UP_TO_DATE 0.3.3');
 

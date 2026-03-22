@@ -69,8 +69,8 @@ To do this: use Grep to find all references to the sibling values (e.g., grep fo
 
 #### Dead Code & Consistency
 - Variables assigned but never read
-- Version mismatch between PR title and VERSION/CHANGELOG files
-- CHANGELOG entries that describe changes inaccurately (e.g., "changed from X to Y" when X never existed)
+- Version mismatch between PR title and `docs/releases/VERSION` / `docs/releases/RELEASE_LOG.md`
+- Release-log entries that describe changes inaccurately (e.g., "changed from X to Y" when X never existed)
 - Comments/docstrings that describe old behavior after the code changed
 
 #### LLM Prompt Issues

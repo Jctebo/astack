@@ -1,5 +1,17 @@
 # Release Log
 
+## [0.9.5.3] - 2026-03-22
+
+### Changed
+- Converged astack's machine-facing version contract onto `docs/releases/VERSION` and `docs/releases/RELEASE_LOG.md`.
+- Update checks now fetch the remote version from `main/docs/releases/VERSION` and runtime telemetry reads the same release-folder metadata.
+- Upgrade guidance and contributor docs now describe `docs/releases/` as the only canonical release source of truth.
+
+### Fixed
+- Runtime roots now materialize release metadata under `docs/releases/` instead of copying repo-root `VERSION` and `CHANGELOG.md`.
+- The upgrade flow now compares installed and vendored versions using release-folder metadata and summarizes changes from the shipped release log.
+- Review guidance and update-check tests no longer depend on repo-root release files.
+
 ## [0.9.5.2] - 2026-03-22
 
 ### Changed
