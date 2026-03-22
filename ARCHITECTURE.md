@@ -17,19 +17,19 @@ The browser is the runtime piece. The workflow logic is mostly Markdown.
 The planning and delivery loop is artifact-driven:
 
 ```text
-/scope      -> 00-scope.md
-/research   -> 01-research.md
-/plan       -> 02-plan.md
-/implement  -> 03-progress.md
+/scope-astack      -> 00-scope.md
+/research-astack   -> 01-research.md
+/plan-astack       -> 02-plan.md
+/implement-astack  -> 03-progress.md
 ```
 
 Downstream skills consume those artifacts:
 
-- `/review` compares the diff to `02-plan.md` and `03-progress.md`
-- `/qa` reads the QA matrix in `02-plan.md`
-- `/ship` checks code, docs, and plan alignment
-- `/document-release` syncs docs to shipped behavior
-- `/retro` uses the numbered docs as sprint context
+- `/review-astack` compares the diff to `02-plan.md` and `03-progress.md`
+- `/qa-astack` reads the QA matrix in `02-plan.md`
+- `/ship-astack` checks code, docs, and plan alignment
+- `/document-release-astack` syncs docs to shipped behavior
+- `/retro-astack` uses the numbered docs as sprint context
 
 This keeps planning context visible in the repo instead of burying it in hidden
 branch-local state.
@@ -75,7 +75,7 @@ Key injected sections include:
 | `{{PREAMBLE}}` | Shared startup behavior and update checks |
 | `{{BROWSE_SETUP}}` | Browse discovery and setup instructions |
 | `{{BASE_BRANCH_DETECT}}` | Dynamic PR base branch detection |
-| `{{QA_METHODOLOGY}}` | Shared QA methodology for `/qa` and `/qa-only` |
+| `{{QA_METHODOLOGY}}` | Shared QA methodology for `/qa-astack` and `/qa-only-astack` |
 | `{{DESIGN_METHODOLOGY}}` | Shared design QA methodology |
 | `{{REVIEW_DASHBOARD}}` | Plan-and-review readiness dashboard |
 | `{{TEST_BOOTSTRAP}}` | Test framework bootstrap instructions |
@@ -85,9 +85,12 @@ Key injected sections include:
 The repo generates:
 
 - Claude-style skills rooted at `astack`
-- Codex sidecar skills named `astack-*`
+- Codex and Copilot sidecar skills named from canonical skill `name:` values like `plan-astack`
 
-That keeps install paths and command names consistent across supported hosts.
+That keeps install paths stable while letting host-discoverable skill names match the canonical command names.
+
+See `docs/host-support.md` for the normalized host contract, install roots, and
+Copilot support boundary.
 
 ## Fork position
 
@@ -96,4 +99,4 @@ astack is a fork of gstack, but this repo is the source of truth for:
 - astack naming
 - astack workflow docs
 - astack upgrade paths
-- the `/scope` -> `/research` -> `/plan` -> `/implement` lifecycle
+- the `/scope-astack` -> `/research-astack` -> `/plan-astack` -> `/implement-astack` lifecycle

@@ -10,11 +10,15 @@ bun run test:e2e
 bun run build
 bun run gen:skill-docs
 bun run gen:skill-docs --host codex
+bun run gen:skill-docs --host copilot
 bun run skill:check
 bun run dev <cmd>
 ```
 
 `test:evals` requires the relevant external auth for the eval runners.
+
+On Windows, `setup` requires Node.js in addition to Bun because Playwright
+verification uses Node there.
 
 ## Project structure
 
@@ -59,6 +63,8 @@ These replace the older hidden planning files under `~/.astack/projects/` for
 the main implementation lifecycle. Skills that plan, review, QA, and ship
 should treat them as the source of truth.
 
+Host-specific install and naming rules live in `docs/host-support.md`.
+
 ## Template workflow
 
 SKILL docs are generated.
@@ -76,7 +82,7 @@ SKILL docs are generated.
 
 ## Browser interaction
 
-Use `/browse` or the browse binary directly for browser automation. Do not use
+Use `/browse-astack` or the browse binary directly for browser automation. Do not use
 other browser MCP integrations in this repo.
 
 ## Local contributor state

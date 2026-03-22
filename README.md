@@ -7,13 +7,13 @@ delivery workflow:
 
 The planning path is now built around four canonical commands:
 
-- `/scope` writes `00-scope.md`
-- `/research` writes `01-research.md`
-- `/plan` writes `02-plan.md`
-- `/implement` updates `03-progress.md`
+- `/scope-astack` writes `00-scope.md`
+- `/research-astack` writes `01-research.md`
+- `/plan-astack` writes `02-plan.md`
+- `/implement-astack` updates `03-progress.md`
 
 Those four repo-root artifacts are the source of truth for the whole sprint.
-Operational skills like `/review`, `/qa`, `/ship`, and `/document-release`
+Operational skills like `/review-astack`, `/qa-astack`, `/ship-astack`, and `/document-release-astack`
 consume them instead of relying on hidden per-branch planning files.
 
 ## What astack is for
@@ -25,29 +25,32 @@ consume them instead of relying on hidden per-branch planning files.
 
 astack still includes the supporting skill set from gstack:
 
-- `/browse`
-- `/review`
-- `/qa`
-- `/qa-only`
-- `/ship`
-- `/document-release`
-- `/retro`
-- `/design-consultation`
-- `/design-review`
-- `/investigate`
-- `/codex`
-- `/setup-browser-cookies`
-- `/careful`
-- `/freeze`
-- `/guard`
-- `/unfreeze`
-- `/astack-upgrade`
+- `/browse-astack`
+- `/review-astack`
+- `/qa-astack`
+- `/qa-only-astack`
+- `/ship-astack`
+- `/document-release-astack`
+- `/retro-astack`
+- `/design-consultation-astack`
+- `/design-review-astack`
+- `/investigate-astack`
+- `/codex-astack`
+- `/setup-browser-cookies-astack`
+- `/careful-astack`
+- `/freeze-astack`
+- `/guard-astack`
+- `/unfreeze-astack`
+- `/astack-upgrade-astack`
+
+For the durable host contract and naming rules, see [docs/host-support.md](docs/host-support.md).
+For per-skill workflow details, see [docs/skills.md](docs/skills.md).
 
 ## Workflow
 
-### 1. `/scope`
+### 1. `/scope-astack`
 
-Use `/scope` when the request is still fuzzy or needs a stronger wedge. It
+Use `/scope-astack` when the request is still fuzzy or needs a stronger wedge. It
 combines the old brainstorming and founder-review stages into one plan-mode
 step and writes `00-scope.md`.
 
@@ -62,9 +65,9 @@ step and writes `00-scope.md`.
 - non-goals
 - open risks and unknowns
 
-### 2. `/research`
+### 2. `/research-astack`
 
-Use `/research` after scope is settled. It reads `00-scope.md`, maps the
+Use `/research-astack` after scope is settled. It reads `00-scope.md`, maps the
 current system, identifies reuse opportunities, checks relevant docs, and
 writes `01-research.md`.
 
@@ -78,9 +81,9 @@ writes `01-research.md`.
 - unknowns
 - recommended implementation direction
 
-### 3. `/plan`
+### 3. `/plan-astack`
 
-Use `/plan` when we are ready to lock the implementation spec. It combines the
+Use `/plan-astack` when we are ready to lock the implementation spec. It combines the
 old engineering review, plan-mode design review, and implementation planning
 into one plan-mode pass that writes `02-plan.md`.
 
@@ -96,9 +99,9 @@ into one plan-mode pass that writes `02-plan.md`.
 - rollout notes
 - items explicitly out of scope
 
-### 4. `/implement`
+### 4. `/implement-astack`
 
-Use `/implement` once the plan is approved. It reads `02-plan.md`, makes the
+Use `/implement-astack` once the plan is approved. It reads `02-plan.md`, makes the
 code changes, and maintains `03-progress.md` throughout execution.
 
 `03-progress.md` tracks:
@@ -115,16 +118,20 @@ code changes, and maintains `03-progress.md` throughout execution.
 
 After implementation:
 
-- `/review` checks the diff against `02-plan.md` and `03-progress.md`
-- `/qa` and `/qa-only` use the QA matrix in `02-plan.md`
-- `/ship` verifies code, docs, and progress are aligned before opening a PR
-- `/document-release` syncs project docs to what actually shipped
-- `/retro` uses the numbered docs as sprint context
+- `/review-astack` checks the diff against `02-plan.md` and `03-progress.md`
+- `/qa-astack` and `/qa-only-astack` use the QA matrix in `02-plan.md`
+- `/ship-astack` verifies code, docs, and progress are aligned before opening a PR
+- `/document-release-astack` syncs project docs to what actually shipped
+- `/retro-astack` uses the numbered docs as sprint context
 
 ## Install
 
 Until your final GitHub owner is decided, replace `<owner>` below with the
 account that will host the public fork.
+
+Windows note: `setup` requires both Bun and Node.js. Bun is the main runtime,
+and Node.js is required on Windows for the Playwright/Chromium verification
+path.
 
 ### Claude Code
 
@@ -142,6 +149,18 @@ cd ~/.codex/skills/astack
 ./setup --host codex
 ```
 
+### GitHub Copilot
+
+```bash
+git clone https://github.com/Jctebo/astack.git ~/src/astack
+cd ~/src/astack
+./setup --host copilot
+```
+
+Copilot v1 currently installs the base planning workflow only:
+`/scope-astack`, `/research-astack`, `/plan-astack`, and `/implement-astack`.
+The exact host support boundary is documented in [docs/host-support.md](docs/host-support.md).
+
 ### Vendoring into a repo
 
 ```bash
@@ -157,14 +176,14 @@ Add an `astack` section to your project instructions:
 
 ```md
 ## astack
-Use `/browse` from astack for web browsing.
+Use `/browse-astack` from astack for web browsing.
 Prefer the astack workflow:
-`/scope` -> `/research` -> `/plan` -> `/implement` -> `/review` -> `/qa` -> `/ship`.
-Available skills: `/scope`, `/research`, `/plan`, `/implement`, `/review`,
-`/qa`, `/qa-only`, `/browse`, `/ship`, `/document-release`, `/retro`,
-`/design-consultation`, `/design-review`, `/investigate`, `/codex`,
-`/setup-browser-cookies`, `/careful`, `/freeze`, `/guard`, `/unfreeze`,
-`/astack-upgrade`.
+`/scope-astack` -> `/research-astack` -> `/plan-astack` -> `/implement-astack` -> `/review-astack` -> `/qa-astack` -> `/ship-astack`.
+Available skills: `/scope-astack`, `/research-astack`, `/plan-astack`, `/implement-astack`, `/review-astack`,
+`/qa-astack`, `/qa-only-astack`, `/browse-astack`, `/ship-astack`, `/document-release-astack`, `/retro-astack`,
+`/design-consultation-astack`, `/design-review-astack`, `/investigate-astack`, `/codex-astack`,
+`/setup-browser-cookies-astack`, `/careful-astack`, `/freeze-astack`, `/guard-astack`, `/unfreeze-astack`,
+`/astack-upgrade-astack`.
 ```
 
 ## Repo layout
@@ -182,9 +201,11 @@ astack/
 ├── document-release/       # /document-release skill
 ├── retro/                  # /retro skill
 ├── browse/                 # headless browser runtime + tests
+├── docs/                   # durable contributor and host documentation
 ├── scripts/                # generators and validation tooling
 ├── test/                   # skill validation + eval suites
 ├── .agents/skills/         # generated sidecar skills for Codex-style hosts
+├── .copilot/skills/        # generated sidecar skills for Copilot
 ├── SKILL.md.tmpl           # root skill template
 └── setup                   # install + registration entrypoint
 ```
@@ -195,6 +216,7 @@ astack/
 bun install
 bun run gen:skill-docs
 bun run gen:skill-docs --host codex
+bun run gen:skill-docs --host copilot
 bun run build
 bun test
 bun run skill:check

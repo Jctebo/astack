@@ -2,18 +2,21 @@
 
 This document describes the intended astack workflow and the role of each skill.
 
+For install roots, generated host folders, and Copilot scope, see
+`docs/host-support.md`.
+
 ## Core Workflow
 
 | Skill | Purpose | Output |
 |-------|---------|--------|
-| `/scope` | Frame the problem, audience, wedge, and non-goals | `00-scope.md` |
-| `/research` | Map the current system, reuse paths, constraints, and unknowns | `01-research.md` |
-| `/plan` | Produce the implementation spec and QA matrix | `02-plan.md` |
-| `/implement` | Execute the plan and keep progress current | `03-progress.md` |
+| `/scope-astack` | Frame the problem, audience, wedge, and non-goals | `00-scope.md` |
+| `/research-astack` | Map the current system, reuse paths, constraints, and unknowns | `01-research.md` |
+| `/plan-astack` | Produce the implementation spec and QA matrix | `02-plan.md` |
+| `/implement-astack` | Execute the plan and keep progress current | `03-progress.md` |
 
-### `/scope`
+### `/scope-astack`
 
-`/scope` is the first planning stage. It combines the old brainstorming and
+`/scope-astack` is the first planning stage. It combines the old brainstorming and
 founder-review motions into one plan-mode workflow.
 
 Use it when:
@@ -41,9 +44,9 @@ It should:
 - non-goals
 - risks and unknowns
 
-### `/research`
+### `/research-astack`
 
-`/research` is the discovery pass between scope and plan.
+`/research-astack` is the discovery pass between scope and plan.
 
 Use it when:
 
@@ -70,9 +73,9 @@ It should:
 - unknowns
 - recommended direction
 
-### `/plan`
+### `/plan-astack`
 
-`/plan` is the decision-complete implementation planning stage. It replaces the
+`/plan-astack` is the decision-complete implementation planning stage. It replaces the
 old engineering review and plan-mode design review split.
 
 Use it when:
@@ -102,9 +105,9 @@ It should:
 - items out of scope
 - open questions
 
-### `/implement`
+### `/implement-astack`
 
-`/implement` is the build stage.
+`/implement-astack` is the build stage.
 
 Use it when:
 
@@ -131,7 +134,7 @@ It should:
 
 ## Downstream Skills
 
-### `/review`
+### `/review-astack`
 
 Pre-landing code review. It should review the actual diff against the plan and
 execution artifacts:
@@ -139,9 +142,9 @@ execution artifacts:
 - `02-plan.md`
 - `03-progress.md`
 
-Use it before merge or before `/ship`.
+Use it before merge or before `/ship-astack`.
 
-### `/qa`
+### `/qa-astack`
 
 Full QA loop: test, fix, verify. It should read the QA matrix in `02-plan.md`
 and the current state in `03-progress.md`.
@@ -151,15 +154,15 @@ Use it when:
 - implementation is ready for browser testing
 - you want bugs fixed, not just reported
 
-### `/qa-only`
+### `/qa-only-astack`
 
-Same QA methodology as `/qa`, but report only.
+Same QA methodology as `/qa-astack`, but report only.
 
 Use it when:
 
 - you want a QA report without code changes
 
-### `/ship`
+### `/ship-astack`
 
 Release workflow. It should verify the code, docs, and progress state are all
 aligned before opening or updating a PR.
@@ -169,61 +172,61 @@ Use it when:
 - implementation, review, and QA are complete
 - the branch is ready to push and propose for merge
 
-### `/document-release`
+### `/document-release-astack`
 
 Post-implementation docs sync. It should update repo docs so they match the
 shipped behavior and astack workflow artifacts.
 
-### `/retro`
+### `/retro-astack`
 
 Retrospective workflow. It can use `00-scope.md` through `03-progress.md` as
 sprint context alongside git history.
 
 ## Supporting Skills
 
-### `/browse`
+### `/browse-astack`
 
 Fast persistent browser for dogfooding, QA, screenshots, and authenticated app
 testing.
 
-### `/setup-browser-cookies`
+### `/setup-browser-cookies-astack`
 
 Imports cookies from a real browser into the headless browse session.
 
-### `/design-consultation`
+### `/design-consultation-astack`
 
 Creates a design system from scratch and writes `DESIGN.md`. This is still the
 right skill when a product has no visual direction yet.
 
-### `/design-review`
+### `/design-review-astack`
 
 Live-site design QA and polish after implementation.
 
-### `/investigate`
+### `/investigate-astack`
 
 Systematic debugging workflow. Root cause first, fixes second.
 
-### `/codex`
+### `/codex-astack`
 
 Independent second opinion via Codex CLI.
 
-### `/careful`
+### `/careful-astack`
 
 Warn before destructive commands.
 
-### `/freeze`
+### `/freeze-astack`
 
 Restrict file edits to one directory.
 
-### `/guard`
+### `/guard-astack`
 
-Combine `/careful` and `/freeze`.
+Combine `/careful-astack` and `/freeze-astack`.
 
-### `/unfreeze`
+### `/unfreeze-astack`
 
 Remove the active freeze boundary.
 
-### `/astack-upgrade`
+### `/astack-upgrade-astack`
 
 Upgrade astack from the astack fork source, not upstream gstack.
 
@@ -231,12 +234,12 @@ Upgrade astack from the astack fork source, not upstream gstack.
 
 The happy-path loop is:
 
-1. Run `/scope` to define the problem and wedge.
-2. Run `/research` to map the current system and constraints.
-3. Run `/plan` to lock the implementation and QA spec.
-4. Run `/implement` to build and track progress.
-5. Run `/review` to compare the diff to the plan.
-6. Run `/qa` or `/qa-only` to verify the feature in a browser.
-7. Run `/ship` to prepare the branch for merge.
-8. Run `/document-release` to sync docs after shipping.
-9. Run `/retro` to capture learnings from the sprint.
+1. Run `/scope-astack` to define the problem and wedge.
+2. Run `/research-astack` to map the current system and constraints.
+3. Run `/plan-astack` to lock the implementation and QA spec.
+4. Run `/implement-astack` to build and track progress.
+5. Run `/review-astack` to compare the diff to the plan.
+6. Run `/qa-astack` or `/qa-only-astack` to verify the feature in a browser.
+7. Run `/ship-astack` to prepare the branch for merge.
+8. Run `/document-release-astack` to sync docs after shipping.
+9. Run `/retro-astack` to capture learnings from the sprint.

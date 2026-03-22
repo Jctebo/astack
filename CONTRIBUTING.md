@@ -14,7 +14,7 @@ bun install                    # install dependencies
 bin/dev-setup                  # activate dev mode
 ```
 
-Now edit any `SKILL.md`, invoke it in Claude Code (e.g. `/review`), and see your changes live. When you're done developing:
+Now edit any `SKILL.md`, invoke it in Claude Code (e.g. `/review-astack`), and see your changes live. When you're done developing:
 
 ```bash
 bin/dev-teardown               # deactivate — back to your global install
@@ -92,7 +92,7 @@ bin/dev-setup
 vim review/SKILL.md
 
 # 3. Test it in Claude Code — changes are live
-#    > /review
+#    > /review-astack
 
 # 4. Editing browse source? Rebuild the binary
 bun run build
@@ -115,6 +115,9 @@ bun install
 ```
 
 Bun auto-loads `.env` — no extra config. Conductor workspaces inherit `.env` from the main worktree automatically (see "Conductor workspaces" below).
+
+On Windows, `setup` also requires Node.js. Bun remains the primary runtime, but
+Node is needed for the Playwright/Chromium validation path.
 
 ### Test tiers
 
@@ -213,11 +216,12 @@ SKILL.md files are **generated** from `.tmpl` templates. Don't edit the `.md` di
 # 1. Edit the template
 vim SKILL.md.tmpl              # or browse/SKILL.md.tmpl
 
-# 2. Regenerate for both hosts
+# 2. Regenerate for all supported hosts
 bun run gen:skill-docs
 bun run gen:skill-docs --host codex
+bun run gen:skill-docs --host copilot
 
-# 3. Check health (reports both Claude and Codex)
+# 3. Check health (reports Claude, Codex, and Copilot)
 bun run skill:check
 
 # Or use watch mode — auto-regenerates on save
@@ -226,11 +230,15 @@ bun run dev:skill
 
 For template authoring best practices (natural language over bash-isms, dynamic branch detection, `{{BASE_BRANCH_DETECT}}` usage), see CLAUDE.md's "Writing SKILL templates" section.
 
+For the durable host and naming contract, see `docs/host-support.md`. Do not
+create new implementation-history folders under `enhancement/`; capture lasting
+behavior in the normal docs instead.
+
 To add a browse command, add it to `browse/src/commands.ts`. To add a snapshot flag, add it to `SNAPSHOT_FLAGS` in `browse/src/snapshot.ts`. Then rebuild.
 
-## Dual-host development (Claude + Codex)
+## Multi-host development (Claude + Codex + Copilot)
 
-astack generates SKILL.md files for two hosts: **Claude** (`.claude/skills/`) and **Codex** (`.agents/skills/`). Every template change needs to be generated for both.
+astack generates SKILL.md files for three hosts: **Claude** (`.claude/skills/`), **Codex** (`.agents/skills/`), and **Copilot** (`.copilot/skills/`). Every template change needs to be generated for all relevant hosts.
 
 ### Generating for both hosts
 
@@ -242,31 +250,37 @@ bun run gen:skill-docs
 bun run gen:skill-docs --host codex
 # --host agents is an alias for --host codex
 
-# Or use build, which does both + compiles binaries
+# Generate Copilot output
+bun run gen:skill-docs --host copilot
+
+# Or use build, which does all three + compiles binaries
 bun run build
 ```
 
 ### What changes between hosts
 
-| Aspect | Claude | Codex |
-|--------|--------|-------|
-| Output directory | `{skill}/SKILL.md` | `.agents/skills/astack-{skill}/SKILL.md` |
-| Frontmatter | Full (name, description, allowed-tools, hooks, version) | Minimal (name + description only) |
-| Paths | `~/.claude/skills/astack` | `~/.codex/skills/astack` |
-| Hook skills | `hooks:` frontmatter (enforced by Claude) | Inline safety advisory prose (advisory only) |
-| `/codex` skill | Included (Claude wraps codex exec) | Excluded (self-referential) |
+| Aspect | Claude | Codex | Copilot |
+|--------|--------|-------|---------|
+| Output directory | `{skill}/SKILL.md` | `.agents/skills/{name}/SKILL.md` | `.copilot/skills/{name}/SKILL.md` |
+| Frontmatter | Full (name, description, allowed-tools, hooks, version) | Minimal (name + description only) | Minimal (name + description only) |
+| Paths | `~/.claude/skills/astack` | `~/.codex/skills/astack` | `~/.copilot/skills/astack` |
+| Hook skills | `hooks:` frontmatter (enforced by Claude) | Inline safety advisory prose (advisory only) | Inline safety advisory prose if emitted |
+| Scope in v1 | Full astack skill set | Full generated Codex set | Base workflow only: `/scope-astack`, `/research-astack`, `/plan-astack`, `/implement-astack` |
 
-### Testing Codex output
+The rules behind that table live in `docs/host-support.md`.
+
+### Testing generated host output
 
 ```bash
-# Run all static tests (includes Codex validation)
+# Run all static tests (includes Codex and Copilot validation)
 bun test
 
-# Check freshness for both hosts
+# Check freshness for all generated hosts
 bun run gen:skill-docs --dry-run
 bun run gen:skill-docs --host codex --dry-run
+bun run gen:skill-docs --host copilot --dry-run
 
-# Health dashboard covers both hosts
+# Health dashboard covers all generated hosts
 bun run skill:check
 ```
 
@@ -276,11 +290,11 @@ When you run `bin/dev-setup`, it creates symlinks in both `.claude/skills/` and 
 
 ### Adding a new skill
 
-When you add a new skill template, both hosts get it automatically:
+When you add a new skill template, each supported host picks it up from the same source template:
 1. Create `{skill}/SKILL.md.tmpl`
-2. Run `bun run gen:skill-docs` (Claude output) and `bun run gen:skill-docs --host codex` (Codex output)
+2. Run `bun run gen:skill-docs` (Claude output), `bun run gen:skill-docs --host codex` (Codex output), and `bun run gen:skill-docs --host copilot` if the skill belongs in the Copilot base workflow surface
 3. The dynamic template discovery picks it up — no static list to update
-4. Commit both `{skill}/SKILL.md` and `.agents/skills/astack-{skill}/SKILL.md`
+4. Commit the generated outputs for every host the skill supports
 
 ## Conductor workspaces
 
@@ -298,7 +312,7 @@ When Conductor creates a new workspace, `bin/dev-setup` runs automatically. It d
 ## Things to know
 
 - **SKILL.md files are generated.** Edit the `.tmpl` template, not the `.md`. Run `bun run gen:skill-docs` to regenerate.
-- **TODOS.md is the unified backlog.** Organized by skill/component with P0-P4 priorities. `/ship` auto-detects completed items. All planning/review/retro skills read it for context.
+- **TODOS.md is the unified backlog.** Organized by skill/component with P0-P4 priorities. `/ship-astack` auto-detects completed items. All planning/review/retro skills read it for context.
 - **Browse source changes need a rebuild.** If you touch `browse/src/*.ts`, run `bun run build`.
 - **Dev mode shadows your global install.** Project-local skills take priority over `~/.claude/skills/astack`. `bin/dev-teardown` restores the global one.
 - **Conductor workspaces are independent.** Each workspace is its own git worktree. `bin/dev-setup` runs automatically via `conductor.json`.
@@ -318,7 +332,7 @@ cd .claude/skills/astack && bun install && bun run build
 ```
 
 Now every astack skill invocation in this project uses your working tree. Edit a
-template, run `bun run gen:skill-docs`, and the next `/review` or `/qa` call picks
+template, run `bun run gen:skill-docs`, and the next `/review-astack` or `/qa-astack` call picks
 it up immediately.
 
 **To go back to the stable global install**, just remove the symlink:
@@ -347,7 +361,7 @@ This affects all projects. To revert: `git checkout main && git pull && bun run 
 When you're happy with your skill edits:
 
 ```bash
-/ship
+/ship-astack
 ```
 
 This runs tests, reviews the diff, triages Greptile comments (with 2-tier escalation), manages TODOS.md, bumps the version, and opens a PR. See `ship/SKILL.md` for the full workflow.
