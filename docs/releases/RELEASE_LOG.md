@@ -1,5 +1,14 @@
 # Release Log
 
+## [0.9.5.4] - 2026-03-22
+
+### Added
+- Branch lifecycle automation for new enhancements: planning skills now bootstrap `enhancement/<slug>` from `main`, and ship now asks whether to merge the PR before cleaning up the branch and returning to `main`.
+
+### Changed
+- Ship workflow docs and generated skill outputs now describe the merge-confirmation step, branch cleanup, and return-to-main behavior.
+- Planning workflow docs now describe the automatic enhancement-branch bootstrap when work starts on `main`.
+
 ## [0.9.5.3] - 2026-03-22
 
 ### Changed

@@ -37,6 +37,19 @@ Read these files first:
 If the selected release artifact has no `Plan` section, stop and tell the user
 to run `/plan-astack` first.
 
+## Step 1.5: Ensure the enhancement branch
+
+If the current branch is `main`, move the implementation work onto a fresh
+branch before you start editing code:
+
+1. Derive the branch name from the active enhancement slug: `enhancement/<slug>`.
+2. If the worktree is dirty, stop and tell the user to commit or stash local
+   changes first.
+3. If that branch already exists locally, switch to it.
+4. Otherwise create it from `main` and continue there.
+
+If the current branch is already a feature branch, keep using it.
+
 ## Step 2: Execute against the plan
 
 Rules:

@@ -72,6 +72,10 @@ the main implementation lifecycle. Skills that plan, review, QA, ship, and
 document releases should treat the active release artifact as the source of
 truth.
 
+Planning skills should auto-create or reuse `enhancement/<slug>` when the work
+starts on `main`, and `/ship-astack` should ask once whether to merge the PR
+before cleaning up the branch and returning to `main`.
+
 Host-specific install and naming rules live in `docs/host-support.md`.
 
 ## Template workflow

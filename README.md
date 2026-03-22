@@ -71,6 +71,8 @@ Use `/scope-astack` when the request is still fuzzy or needs a stronger wedge. I
 combines the old brainstorming and founder-review stages into one plan-mode
 step and updates the `Scope` section in the active release artifact at
 `docs/releases/<version>-<slug>.md`.
+If you start from `main`, astack will create or reuse `enhancement/<slug>`
+before it writes the scope so the enhancement work stays on its own branch.
 
 The `Scope` section captures:
 
@@ -144,7 +146,9 @@ After implementation:
   artifact's `Plan` section
 - `/ship-astack` verifies code, docs, and progress are aligned, updates
   `docs/releases/VERSION`, appends `docs/releases/RELEASE_LOG.md`, and turns the
-  active release artifact into a shipped record before opening a PR
+  active release artifact into a shipped record before opening a PR, asks
+  whether to merge it, and after approval deletes the branch and switches back
+  to `main`
 - `/document-release-astack` syncs project docs to what actually shipped and
   rewrites the active release artifact into polished past-tense archival form
 - `/retro-astack` uses release artifacts and commit history as sprint context

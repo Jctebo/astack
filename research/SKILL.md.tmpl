@@ -54,6 +54,19 @@ Then read, if present:
 - `docs/releases/RELEASE_LOG.md`
 - the selected release artifact
 
+## Step 1.5: Ensure the enhancement branch
+
+If the current branch is `main`, move the enhancement work onto a fresh branch
+before you research further:
+
+1. Derive the branch name from the active enhancement slug: `enhancement/<slug>`.
+2. If the worktree is dirty, stop and tell the user to commit or stash local
+   changes first.
+3. If that branch already exists locally, switch to it.
+4. Otherwise create it from `main` and continue there.
+
+If the current branch is already a feature branch, keep using it.
+
 ## Step 2: Research the implementation landscape
 
 Inspect the codebase and map the relevant system:

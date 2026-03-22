@@ -51,6 +51,19 @@ If the selected release artifact is missing a `Scope` or `Research` section,
 say so explicitly and proceed only if the user has already provided enough
 context. Otherwise recommend running the missing stage first.
 
+## Step 1.5: Ensure the enhancement branch
+
+If the current branch is `main`, move the enhancement work onto a fresh branch
+before you lock the plan:
+
+1. Derive the branch name from the active enhancement slug: `enhancement/<slug>`.
+2. If the worktree is dirty, stop and tell the user to commit or stash local
+   changes first.
+3. If that branch already exists locally, switch to it.
+4. Otherwise create it from `main` and continue there.
+
+If the current branch is already a feature branch, keep using it.
+
 ## Step 2: Resolve the remaining decisions
 
 Treat this like a combined engineering + design review:

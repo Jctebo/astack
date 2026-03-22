@@ -51,6 +51,10 @@ function commitAll(dir: string, message: string) {
   git(dir, ['commit', '-m', message]);
 }
 
+function currentBranch(dir: string) {
+  return git(dir, ['branch', '--show-current']).stdout.toString().trim();
+}
+
 function installSkills(tmpDir: string) {
   const skillDirs = ['', 'scope', 'research', 'plan', 'implement', 'browse'];
   for (const skill of skillDirs) {
@@ -203,6 +207,51 @@ Report the observed structure and whether the annotated screenshot was created.`
       expect(artifact).toContain('### Problem');
       expect(artifact).toContain('### Narrow Wedge');
       expect(artifact).toContain('### Recommended Next Step');
+    } finally {
+      fs.rmSync(tmpDir, { recursive: true, force: true });
+    }
+  }, 120_000);
+
+  testIfSelected('scope-branch-bootstrap', async () => {
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'scope-branch-e2e-'));
+    try {
+      initGitRepo(tmpDir);
+      git(tmpDir, ['branch', '-M', 'main']);
+      installSkills(tmpDir);
+      setupReleaseArtifacts(tmpDir, '0.0.1.0-branch-lifecycle-automation.md', [
+        '## Scope\n',
+        '## Research\n',
+        '## Plan\n',
+        '## Progress\n',
+        '## QA\n',
+        '## Release Notes\n',
+      ]);
+      fs.writeFileSync(path.join(tmpDir, 'README.md'), '# Branch Lifecycle\n');
+      commitAll(tmpDir, 'initial');
+
+      expect(currentBranch(tmpDir)).toBe('main');
+
+      const result = await runSkillTest({
+        prompt: 'Use /scope-astack. We are starting a new enhancement for branch lifecycle automation. Begin on main, create the enhancement branch automatically, and then write the scope for the feature that starts a fresh branch from main and asks whether to merge the PR on ship.',
+        workingDirectory: tmpDir,
+        maxTurns: 8,
+        allowedTools: ['Skill', 'Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep'],
+        timeout: 90_000,
+        testName: 'scope-branch-bootstrap',
+        runId,
+      });
+
+      logCost('scope-branch-bootstrap', result);
+      recordE2E('scope-branch-bootstrap', 'Skill E2E tests', result);
+
+      const branch = currentBranch(tmpDir);
+      expect(branch).toMatch(/^enhancement\//);
+      expect(branch).not.toBe('main');
+
+      const artifact = fs.readFileSync(path.join(tmpDir, 'docs', 'releases', '0.0.1.0-branch-lifecycle-automation.md'), 'utf-8');
+      expect(artifact).toContain('## Scope');
+      expect(artifact).toContain('### Goal');
+      expect(artifact).toContain('### Narrow Wedge');
     } finally {
       fs.rmSync(tmpDir, { recursive: true, force: true });
     }

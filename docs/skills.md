@@ -9,7 +9,7 @@ For install roots, generated host folders, and Copilot scope, see
 
 | Skill | Purpose | Output |
 |-------|---------|--------|
-| `/scope-astack` | Frame the problem, audience, wedge, and non-goals | `Scope` section in `docs/releases/<version>-<slug>.md` |
+| `/scope-astack` | Frame the problem, audience, wedge, and non-goals; auto-bootstrap the enhancement branch when starting on `main` | `Scope` section in `docs/releases/<version>-<slug>.md` |
 | `/research-astack` | Map the current system, reuse paths, constraints, and unknowns | `Research` section in `docs/releases/<version>-<slug>.md` |
 | `/plan-astack` | Produce the implementation spec and QA matrix | `Plan` section in `docs/releases/<version>-<slug>.md` |
 | `/implement-astack` | Execute the plan and keep progress current | `Progress` section in `docs/releases/<version>-<slug>.md` |
@@ -32,6 +32,7 @@ It should:
 - challenge assumptions one at a time
 - prefer concrete user pain over feature phrasing
 - update the `Scope` section in the active release artifact
+- create or reuse `enhancement/<slug>` when the workflow starts on `main`
 
 The `Scope` section should cover:
 
@@ -61,6 +62,7 @@ It should:
 - identify existing patterns worth reusing
 - consult primary external references when needed
 - update the `Research` section
+- keep using the same enhancement branch created by `/scope-astack`
 
 The `Research` section should cover:
 
@@ -91,6 +93,7 @@ It should:
 - specify loading, empty, success, and error states when UI exists
 - include a concrete QA and test matrix
 - update the `Plan` section
+- keep using the same enhancement branch when the work started on `main`
 
 The `Plan` section should cover:
 
@@ -121,6 +124,7 @@ It should:
 - implement in focused steps
 - validate as it goes
 - update the `Progress` section throughout execution
+- keep using the same enhancement branch as the planning stages
 
 The `Progress` section should cover:
 
@@ -166,7 +170,8 @@ Use it when:
 ### `/ship-astack`
 
 Release workflow. It should verify the code, docs, and progress state are all
-aligned before opening or updating a PR.
+aligned before opening or updating a PR, then ask whether to merge the PR and
+clean up the branch if the user says yes.
 
 Use it when:
 
@@ -235,12 +240,12 @@ Upgrade astack from the astack fork source, not upstream gstack.
 
 The happy-path loop is:
 
-1. Run `/scope-astack` to define the problem and wedge.
+1. Run `/scope-astack` to define the problem and wedge. If the work started on `main`, this creates or reuses the enhancement branch.
 2. Run `/research-astack` to map the current system and constraints.
 3. Run `/plan-astack` to lock the implementation and QA spec.
 4. Run `/implement-astack` to build and track progress.
 5. Run `/review-astack` to compare the diff to the plan.
 6. Run `/qa-astack` or `/qa-only-astack` to verify the feature in a browser.
-7. Run `/ship-astack` to prepare the branch for merge.
+7. Run `/ship-astack` to prepare the branch for merge, create the PR, and optionally merge it.
 8. Run `/document-release-astack` to sync docs after shipping.
 9. Run `/retro-astack` to capture learnings from the sprint.

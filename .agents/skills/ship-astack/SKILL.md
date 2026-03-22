@@ -4,9 +4,9 @@ version: 1.0.0
 description: |
   Ship workflow: detect + merge base branch, run tests, review diff, update
   `docs/releases/VERSION`, append `docs/releases/RELEASE_LOG.md`, mark the
-  active release artifact as shipped, commit, push, and create PR. Use when
-  asked to "ship", "deploy", "push to main", "create a PR", or "merge and
-  push".
+  active release artifact as shipped, commit, push, create PR, ask whether to
+  merge it, clean up the branch, and return to `main`. Use when asked to
+  "ship", "deploy", "push to main", "create a PR", or "merge and push".
   Proactively suggest when the user says code is ready or asks about deploying.
 allowed-tools:
   - Bash
@@ -177,7 +177,7 @@ branch name wherever the instructions say "the base branch."
 
 # Ship: Fully Automated Ship Workflow
 
-You are running the `/ship-astack` workflow. This is a **non-interactive, fully automated** workflow. Do NOT ask for confirmation at any step. The user said `/ship-astack` which means DO IT. Run straight through and output the PR URL at the end.
+You are running the `/ship-astack` workflow. This is a **mostly automated** workflow with one explicit merge decision at the end. Do NOT ask for routine confirmation before the PR exists. After the PR and docs sync are ready, ask whether the user wants to merge now, then clean up the branch and return to `main` if they say yes. Run straight through and output the PR URL at the end.
 
 **Only stop for:**
 - On the base branch (abort)
@@ -1040,12 +1040,33 @@ doc updates — the user runs `/ship-astack` and documentation stays current wit
 
 ---
 
+## Step 8.6: Final merge decision
+
+Once the PR has been created and documentation sync is complete, ask the user
+whether they want to merge the PR now.
+
+- If the user says yes:
+  - merge with `gh pr merge --merge --delete-branch`
+  - switch back to `main`
+  - fast-forward local `main` from the remote base branch
+  - delete the local feature branch if it still exists
+- If the user says no:
+  - leave the PR open
+  - keep the feature branch checked out
+  - do not delete the branch locally or remotely
+
+After a successful merge and cleanup, output a short note that the branch is
+gone and the workspace is back on `main`.
+
+---
+
 ## Important Rules
 
 - **Never skip tests.** If tests fail, stop.
 - **Never skip the pre-landing review.** If checklist.md is unreadable, stop.
 - **Never force push.** Use regular `git push` only.
 - **Never ask for trivial confirmations** (e.g., "ready to push?", "create PR?"). DO stop for: version bumps (MINOR/MAJOR), pre-landing review findings (ASK items), Codex critical findings ([P1]), and the one-time Codex adoption prompt.
+- **Do ask once** for the final merge decision after the PR exists and docs sync is complete.
 - **Always use the 4-digit version format** from `docs/releases/VERSION`.
 - **Date format in `docs/releases/RELEASE_LOG.md`:** `YYYY-MM-DD`
 - **Split commits for bisectability** — each commit = one logical change.
@@ -1054,3 +1075,4 @@ doc updates — the user runs `/ship-astack` and documentation stays current wit
 - **Never push without fresh verification evidence.** If code changed after Step 3 tests, re-run before pushing.
 - **Step 3.4 generates coverage tests.** They must pass before committing. Never commit failing tests.
 - **The goal is: user says `/ship-astack`, next thing they see is the review + PR URL + auto-synced docs.**
+

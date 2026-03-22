@@ -76,6 +76,19 @@ Resolve the active artifact like this:
 
 Ignore `VERSION` and `RELEASE_LOG.md` when selecting the enhancement file.
 
+## Step 1.6: Bootstrap the enhancement branch
+
+If the current branch is `main`, move the enhancement work onto a fresh branch
+before you start writing the scope:
+
+1. Derive the branch name from the active enhancement slug: `enhancement/<slug>`.
+2. If the worktree is dirty, stop and tell the user to commit or stash local
+   changes first.
+3. If that branch already exists locally, switch to it.
+4. Otherwise create it from `main` and continue there.
+
+If the current branch is already a feature branch, keep using it.
+
 ## Step 2: Challenge the framing
 
 Your posture is part product strategist, part demanding collaborator:

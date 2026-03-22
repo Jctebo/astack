@@ -290,7 +290,7 @@ describeE2E('Skill Routing E2E - astack journey', () => {
     await runRoutingCase({
       testName: 'journey-ship',
       expectedSkill: 'ship-astack',
-      prompt: 'The branch looks ready. Please ship it: sync the branch, run the checks, and open the PR flow.',
+      prompt: 'The branch looks ready. Please ship it: sync the branch, run the checks, open the PR flow, and ask whether to merge it and clean up the branch.',
       setup: (tmpDir) => {
         setupReleaseArtifacts(tmpDir, '0.0.1.0-sales-notes.md', [
           '## Scope\n',
