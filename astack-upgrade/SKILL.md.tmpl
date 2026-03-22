@@ -71,26 +71,41 @@ Tell user the snooze duration: "Next reminder in 24h" (or 48h or 1 week, dependi
 Tell user: "Update checks disabled. Run `~/.claude/skills/astack/bin/astack-config set update_check true` to re-enable."
 Continue with the current skill.
 
-### Step 2: Detect install type
+### Step 2: Detect install type and source checkout
 
 ```bash
-if [ -d "$HOME/.claude/skills/astack/.git" ]; then
-  INSTALL_TYPE="global-git"
-  INSTALL_DIR="$HOME/.claude/skills/astack"
-elif [ -d ".claude/skills/astack/.git" ]; then
+PRIMARY_ROOT="$HOME/.claude/skills/astack"
+LOCAL_ROOT=".claude/skills/astack"
+INSTALL_TYPE=""
+INSTALL_DIR=""
+SOURCE_DIR=""
+
+if [ -d "$PRIMARY_ROOT/.git" ]; then
+  INSTALL_TYPE="primary-git"
+  INSTALL_DIR="$PRIMARY_ROOT"
+  SOURCE_DIR="$PRIMARY_ROOT"
+elif [ -f "$PRIMARY_ROOT/.astack-source-path" ]; then
+  SOURCE_DIR="$(tr -d '\r\n' < "$PRIMARY_ROOT/.astack-source-path" 2>/dev/null || true)"
+  if [ -n "$SOURCE_DIR" ] && [ -d "$SOURCE_DIR/.git" ]; then
+    INSTALL_TYPE="primary-runtime"
+    INSTALL_DIR="$PRIMARY_ROOT"
+  else
+    echo "ERROR: astack primary runtime found at $PRIMARY_ROOT but source checkout metadata is missing or invalid"
+    exit 1
+  fi
+elif [ -d "$LOCAL_ROOT/.git" ]; then
   INSTALL_TYPE="local-git"
-  INSTALL_DIR=".claude/skills/astack"
-elif [ -d ".claude/skills/astack" ]; then
-  INSTALL_TYPE="vendored"
-  INSTALL_DIR=".claude/skills/astack"
-elif [ -d "$HOME/.claude/skills/astack" ]; then
-  INSTALL_TYPE="vendored-global"
-  INSTALL_DIR="$HOME/.claude/skills/astack"
+  INSTALL_DIR="$LOCAL_ROOT"
+  SOURCE_DIR="$LOCAL_ROOT"
+elif [ -d "$LOCAL_ROOT" ]; then
+  INSTALL_TYPE="vendored-local"
+  INSTALL_DIR="$LOCAL_ROOT"
 else
   echo "ERROR: astack not found"
   exit 1
 fi
 echo "Install type: $INSTALL_TYPE at $INSTALL_DIR"
+echo "Source dir: ${SOURCE_DIR:-none}"
 ```
 
 The install type and directory path printed above will be used in all subsequent steps.
@@ -100,24 +115,30 @@ The install type and directory path printed above will be used in all subsequent
 Use the install directory from Step 2's output below:
 
 ```bash
-OLD_VERSION=$(cat "$INSTALL_DIR/VERSION" 2>/dev/null || echo "unknown")
+VERSION_ROOT="${SOURCE_DIR:-$INSTALL_DIR}"
+OLD_VERSION=$(cat "$VERSION_ROOT/VERSION" 2>/dev/null || echo "unknown")
 ```
 
 ### Step 4: Upgrade
 
-Use the install type and directory detected in Step 2:
+Use the install type, install directory, and source directory detected in Step 2:
 
-**For git installs** (global-git, local-git):
+**For source-backed installs** (`primary-git`, `primary-runtime`, `local-git`):
 ```bash
-cd "$INSTALL_DIR"
+SETUP_ARGS=""
+case "$INSTALL_DIR" in
+  "$HOME/.codex/skills/astack"|".agents/skills/astack") SETUP_ARGS="--host codex" ;;
+  "$HOME/.copilot/skills/astack"|".copilot/skills/astack") SETUP_ARGS="--host copilot" ;;
+esac
+cd "$SOURCE_DIR"
 STASH_OUTPUT=$(git stash 2>&1)
 git fetch origin
 git reset --hard origin/main
-./setup
+./setup $SETUP_ARGS
 ```
 If `$STASH_OUTPUT` contains "Saved working directory", warn the user: "Note: local changes were stashed. Run `git stash pop` in the skill directory to restore them."
 
-**For vendored installs** (vendored, vendored-global):
+**For vendored-only installs** (`vendored-local`):
 ```bash
 PARENT=$(dirname "$INSTALL_DIR")
 TMP_DIR=$(mktemp -d)
@@ -125,7 +146,12 @@ ASTACK_REPO_URL="${ASTACK_REPO_URL:-https://github.com/Jctebo/astack.git}"
 git clone --depth 1 "$ASTACK_REPO_URL" "$TMP_DIR/astack"
 mv "$INSTALL_DIR" "$INSTALL_DIR.bak"
 mv "$TMP_DIR/astack" "$INSTALL_DIR"
-cd "$INSTALL_DIR" && ./setup
+SETUP_ARGS=""
+case "$INSTALL_DIR" in
+  ".agents/skills/astack") SETUP_ARGS="--host codex" ;;
+  ".copilot/skills/astack") SETUP_ARGS="--host copilot" ;;
+esac
+cd "$INSTALL_DIR" && ./setup $SETUP_ARGS
 rm -rf "$INSTALL_DIR.bak" "$TMP_DIR"
 ```
 
@@ -138,7 +164,8 @@ _ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
 LOCAL_ASTACK=""
 if [ -n "$_ROOT" ] && [ -d "$_ROOT/.claude/skills/astack" ]; then
   _RESOLVED_LOCAL=$(cd "$_ROOT/.claude/skills/astack" && pwd -P)
-  _RESOLVED_PRIMARY=$(cd "$INSTALL_DIR" && pwd -P)
+  _PRIMARY_COMPARE="${SOURCE_DIR:-$INSTALL_DIR}"
+  _RESOLVED_PRIMARY=$(cd "$_PRIMARY_COMPARE" && pwd -P)
   if [ "$_RESOLVED_LOCAL" != "$_RESOLVED_PRIMARY" ]; then
     LOCAL_ASTACK="$_ROOT/.claude/skills/astack"
   fi
@@ -149,12 +176,17 @@ echo "LOCAL_ASTACK=$LOCAL_ASTACK"
 If `LOCAL_ASTACK` is non-empty, update it by copying from the freshly-upgraded primary install (same approach as README vendored install):
 ```bash
 mv "$LOCAL_ASTACK" "$LOCAL_ASTACK.bak"
-cp -Rf "$INSTALL_DIR" "$LOCAL_ASTACK"
+cp -Rf "${SOURCE_DIR:-$INSTALL_DIR}" "$LOCAL_ASTACK"
 rm -rf "$LOCAL_ASTACK/.git"
-cd "$LOCAL_ASTACK" && ./setup
+SETUP_ARGS=""
+case "$LOCAL_ASTACK" in
+  ".agents/skills/astack"|*/.agents/skills/astack) SETUP_ARGS="--host codex" ;;
+  ".copilot/skills/astack"|*/.copilot/skills/astack) SETUP_ARGS="--host copilot" ;;
+esac
+cd "$LOCAL_ASTACK" && ./setup $SETUP_ARGS
 rm -rf "$LOCAL_ASTACK.bak"
 ```
-Tell user: "Also updated vendored copy at `$LOCAL_ASTACK` — commit `.claude/skills/astack/` when you're ready."
+Tell user: "Also updated vendored copy at `$LOCAL_ASTACK`."
 
 If `./setup` fails, restore from backup and warn the user:
 ```bash
@@ -174,7 +206,7 @@ rm -f ~/.astack/update-snoozed
 
 ### Step 6: Show What's New
 
-Read `$INSTALL_DIR/CHANGELOG.md`. Find all version entries between the old version and the new version. Summarize as 5-7 bullets grouped by theme. Don't overwhelm — focus on user-facing changes. Skip internal refactors unless they're significant.
+Read `${SOURCE_DIR:-$INSTALL_DIR}/CHANGELOG.md`. Find all version entries between the old version and the new version. Summarize as 5-7 bullets grouped by theme. Don't overwhelm — focus on user-facing changes. Skip internal refactors unless they're significant.
 
 Format:
 ```
@@ -215,7 +247,7 @@ Run the Step 2 bash block above to detect the primary install type and directory
 
 **If `LOCAL_ASTACK` is non-empty**, compare versions:
 ```bash
-PRIMARY_VER=$(cat "$INSTALL_DIR/VERSION" 2>/dev/null || echo "unknown")
+PRIMARY_VER=$(cat "${SOURCE_DIR:-$INSTALL_DIR}/VERSION" 2>/dev/null || echo "unknown")
 LOCAL_VER=$(cat "$LOCAL_ASTACK/VERSION" 2>/dev/null || echo "unknown")
 echo "PRIMARY=$PRIMARY_VER LOCAL=$LOCAL_VER"
 ```

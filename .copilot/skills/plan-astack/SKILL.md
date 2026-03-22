@@ -1,11 +1,20 @@
 ---
 name: plan-astack
+version: 1.0.0
 description: |
   Unified planning review. Combines engineering review, design review, and
   implementation planning into one plan-mode skill that resolves decisions and
   updates the `Plan` section in the active release artifact. Use when asked to
   "make the plan", "review the architecture", "lock the implementation plan",
   or "finalize what we should build".
+allowed-tools:
+  - Read
+  - Write
+  - Edit
+  - Grep
+  - Glob
+  - AskUserQuestion
+  - Bash
 ---
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->

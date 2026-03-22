@@ -1,5 +1,15 @@
 # Release Log
 
+## [0.9.5.2] - 2026-03-22
+
+### Changed
+- Codex upgrades now resolve the primary source checkout from the user-home runtime root instead of guessing from repo-local `.agents/skills/astack` copies.
+- Codex install documentation now explains that the checkout used to run `setup --host codex` remains the upgrade source of truth.
+
+### Fixed
+- Runtime roots now carry `VERSION`, `CHANGELOG.md`, and `.astack-source-path` metadata so update and upgrade flows can identify the installed build correctly.
+- Legacy Codex installs where `~/.codex/skills/astack` is itself a git checkout are preserved instead of being treated like disposable runtime roots.
+
 ## [0.9.5.1] - 2026-03-22
 
 ### Added

@@ -165,10 +165,14 @@ cd ~/.claude/skills/astack
 ### Codex
 
 ```bash
-git clone https://github.com/Jctebo/astack.git ~/.codex/skills/astack
-cd ~/.codex/skills/astack
+git clone https://github.com/Jctebo/astack.git ~/src/astack
+cd ~/src/astack
 ./setup --host codex
 ```
+
+Codex note: `setup --host codex` installs the runtime entrypoint under
+`~/.codex/skills/astack`, but the git checkout you ran setup from remains the
+source of truth for upgrades.
 
 ### GitHub Copilot
 
