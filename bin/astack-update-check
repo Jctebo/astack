@@ -3,12 +3,12 @@
 #
 # Output (one line, or nothing):
 #   JUST_UPGRADED <old> <new>       — marker found from recent upgrade
-#   UPGRADE_AVAILABLE <old> <new>   — remote VERSION differs from local
+#   UPGRADE_AVAILABLE <old> <new>   — remote release VERSION differs from local
 #   (nothing)                       — up to date, snoozed, disabled, or check skipped
 #
 # Env overrides (for testing):
 #   ASTACK_DIR          — override auto-detected astack root
-#   ASTACK_REMOTE_URL   — override remote VERSION URL
+#   ASTACK_REMOTE_URL   — override remote release VERSION URL
 #   ASTACK_STATE_DIR    — override ~/.astack state directory
 set -euo pipefail
 
@@ -17,9 +17,10 @@ STATE_DIR="${ASTACK_STATE_DIR:-$HOME/.astack}"
 CACHE_FILE="$STATE_DIR/last-update-check"
 MARKER_FILE="$STATE_DIR/just-upgraded-from"
 SNOOZE_FILE="$STATE_DIR/update-snoozed"
-VERSION_FILE="$ASTACK_DIR/VERSION"
+VERSION_FILE="$ASTACK_DIR/docs/releases/VERSION"
+LEGACY_VERSION_FILE="$ASTACK_DIR/VERSION"
 ASTACK_REPO_SLUG="${ASTACK_REPO_SLUG:-Jctebo/astack}"
-REMOTE_URL="${ASTACK_REMOTE_URL:-https://raw.githubusercontent.com/$ASTACK_REPO_SLUG/main/VERSION}"
+REMOTE_URL="${ASTACK_REMOTE_URL:-https://raw.githubusercontent.com/$ASTACK_REPO_SLUG/main/docs/releases/VERSION}"
 
 # ─── Force flag (busts cache for standalone /astack-upgrade) ──
 if [ "${1:-}" = "--force" ]; then
@@ -85,9 +86,11 @@ check_snooze() {
 LOCAL=""
 if [ -f "$VERSION_FILE" ]; then
   LOCAL="$(cat "$VERSION_FILE" 2>/dev/null | tr -d '[:space:]')"
+elif [ -f "$LEGACY_VERSION_FILE" ]; then
+  LOCAL="$(cat "$LEGACY_VERSION_FILE" 2>/dev/null | tr -d '[:space:]')"
 fi
 if [ -z "$LOCAL" ]; then
-  exit 0  # No VERSION file → skip check
+  exit 0  # No release VERSION file → skip check
 fi
 
 # ─── Step 2: Check "just upgraded" marker ─────────────────────

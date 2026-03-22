@@ -39,6 +39,10 @@ Downstream skills consume those artifacts:
 This keeps planning and release context visible in the repo instead of burying
 it in hidden branch-local state.
 
+The same release-folder contract also backs runtime metadata for installs and
+update checks, so there is one canonical version and release-history source for
+both humans and tooling.
+
 This artifact-first flow was informed in part by HumanLayer's DeepWiki material
 on research and planning for coding agents, particularly the emphasis on
 separating repository research from planning and then compacting that context

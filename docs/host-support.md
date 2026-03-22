@@ -37,6 +37,9 @@ documented commands users invoke.
   stale legacy `astack-*` sidecars when needed.
 - Codex runtime roots also record the source checkout path that upgrades should
   use instead of guessing from repo-local `.agents/skills/astack` copies.
+- Runtime roots carry release metadata under `docs/releases/` so update checks,
+  upgrade summaries, and telemetry all read the same canonical version and
+  release log files.
 
 ## GitHub Copilot support boundary
 

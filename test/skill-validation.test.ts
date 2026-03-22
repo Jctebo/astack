@@ -139,7 +139,8 @@ describe('generated skill health', () => {
     expect(setup).toContain('$HOME/.codex/skills');
     expect(setup).toContain('$HOME/.copilot/skills');
     expect(setup).toContain('.astack-source-path');
-    expect(setup).toContain('cp "$ASTACK_DIR/VERSION" "$target_root/VERSION"');
+    expect(setup).toContain('cp "$ASTACK_DIR/docs/releases/VERSION" "$target_root/docs/releases/VERSION"');
+    expect(setup).toContain('cp "$ASTACK_DIR/docs/releases/RELEASE_LOG.md" "$target_root/docs/releases/RELEASE_LOG.md"');
     expect(setup).not.toContain('ln -snf "$ASTACK_DIR" "$CODEX_ASTACK"');
   });
 

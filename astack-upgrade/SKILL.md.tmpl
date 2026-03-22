@@ -116,7 +116,7 @@ Use the install directory from Step 2's output below:
 
 ```bash
 VERSION_ROOT="${SOURCE_DIR:-$INSTALL_DIR}"
-OLD_VERSION=$(cat "$VERSION_ROOT/VERSION" 2>/dev/null || echo "unknown")
+OLD_VERSION=$(cat "$VERSION_ROOT/docs/releases/VERSION" 2>/dev/null || cat "$VERSION_ROOT/VERSION" 2>/dev/null || echo "unknown")
 ```
 
 ### Step 4: Upgrade
@@ -206,7 +206,7 @@ rm -f ~/.astack/update-snoozed
 
 ### Step 6: Show What's New
 
-Read `${SOURCE_DIR:-$INSTALL_DIR}/CHANGELOG.md`. Find all version entries between the old version and the new version. Summarize as 5-7 bullets grouped by theme. Don't overwhelm — focus on user-facing changes. Skip internal refactors unless they're significant.
+Read `${SOURCE_DIR:-$INSTALL_DIR}/docs/releases/RELEASE_LOG.md`. If that file is missing, fall back to `${SOURCE_DIR:-$INSTALL_DIR}/CHANGELOG.md`. Find all version entries between the old version and the new version. Summarize as 5-7 bullets grouped by theme. Don't overwhelm — focus on user-facing changes. Skip internal refactors unless they're significant.
 
 Format:
 ```
@@ -247,8 +247,8 @@ Run the Step 2 bash block above to detect the primary install type and directory
 
 **If `LOCAL_ASTACK` is non-empty**, compare versions:
 ```bash
-PRIMARY_VER=$(cat "${SOURCE_DIR:-$INSTALL_DIR}/VERSION" 2>/dev/null || echo "unknown")
-LOCAL_VER=$(cat "$LOCAL_ASTACK/VERSION" 2>/dev/null || echo "unknown")
+PRIMARY_VER=$(cat "${SOURCE_DIR:-$INSTALL_DIR}/docs/releases/VERSION" 2>/dev/null || cat "${SOURCE_DIR:-$INSTALL_DIR}/VERSION" 2>/dev/null || echo "unknown")
+LOCAL_VER=$(cat "$LOCAL_ASTACK/docs/releases/VERSION" 2>/dev/null || cat "$LOCAL_ASTACK/VERSION" 2>/dev/null || echo "unknown")
 echo "PRIMARY=$PRIMARY_VER LOCAL=$LOCAL_VER"
 ```
 
