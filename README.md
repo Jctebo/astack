@@ -7,7 +7,7 @@ delivery workflow:
 
 The planning path is now built around one canonical release artifact model:
 
-- `/scope-astack` updates the `Scope` section
+- `/scope-astack` updates the `Scope` section and bootstraps the enhancement branch when starting on `main`
 - `/research-astack` updates the `Research` section
 - `/plan-astack` updates the `Plan` section
 - `/implement-astack` updates the `Progress` section
@@ -17,6 +17,10 @@ Those workflow sections live in `docs/releases/<version>-<slug>.md`, alongside
 like `/review-astack`, `/qa-astack`, `/ship-astack`, and
 `/document-release-astack` consume the active release artifact instead of
 relying on hidden per-branch planning files.
+
+The newest enhancement, `end-to-end`, is the workflow that carries one request
+from scope through ship, docs sync, merge prompt, and local cleanup when the
+path stays clear.
 
 That same `docs/releases/` folder is also the canonical machine-facing release
 contract. astack no longer treats repo-root `VERSION` or `CHANGELOG.md` as the
@@ -73,6 +77,8 @@ step and updates the `Scope` section in the active release artifact at
 `docs/releases/<version>-<slug>.md`.
 If you start from `main`, astack will create or reuse `enhancement/<slug>`
 before it writes the scope so the enhancement work stays on its own branch.
+That same branch is reused as the request moves through research, plan,
+implementation, QA, and ship.
 
 The `Scope` section captures:
 
@@ -152,6 +158,10 @@ After implementation:
 - `/document-release-astack` syncs project docs to what actually shipped and
   rewrites the active release artifact into polished past-tense archival form
 - `/retro-astack` uses release artifacts and commit history as sprint context
+
+For unattended enhancement runs, astack should call the existing skills in
+sequence and stop whenever a step needs human judgment, branch recovery, or a
+non-transient fix.
 
 ## Install
 

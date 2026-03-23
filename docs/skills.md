@@ -178,6 +178,30 @@ Use it when:
 - implementation, review, and QA are complete
 - the branch is ready to push and propose for merge
 
+### `end-to-end`
+
+`end-to-end` is the unattended enhancement wedge. It is not a new hidden skill;
+it is the complete use of the existing workflow in sequence.
+
+Use it when:
+
+- one enhancement request should carry itself from scope to ship
+- the remaining stops are known human decisions, not missing automation
+
+It should:
+
+- call the existing skills in order
+- carry the same release artifact through the whole path
+- retry once for clearly transient failures
+- stop immediately for branch conflicts, merge ambiguity, or user judgment
+
+The `end-to-end` enhancement should finish with:
+
+- the PR opened
+- docs synced
+- merge prompted
+- branch cleaned up locally after a successful merge
+
 ### `/document-release-astack`
 
 Post-implementation docs sync. It should update repo docs so they match the

@@ -76,6 +76,11 @@ Planning skills should auto-create or reuse `enhancement/<slug>` when the work
 starts on `main`, and `/ship-astack` should ask once whether to merge the PR
 before cleaning up the branch and returning to `main`.
 
+The `end-to-end` enhancement is the first version of an unattended path across
+the whole workflow. It should be able to take one request from scope through
+ship, docs sync, merge prompt, and local cleanup while still stopping for any
+human judgment, branch conflict, or clearly non-transient failure.
+
 Host-specific install and naming rules live in `docs/host-support.md`.
 
 ## Template workflow

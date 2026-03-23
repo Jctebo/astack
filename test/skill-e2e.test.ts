@@ -257,6 +257,17 @@ Report the observed structure and whether the annotated screenshot was created.`
     }
   }, 120_000);
 
+  testIfSelected('end-to-end-artifact', async () => {
+    const artifact = fs.readFileSync(path.join(ROOT, 'docs', 'releases', '0.9.5.5-end-to-end.md'), 'utf-8');
+
+    expect(artifact).toContain('## Scope');
+    expect(artifact).toContain('## Research');
+    expect(artifact).toContain('## Plan');
+    expect(artifact).toContain('## Progress');
+    expect(artifact).toContain('### QA And Test Matrix');
+    expect(artifact).toContain('single transient retry allowance');
+  }, 30_000);
+
   testIfSelected('research-artifact', async () => {
     const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'research-e2e-'));
     try {

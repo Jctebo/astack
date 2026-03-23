@@ -104,6 +104,8 @@ describe('gen-skill-docs', () => {
     const planContent = fs.readFileSync(path.join(ROOT, 'plan', 'SKILL.md'), 'utf-8');
     const implementContent = fs.readFileSync(path.join(ROOT, 'implement', 'SKILL.md'), 'utf-8');
     const shipContent = fs.readFileSync(path.join(ROOT, 'ship', 'SKILL.md'), 'utf-8');
+    const skillsContent = fs.readFileSync(path.join(ROOT, 'docs', 'skills.md'), 'utf-8');
+    const endToEndArtifact = fs.readFileSync(path.join(ROOT, 'docs', 'releases', '0.9.5.5-end-to-end.md'), 'utf-8');
 
     expect(scopeContent).toContain('Step 1.6: Bootstrap the enhancement branch');
     expect(scopeContent).toContain('enhancement/<slug>');
@@ -112,6 +114,11 @@ describe('gen-skill-docs', () => {
     expect(implementContent).toContain('Step 1.5: Ensure the enhancement branch');
     expect(shipContent).toContain('Step 8.6: Final merge decision');
     expect(shipContent).toContain('gh pr merge --merge --delete-branch');
+    expect(skillsContent).toContain('### `end-to-end`');
+    expect(skillsContent).toContain('retry once for clearly transient failures');
+    expect(endToEndArtifact).toContain('## Scope');
+    expect(endToEndArtifact).toContain('## Plan');
+    expect(endToEndArtifact).toContain('### QA And Test Matrix');
   });
 
   test('root skill suggests the new astack workflow', () => {

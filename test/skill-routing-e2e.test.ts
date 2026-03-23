@@ -168,6 +168,26 @@ describeE2E('Skill Routing E2E - astack journey', () => {
     });
   }, 120_000);
 
+  testIfSelected('journey-end-to-end', async () => {
+    await runRoutingCase({
+      testName: 'journey-end-to-end',
+      expectedSkill: 'scope-astack',
+      prompt: 'Use /scope-astack for an end-to-end enhancement that should move one request through scope, research, plan, implement, QA, and ship without manual orchestration unless a human decision is required.',
+      setup: (tmpDir) => {
+        fs.writeFileSync(path.join(tmpDir, 'README.md'), '# End to End\n');
+        setupReleaseArtifacts(tmpDir, '0.0.1.0-end-to-end.md', [
+          '# Scope\n\n## Problem\n- One enhancement still needs too much manual handoff.\n',
+          '## Research\n',
+          '## Plan\n',
+          '## Progress\n',
+          '## QA\n',
+          '## Release Notes\n',
+        ]);
+        commitAll(tmpDir, 'initial');
+      },
+    });
+  }, 120_000);
+
   testIfSelected('journey-research', async () => {
     await runRoutingCase({
       testName: 'journey-research',

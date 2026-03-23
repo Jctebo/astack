@@ -55,3 +55,4 @@ bun run skill:check
 - `/review-astack`, `/qa-astack`, `/ship-astack`, and `/document-release-astack` should align with the
   active release artifact instead of hidden sidecar planning files.
 - Durable host behavior belongs in `docs/host-support.md`, not ad hoc workflow folders under `enhancement/`.
+- The `end-to-end` enhancement is the unattended workflow path: it should sequence scope through ship while still stopping for human decisions or non-transient failures.
