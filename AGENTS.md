@@ -7,8 +7,8 @@ astack is a set of SKILL.md-based workflows for AI-assisted software delivery.
 Skills live in `.agents/skills/`. Invoke them by name.
 
 GitHub Copilot support is also available as a system-level install in
-`~/.copilot/skills`, currently limited to `/scope-astack`, `/research-astack`, `/plan-astack`, and
-`/implement-astack`.
+`~/.copilot/skills`, currently limited to `/scope-astack`, `/research-astack`, `/plan-astack`,
+`/implement-astack`, and `/end-to-end`.
 
 | Skill | What it does |
 |-------|--------------|
@@ -16,6 +16,7 @@ GitHub Copilot support is also available as a system-level install in
 | `/research-astack` | Repository and dependency research. Updates the `Research` section in the active release artifact. |
 | `/plan-astack` | Unified engineering and design planning. Updates the `Plan` section in the active release artifact. |
 | `/implement-astack` | Plan-driven implementation. Updates the `Progress` section in the active release artifact. |
+| `/end-to-end` | Unattended orchestration from scope through ship using the existing workflow skills in sequence. |
 | `/review-astack` | Pre-landing PR review against the plan and diff. |
 | `/investigate-astack` | Systematic root-cause debugging. |
 | `/design-consultation-astack` | Create a design system from scratch. |

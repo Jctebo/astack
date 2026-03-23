@@ -9,7 +9,7 @@ temporary implementation notes that previously lived under `enhancement/`.
 |------|--------------|-------------------------------|---------------|
 | Claude Code | `~/.claude/skills/astack` | source skill folders such as `scope/`, `plan/`, and `ship/` | Full astack skill set |
 | Codex | `~/.codex/skills/astack` runtime root backed by the git checkout that ran `setup --host codex` | `.agents/skills/` | Full generated astack skill set |
-| GitHub Copilot | `~/.copilot/skills/astack` | `.copilot/skills/` | Base planning workflow only |
+| GitHub Copilot | `~/.copilot/skills/astack` | `.copilot/skills/` | Base planning workflow plus `/end-to-end` |
 
 ## Canonical naming
 
@@ -51,6 +51,7 @@ Installed Copilot skills:
 - `/research-astack`
 - `/plan-astack`
 - `/implement-astack`
+- `/end-to-end`
 
 Not installed for Copilot yet:
 

@@ -47,6 +47,7 @@ artifacts to compact context for implementation.
 astack still includes the supporting skill set from gstack:
 
 - `/browse-astack`
+- `/end-to-end`
 - `/review-astack`
 - `/qa-astack`
 - `/qa-only-astack`

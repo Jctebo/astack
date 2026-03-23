@@ -14,6 +14,7 @@ description: |
   - Mapping the existing system before planning → suggest /research-astack
   - Locking the implementation plan → suggest /plan-astack
   - Building an approved plan → suggest /implement-astack
+  - Running one enhancement all the way through scope to ship → suggest /end-to-end
   - Creating a design system → suggest /design-consultation-astack
   - Debugging errors → suggest /investigate-astack
   - Testing the app → suggest /qa-astack

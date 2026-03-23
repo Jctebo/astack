@@ -178,7 +178,7 @@ Use it when:
 - implementation, review, and QA are complete
 - the branch is ready to push and propose for merge
 
-### `end-to-end`
+### `/end-to-end`
 
 `end-to-end` is the unattended enhancement wedge. It is not a new hidden skill;
 it is the complete use of the existing workflow in sequence.
@@ -194,6 +194,8 @@ It should:
 - carry the same release artifact through the whole path
 - retry once for clearly transient failures
 - stop immediately for branch conflicts, merge ambiguity, or user judgment
+
+The real skill is `/end-to-end`, installed alongside the other astack skills.
 
 The `end-to-end` enhancement should finish with:
 
