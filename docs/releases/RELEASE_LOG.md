@@ -1,5 +1,14 @@
 # Release Log
 
+## [0.9.5.5] - 2026-03-23
+
+### Added
+- End-to-end unattended enhancement orchestration scaffolding: the new `end-to-end` release artifact captures the scope-to-ship wedge for a single request that should move through the existing skill chain with only clearly transient retries.
+
+### Changed
+- Workflow docs and generated skill outputs now describe the unattended enhancement story alongside the existing branch bootstrap and ship/cleanup behavior.
+- Skill and routing tests now assert that the new end-to-end enhancement artifact and workflow wording stay in sync with the generated docs.
+
 ## [0.9.5.4] - 2026-03-22
 
 ### Added
