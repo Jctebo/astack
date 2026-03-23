@@ -7,7 +7,7 @@ import { SNAPSHOT_FLAGS } from '../browse/src/snapshot';
 const ROOT = path.resolve(import.meta.dir, '..');
 const AGENTS_DIR = path.join(ROOT, '.agents', 'skills');
 const COPILOT_DIR = path.join(ROOT, '.copilot', 'skills');
-const WORKFLOW_SKILLS = ['scope', 'research', 'plan', 'implement'] as const;
+const WORKFLOW_SKILLS = ['scope', 'architecture', 'research', 'plan', 'implement'] as const;
 const RETIRED_SKILLS = ['office-hours', 'plan-ceo-review', 'plan-eng-review', 'plan-design-review'] as const;
 const BUN = process.execPath;
 
@@ -87,12 +87,15 @@ describe('gen-skill-docs', () => {
 
   test('workflow skills write to the canonical release artifacts', () => {
     const scopeContent = fs.readFileSync(path.join(ROOT, 'scope', 'SKILL.md'), 'utf-8');
+    const architectureContent = fs.readFileSync(path.join(ROOT, 'architecture', 'SKILL.md'), 'utf-8');
     const researchContent = fs.readFileSync(path.join(ROOT, 'research', 'SKILL.md'), 'utf-8');
     const planContent = fs.readFileSync(path.join(ROOT, 'plan', 'SKILL.md'), 'utf-8');
     const implementContent = fs.readFileSync(path.join(ROOT, 'implement', 'SKILL.md'), 'utf-8');
 
     expect(scopeContent).toContain('docs/releases/');
     expect(scopeContent).toContain('Scope');
+    expect(architectureContent).toContain('docs/architecture/');
+    expect(architectureContent).toContain('pointer summary');
     expect(researchContent).toContain('Research');
     expect(planContent).toContain('Plan');
     expect(implementContent).toContain('Progress');
@@ -124,6 +127,7 @@ describe('gen-skill-docs', () => {
   test('root skill suggests the new astack workflow', () => {
     const content = fs.readFileSync(path.join(ROOT, 'SKILL.md'), 'utf-8');
     expect(content).toContain('suggest /scope-astack');
+    expect(content).toContain('suggest /architecture-astack');
     expect(content).toContain('suggest /research-astack');
     expect(content).toContain('suggest /plan-astack');
     expect(content).toContain('suggest /implement-astack');
@@ -162,6 +166,7 @@ describe('Codex generation (--host codex)', () => {
   test('codex output exists for root and astack workflow skills', () => {
     expect(fs.existsSync(path.join(AGENTS_DIR, 'astack', 'SKILL.md'))).toBe(true);
     expect(fs.existsSync(path.join(AGENTS_DIR, 'scope-astack', 'SKILL.md'))).toBe(true);
+    expect(fs.existsSync(path.join(AGENTS_DIR, 'architecture-astack', 'SKILL.md'))).toBe(true);
     expect(fs.existsSync(path.join(AGENTS_DIR, 'research-astack', 'SKILL.md'))).toBe(true);
     expect(fs.existsSync(path.join(AGENTS_DIR, 'plan-astack', 'SKILL.md'))).toBe(true);
     expect(fs.existsSync(path.join(AGENTS_DIR, 'implement-astack', 'SKILL.md'))).toBe(true);

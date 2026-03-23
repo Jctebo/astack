@@ -3,11 +3,12 @@
 astack is a fork of `gstack` that turns agent skills into a clear software
 delivery workflow:
 
-**scope -> research -> plan -> implement -> review -> qa -> ship -> retro**
+**scope -> architecture -> research -> plan -> implement -> review -> qa -> ship -> retro**
 
 The planning path is now built around one canonical release artifact model:
 
 - `/scope-astack` updates the `Scope` section and bootstraps the enhancement branch when starting on `main`
+- `/architecture-astack` writes the full architecture doc to `docs/architecture/` and adds a pointer summary to the active release artifact
 - `/research-astack` updates the `Research` section
 - `/plan-astack` updates the `Plan` section
 - `/implement-astack` updates the `Progress` section
@@ -40,6 +41,7 @@ artifacts to compact context for implementation.
 ## What astack is for
 
 - Turn vague feature requests into a scoped build plan
+- Decide system architecture early and document it durably
 - Map the existing codebase before implementation starts
 - Keep implementation aligned with the approved plan
 - Review, test, ship, and document changes with the same workflow context
@@ -92,7 +94,22 @@ The `Scope` section captures:
 - non-goals
 - open risks and unknowns
 
-### 2. `/research-astack`
+### 2. `/architecture-astack`
+
+Use `/architecture-astack` when a project or major subsystem needs an explicit architecture pass before detailed planning. It writes the full architecture doc to `docs/architecture/` and adds a short pointer summary to the active release artifact.
+
+The architecture doc captures:
+
+- problem and scope
+- current or expected system shape
+- major components and responsibilities
+- data flow and integration points
+- deployment and operational assumptions
+- key tradeoffs
+- open questions and risks
+- next-step handoff
+
+### 3. `/research-astack`
 
 Use `/research-astack` after scope is settled. It reads the active release
 artifact's `Scope` section, maps the current system, identifies reuse
@@ -108,7 +125,7 @@ The `Research` section captures:
 - unknowns
 - recommended implementation direction
 
-### 3. `/plan-astack`
+### 4. `/plan-astack`
 
 Use `/plan-astack` when we are ready to lock the implementation spec. It combines the
 old engineering review, plan-mode design review, and implementation planning
@@ -127,7 +144,7 @@ The `Plan` section captures:
 - rollout notes
 - items explicitly out of scope
 
-### 4. `/implement-astack`
+### 5. `/implement-astack`
 
 Use `/implement-astack` once the plan is approved. It reads the active release
 artifact's `Plan` section, makes the code changes, and maintains the
