@@ -114,7 +114,7 @@ describe('gen-skill-docs', () => {
     expect(implementContent).toContain('Step 1.5: Ensure the enhancement branch');
     expect(shipContent).toContain('Step 8.6: Final merge decision');
     expect(shipContent).toContain('gh pr merge --merge --delete-branch');
-    expect(skillsContent).toContain('### `end-to-end`');
+    expect(skillsContent).toContain('### `/end-to-end`');
     expect(skillsContent).toContain('retry once for clearly transient failures');
     expect(endToEndArtifact).toContain('## Scope');
     expect(endToEndArtifact).toContain('## Plan');
@@ -205,9 +205,10 @@ describe('Copilot generation (--host copilot)', () => {
     expect(fs.existsSync(path.join(COPILOT_DIR, 'implement-astack', 'SKILL.md'))).toBe(true);
   });
 
-  test('copilot output only ships the runtime root plus base workflow skills', () => {
+  test('copilot output ships the runtime root plus base workflow skills and end-to-end', () => {
     expect(COPILOT_SKILLS).toEqual([
       'astack',
+      'end-to-end',
       'implement-astack',
       'plan-astack',
       'research-astack',

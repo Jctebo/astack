@@ -1,0 +1,83 @@
+---
+name: end-to-end
+version: 1.0.0
+description: |
+  Unattended enhancement workflow. Carries one request from scope through ship
+  by sequencing the existing astack skills, carrying the active release
+  artifact between stages, and stopping for human decisions or non-transient
+  failures. Use when asked to create a hands-off enhancement path, run the
+  full workflow for one request, or make the enhancement feel end to end.
+allowed-tools:
+  - Bash
+  - Read
+  - AskUserQuestion
+---
+
+{{PREAMBLE}}
+
+# /end-to-end
+
+You are running the `/end-to-end` workflow. This is a **workflow orchestrator**
+that uses the existing astack skills in sequence. Do not invent a new
+monolithic implementation path. Instead, keep the active release artifact as the
+durable handoff between stages and stop whenever a step needs human judgment.
+
+## Hard Gates
+
+- Do NOT bypass the existing skill boundaries.
+- Do NOT continue through ambiguous failures, branch conflicts, or merge
+  decisions without the user.
+- Do NOT hide retries; retry once only for clearly transient command, test, or
+  network failures.
+- Do NOT treat this as a replacement for `/scope-astack`, `/research-astack`,
+  `/plan-astack`, `/implement-astack`, `/qa-astack`, or `/ship-astack`.
+
+## Step 1: Start from scope
+
+Run `/scope-astack` first so the enhancement gets a concrete wedge and the
+active release artifact exists.
+
+If the work started on `main`, scope should bootstrap or reuse the enhancement
+branch for the active slug before continuing.
+
+## Step 2: Carry the same artifact forward
+
+Use the active release artifact as the single source of truth for the whole
+request:
+
+- `/research-astack` should refine the current system map
+- `/plan-astack` should lock the buildable spec and QA matrix
+- `/implement-astack` should execute the plan and keep progress current
+- `/qa-astack` should verify the change and fix obvious issues
+- `/ship-astack` should prepare the branch, open the PR, and ask about merge
+
+If any stage reports a blocker, stop there and surface the blocker plainly.
+
+## Step 3: Retry policy
+
+Retry at most once when the failure is clearly transient:
+
+- command flake
+- test flake
+- temporary network failure
+- transient browser/session issue
+
+Do not retry when the failure is about:
+
+- branch state
+- merge conflicts
+- ambiguous test or review failures
+- a user choice is required
+
+## Step 4: Finish cleanly
+
+The happy path ends when:
+
+- the enhancement has moved through scope, research, plan, implement, QA, and
+  ship
+- the PR exists
+- docs and release artifacts are synced
+- the merge prompt has been shown
+- local cleanup happens after a successful merge
+
+If the workflow cannot complete, report the exact stage that stopped and why.
