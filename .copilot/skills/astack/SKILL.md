@@ -11,6 +11,7 @@ description: |
   astack also includes development workflow skills. When you notice the user is at
   these stages, suggest the appropriate skill:
   - Scoping a new idea or reframing a request → suggest /scope-astack
+  - Defining the system architecture before implementation → suggest /architecture-astack
   - Mapping the existing system before planning → suggest /research-astack
   - Locking the implementation plan → suggest /plan-astack
   - Building an approved plan → suggest /implement-astack

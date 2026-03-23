@@ -1,5 +1,15 @@
 # Release Log
 
+## [0.9.5.6] - 2026-03-23
+
+### Added
+- New `architecture-astack` workflow skill for early-project system architecture consultation.
+- Canonical `docs/architecture/` home for durable architecture docs, with a copyable template and skill-guided first-doc handoff.
+
+### Changed
+- Workflow docs now place architecture between scope and research/plan, and the root astack suggestion surface now advertises `/architecture-astack`.
+- The new architecture workflow writes a full technical document under `docs/architecture/` and keeps a short pointer summary in the active release artifact.
+
 ## [0.9.5.5] - 2026-03-23
 
 ### Added

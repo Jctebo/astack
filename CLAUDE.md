@@ -26,6 +26,7 @@ verification uses Node there.
 astack/
 ├── browse/                 # Headless browser runtime, CLI, and tests
 ├── scope/                  # /scope skill
+├── architecture/           # /architecture skill
 ├── research/               # /research skill
 ├── plan/                   # /plan skill
 ├── implement/              # /implement skill
@@ -61,6 +62,7 @@ astack uses a release-folder artifact contract:
 The versioned release artifact contains the workflow sections:
 
 - `Scope`
+- `Architecture`
 - `Research`
 - `Plan`
 - `Progress`
@@ -75,6 +77,10 @@ truth.
 Planning skills should auto-create or reuse `enhancement/<slug>` when the work
 starts on `main`, and `/ship-astack` should ask once whether to merge the PR
 before cleaning up the branch and returning to `main`.
+
+The architecture workflow should write the full technical design to
+`docs/architecture/` and keep a short pointer summary in the active release
+artifact so the rest of the workflow can find it easily.
 
 The `end-to-end` enhancement is the first version of an unattended path across
 the whole workflow. It should be able to take one request from scope through

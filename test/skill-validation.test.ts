@@ -6,7 +6,7 @@ import { validateSkill } from './helpers/skill-parser';
 const ROOT = path.resolve(import.meta.dir, '..');
 const AGENTS_DIR = path.join(ROOT, '.agents', 'skills');
 
-const ACTIVE_WORKFLOW_SKILLS = ['scope', 'research', 'plan', 'implement'] as const;
+const ACTIVE_WORKFLOW_SKILLS = ['scope', 'architecture', 'research', 'plan', 'implement'] as const;
 const RETAINED_SKILLS = [
   'browse',
   'qa',
@@ -76,6 +76,7 @@ describe('astack workflow structure', () => {
 
   test('new workflow descriptions advertise the correct artifact contract', () => {
     expect(read('scope/SKILL.md')).toContain('docs/releases/');
+    expect(read('architecture/SKILL.md')).toContain('docs/architecture/');
     expect(read('research/SKILL.md')).toContain('Research');
     expect(read('plan/SKILL.md')).toContain('Plan');
     expect(read('implement/SKILL.md')).toContain('Progress');
@@ -93,6 +94,7 @@ describe('astack workflow structure', () => {
   test('root astack skill points to the new planning flow', () => {
     const content = read('SKILL.md');
     expect(content).toContain('/scope-astack');
+    expect(content).toContain('/architecture-astack');
     expect(content).toContain('/research-astack');
     expect(content).toContain('/plan-astack');
     expect(content).toContain('/implement-astack');
@@ -185,6 +187,7 @@ describe('Codex sidecars', () => {
     const entries = fs.readdirSync(AGENTS_DIR);
     expect(entries).toContain('astack');
     expect(entries).toContain('scope-astack');
+    expect(entries).toContain('architecture-astack');
     expect(entries).toContain('research-astack');
     expect(entries).toContain('plan-astack');
     expect(entries).toContain('implement-astack');

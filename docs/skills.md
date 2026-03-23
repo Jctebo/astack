@@ -10,6 +10,7 @@ For install roots, generated host folders, and Copilot scope, see
 | Skill | Purpose | Output |
 |-------|---------|--------|
 | `/scope-astack` | Frame the problem, audience, wedge, and non-goals; auto-bootstrap the enhancement branch when starting on `main` | `Scope` section in `docs/releases/<version>-<slug>.md` |
+| `/architecture-astack` | Shape the early technical direction and write durable architecture docs | `docs/architecture/<scope>.md` plus a summary pointer in the active release artifact |
 | `/research-astack` | Map the current system, reuse paths, constraints, and unknowns | `Research` section in `docs/releases/<version>-<slug>.md` |
 | `/plan-astack` | Produce the implementation spec and QA matrix | `Plan` section in `docs/releases/<version>-<slug>.md` |
 | `/implement-astack` | Execute the plan and keep progress current | `Progress` section in `docs/releases/<version>-<slug>.md` |
@@ -33,6 +34,36 @@ It should:
 - prefer concrete user pain over feature phrasing
 - update the `Scope` section in the active release artifact
 - create or reuse `enhancement/<slug>` when the workflow starts on `main`
+
+### `/architecture-astack`
+
+`/architecture-astack` is the early technical design pass.
+
+Use it when:
+
+- the user wants to shape system architecture before implementation details
+- a project or major subsystem needs a durable architecture record
+- we need a technical decision document before scope/architecture/research/plan takes over
+
+It should:
+
+- read the repo context and active release artifact first
+- ask only architecture-shaping questions
+- compare viable system shapes and tradeoffs
+- write the full architecture doc under `docs/architecture/`
+- add a short summary and pointer in the active release artifact
+- hand off to `/scope-astack`, `/research-astack`, or `/plan-astack` as appropriate
+
+The architecture doc should cover:
+
+- problem and scope
+- current or expected system shape
+- major components and responsibilities
+- data flow and integration points
+- deployment and operational assumptions
+- key tradeoffs
+- open questions and risks
+- next-step handoff
 
 The `Scope` section should cover:
 

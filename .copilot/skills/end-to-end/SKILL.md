@@ -1,11 +1,16 @@
 ---
 name: end-to-end
+version: 1.0.0
 description: |
   Unattended enhancement workflow. Carries one request from scope through ship
   by sequencing the existing astack skills, carrying the active release
   artifact between stages, and stopping for human decisions or non-transient
   failures. Use when asked to create a hands-off enhancement path, run the
   full workflow for one request, or make the enhancement feel end to end.
+allowed-tools:
+  - Bash
+  - Read
+  - AskUserQuestion
 ---
 <!-- AUTO-GENERATED from SKILL.md.tmpl — do not edit directly -->
 <!-- Regenerate: bun run gen:skill-docs -->
