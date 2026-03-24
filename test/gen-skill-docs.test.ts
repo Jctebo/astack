@@ -43,6 +43,31 @@ function discoverCopilotSkills() {
 const ALL_SKILLS = discoverTemplates();
 const CODEX_SKILLS = discoverCodexSkills();
 const COPILOT_SKILLS = discoverCopilotSkills();
+const EXPECTED_COPILOT_SKILLS = [
+  'architecture-astack',
+  'astack',
+  'astack-upgrade-astack',
+  'browse-astack',
+  'careful-astack',
+  'design-consultation-astack',
+  'design-review-astack',
+  'document-release-astack',
+  'end-to-end',
+  'freeze-astack',
+  'guard-astack',
+  'implement-astack',
+  'investigate-astack',
+  'plan-astack',
+  'qa-astack',
+  'qa-only-astack',
+  'research-astack',
+  'retro-astack',
+  'review-astack',
+  'scope-astack',
+  'setup-browser-cookies-astack',
+  'ship-astack',
+  'unfreeze-astack',
+] as const;
 
 describe('gen-skill-docs', () => {
   test('root generated SKILL.md contains all browse command categories', () => {
@@ -205,20 +230,14 @@ describe('Copilot generation (--host copilot)', () => {
   test('copilot output exists for root and astack workflow skills', () => {
     expect(fs.existsSync(path.join(COPILOT_DIR, 'astack', 'SKILL.md'))).toBe(true);
     expect(fs.existsSync(path.join(COPILOT_DIR, 'scope-astack', 'SKILL.md'))).toBe(true);
+    expect(fs.existsSync(path.join(COPILOT_DIR, 'architecture-astack', 'SKILL.md'))).toBe(true);
     expect(fs.existsSync(path.join(COPILOT_DIR, 'research-astack', 'SKILL.md'))).toBe(true);
     expect(fs.existsSync(path.join(COPILOT_DIR, 'plan-astack', 'SKILL.md'))).toBe(true);
     expect(fs.existsSync(path.join(COPILOT_DIR, 'implement-astack', 'SKILL.md'))).toBe(true);
   });
 
-  test('copilot output ships the runtime root plus base workflow skills and end-to-end', () => {
-    expect(COPILOT_SKILLS).toEqual([
-      'astack',
-      'end-to-end',
-      'implement-astack',
-      'plan-astack',
-      'research-astack',
-      'scope-astack',
-    ]);
+  test('copilot output ships the full astack skill set', () => {
+    expect(COPILOT_SKILLS).toEqual(EXPECTED_COPILOT_SKILLS);
   });
 
   test('copilot skills contain no Claude paths', () => {

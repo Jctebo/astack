@@ -9,7 +9,7 @@ temporary implementation notes that previously lived under `enhancement/`.
 |------|--------------|-------------------------------|---------------|
 | Claude Code | `~/.claude/skills/astack` | source skill folders such as `scope/`, `architecture/`, `plan/`, and `ship/` | Full astack skill set |
 | Codex | `~/.codex/skills/astack` runtime root backed by the git checkout that ran `setup --host codex` | `.agents/skills/` | Full generated astack skill set |
-| GitHub Copilot | `~/.copilot/skills/astack` | `.copilot/skills/` | Base planning workflow plus `/end-to-end` |
+| GitHub Copilot | `~/.copilot/skills/astack` | `.copilot/skills/` | Full astack skill set |
 
 ## Canonical naming
 
@@ -43,25 +43,43 @@ documented commands users invoke.
 
 ## GitHub Copilot support boundary
 
-Copilot support is intentionally smaller than Claude and Codex today.
+Copilot now ships the full astack skill surface that is generated from this
+repository.
 
 Installed Copilot skills:
 
 - `/scope-astack`
+- `/architecture-astack`
 - `/research-astack`
 - `/plan-astack`
 - `/implement-astack`
+- `/review-astack`
+- `/qa-astack`
+- `/qa-only-astack`
+- `/ship-astack`
+- `/document-release-astack`
+- `/retro-astack`
+- `/browse-astack`
+- `/setup-browser-cookies-astack`
+- `/design-consultation-astack`
+- `/design-review-astack`
+- `/investigate-astack`
+- `/codex-astack`
+- `/careful-astack`
+- `/freeze-astack`
+- `/guard-astack`
+- `/unfreeze-astack`
+- `/astack-upgrade-astack`
 - `/end-to-end`
 
 Not installed for Copilot yet:
 
-- operational skills such as `/ship-astack`, `/qa-astack`, and `/review-astack`
 - repo-scoped `.github/skills/` exports
 - `.github/copilot-instructions.md`
 - custom `.github/agents/` profiles
 
-That boundary is deliberate. The planning workflow is the stable v1 Copilot
-surface; broader parity can be added later once discovery and UX are validated.
+That boundary is now the same full workflow and support surface used across the
+repo, with only host packaging differences left.
 
 ## Verification expectations
 
