@@ -21,7 +21,32 @@ const DRY_RUN = process.argv.includes('--dry-run');
 // ─── Template Context ───────────────────────────────────────
 
 type Host = 'claude' | 'codex' | 'copilot';
-const COPILOT_WORKFLOW_DIRS = new Set(['', '.', 'scope', 'research', 'plan', 'implement', 'end-to-end']);
+const COPILOT_WORKFLOW_DIRS = new Set([
+  '',
+  '.',
+  'architecture',
+  'astack-upgrade',
+  'browse',
+  'careful',
+  'design-consultation',
+  'design-review',
+  'document-release',
+  'end-to-end',
+  'freeze',
+  'guard',
+  'implement',
+  'investigate',
+  'plan',
+  'qa',
+  'qa-only',
+  'research',
+  'retro',
+  'review',
+  'scope',
+  'setup-browser-cookies',
+  'ship',
+  'unfreeze',
+]);
 
 const HOST_ARG = process.argv.find(a => a.startsWith('--host'));
 const HOST: Host = (() => {

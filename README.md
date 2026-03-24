@@ -49,12 +49,13 @@ artifacts to compact context for implementation.
 astack still includes the supporting skill set from gstack:
 
 - `/browse-astack`
+- `/architecture-astack`
 - `/end-to-end`
+- `/document-release-astack`
+- `/qa-only-astack`
 - `/review-astack`
 - `/qa-astack`
-- `/qa-only-astack`
 - `/ship-astack`
-- `/document-release-astack`
 - `/retro-astack`
 - `/design-consultation-astack`
 - `/design-review-astack`
@@ -218,8 +219,7 @@ cd ~/src/astack
 ./setup --host copilot
 ```
 
-Copilot v1 currently installs the base planning workflow only:
-`/scope-astack`, `/research-astack`, `/plan-astack`, and `/implement-astack`.
+Copilot installs the full astack skill surface.
 The exact host support boundary is documented in [docs/host-support.md](docs/host-support.md).
 
 ### Vendoring into a repo
@@ -240,11 +240,11 @@ Add an `astack` section to your project instructions:
 Use `/browse-astack` from astack for web browsing.
 Prefer the astack workflow:
 `/scope-astack` -> `/research-astack` -> `/plan-astack` -> `/implement-astack` -> `/review-astack` -> `/qa-astack` -> `/ship-astack`.
-Available skills: `/scope-astack`, `/research-astack`, `/plan-astack`, `/implement-astack`, `/review-astack`,
-`/qa-astack`, `/qa-only-astack`, `/browse-astack`, `/ship-astack`, `/document-release-astack`, `/retro-astack`,
-`/design-consultation-astack`, `/design-review-astack`, `/investigate-astack`, `/codex-astack`,
-`/setup-browser-cookies-astack`, `/careful-astack`, `/freeze-astack`, `/guard-astack`, `/unfreeze-astack`,
-`/astack-upgrade-astack`.
+Available skills: `/scope-astack`, `/architecture-astack`, `/research-astack`, `/plan-astack`, `/implement-astack`,
+`/review-astack`, `/qa-astack`, `/qa-only-astack`, `/ship-astack`, `/document-release-astack`, `/retro-astack`,
+`/browse-astack`, `/setup-browser-cookies-astack`, `/design-consultation-astack`, `/design-review-astack`,
+`/investigate-astack`, `/codex-astack`, `/careful-astack`, `/freeze-astack`, `/guard-astack`,
+`/unfreeze-astack`, `/astack-upgrade-astack`, `/end-to-end`.
 ```
 
 ## Repo layout

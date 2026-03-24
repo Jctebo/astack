@@ -1,5 +1,15 @@
 # Release Log
 
+## [0.9.5.7] - 2026-03-24
+
+### Added
+- GitHub Copilot now ships the full astack skill surface, including the architecture, operational, support, and workflow skills that already exist for the repo.
+
+### Changed
+- Copilot generation now uses the full shipped skill allowlist instead of the earlier planning-only subset.
+- Host-support documentation and the root README now describe Copilot as a full astack host.
+- Copilot generation tests now assert the expanded host surface and freshness checks.
+
 ## [0.9.5.6] - 2026-03-23
 
 ### Added
