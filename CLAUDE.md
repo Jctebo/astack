@@ -29,6 +29,7 @@ astack/
 ├── architecture/           # /architecture skill
 ├── research/               # /research skill
 ├── plan/                   # /plan skill
+├── roadmap/                # /roadmap skill
 ├── implement/              # /implement skill
 ├── review/                 # /review skill
 ├── qa/                     # /qa skill
@@ -68,6 +69,10 @@ The versioned release artifact contains the workflow sections:
 - `Progress`
 - `QA`
 - `Release Notes`
+
+Roadmap outputs live separately under `docs/roadmaps/<slug>.md` as one document
+with a summary section followed by release sections. This keeps future roadmap
+planning separate from the shipped `docs/releases/` contract.
 
 These replace the older hidden planning files under `~/.astack/projects/` for
 the main implementation lifecycle. Skills that plan, review, QA, ship, and

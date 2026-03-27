@@ -7,6 +7,7 @@ const ROOT = path.resolve(import.meta.dir, '..');
 const AGENTS_DIR = path.join(ROOT, '.agents', 'skills');
 
 const ACTIVE_WORKFLOW_SKILLS = ['scope', 'architecture', 'research', 'plan', 'implement'] as const;
+const ROADMAP_SKILLS = ['roadmap'] as const;
 const RETAINED_SKILLS = [
   'browse',
   'qa',
@@ -68,6 +69,10 @@ describe('astack workflow structure', () => {
       expect(fs.existsSync(path.join(ROOT, skill, 'SKILL.md'))).toBe(true);
       expect(fs.existsSync(path.join(ROOT, skill, 'SKILL.md.tmpl'))).toBe(true);
     }
+    for (const skill of ROADMAP_SKILLS) {
+      expect(fs.existsSync(path.join(ROOT, skill, 'SKILL.md'))).toBe(true);
+      expect(fs.existsSync(path.join(ROOT, skill, 'SKILL.md.tmpl'))).toBe(true);
+    }
 
     for (const retired of RETIRED_SKILLS) {
       expect(fs.existsSync(path.join(ROOT, retired))).toBe(false);
@@ -79,6 +84,8 @@ describe('astack workflow structure', () => {
     expect(read('architecture/SKILL.md')).toContain('docs/architecture/');
     expect(read('research/SKILL.md')).toContain('Research');
     expect(read('plan/SKILL.md')).toContain('Plan');
+    expect(read('roadmap/SKILL.md')).toContain('docs/roadmaps/');
+    expect(read('roadmap/SKILL.md')).toContain('Summary Of Changes');
     expect(read('implement/SKILL.md')).toContain('Progress');
   });
 
@@ -86,6 +93,7 @@ describe('astack workflow structure', () => {
     expect(read('scope/SKILL.md')).toContain('enhancement/<slug>');
     expect(read('research/SKILL.md')).toContain('enhancement/<slug>');
     expect(read('plan/SKILL.md')).toContain('enhancement/<slug>');
+    expect(read('roadmap/SKILL.md')).toContain('enhancement/<slug>');
     expect(read('implement/SKILL.md')).toContain('enhancement/<slug>');
     expect(read('ship/SKILL.md')).toContain('gh pr merge --merge --delete-branch');
     expect(read('ship/SKILL.md')).toContain('Step 8.6: Final merge decision');
@@ -97,6 +105,7 @@ describe('astack workflow structure', () => {
     expect(content).toContain('/architecture-astack');
     expect(content).toContain('/research-astack');
     expect(content).toContain('/plan-astack');
+    expect(content).toContain('/roadmap-astack');
     expect(content).toContain('/implement-astack');
     expect(content).not.toContain('/office-hours');
     expect(content).not.toContain('/plan-ceo-review');
@@ -129,6 +138,7 @@ describe('generated skill health', () => {
     const relativePaths = [
       'SKILL.md',
       ...ACTIVE_WORKFLOW_SKILLS.map((skill) => `${skill}/SKILL.md`),
+      ...ROADMAP_SKILLS.map((skill) => `${skill}/SKILL.md`),
       ...RETAINED_SKILLS.map((skill) => `${skill}/SKILL.md`),
     ];
 
@@ -190,6 +200,7 @@ describe('Codex sidecars', () => {
     expect(entries).toContain('architecture-astack');
     expect(entries).toContain('research-astack');
     expect(entries).toContain('plan-astack');
+    expect(entries).toContain('roadmap-astack');
     expect(entries).toContain('implement-astack');
     expect(entries.some((entry) => entry === 'gstack' || entry.startsWith('gstack-'))).toBe(false);
   });

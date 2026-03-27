@@ -1,5 +1,18 @@
 # Release Log
 
+## [0.9.5.8] - 2026-03-27
+
+### Added
+- New `roadmap-astack` workflow skill for multi-release planning that writes a single roadmap document with a summary of changes first and release sections after it.
+
+### Changed
+- The root skill, contributor docs, and generated host surfaces now advertise roadmap planning as a first-class workflow alongside scope, research, and plan.
+- Copilot generation and skill-routing coverage now include the roadmap workflow so it stays discoverable and test-enforced across hosts.
+- The active 0.9.5.8 release artifact was repurposed from the earlier PowerShell investigation to reflect the shipped roadmap-skill enhancement.
+
+### Fixed
+- The global Codex install now points at this checkout and includes `roadmap-astack` under `~/.codex/skills`.
+
 ## [0.9.5.7] - 2026-03-24
 
 ### Added

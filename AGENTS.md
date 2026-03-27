@@ -7,14 +7,14 @@ astack is a set of SKILL.md-based workflows for AI-assisted software delivery.
 Skills live in `.agents/skills/`. Invoke them by name.
 
 GitHub Copilot support is also available as a system-level install in
-`~/.copilot/skills`, currently limited to `/scope-astack`, `/research-astack`, `/plan-astack`,
-`/implement-astack`, and `/end-to-end`.
+`~/.copilot/skills` and ships the full astack skill surface generated from this repo.
 
 | Skill | What it does |
 |-------|--------------|
 | `/scope-astack` | Scope discovery and product framing. Updates the `Scope` section in the active release artifact and auto-branches from `main` when needed. |
 | `/research-astack` | Repository and dependency research. Updates the `Research` section in the active release artifact. |
 | `/plan-astack` | Unified engineering and design planning. Updates the `Plan` section in the active release artifact. |
+| `/roadmap-astack` | Multi-release roadmap planning. Writes one roadmap doc with a summary of changes first and release sections after it under `docs/roadmaps/`. |
 | `/implement-astack` | Plan-driven implementation. Updates the `Progress` section in the active release artifact. |
 | `/end-to-end` | Unattended orchestration from scope through ship using the existing workflow skills in sequence. |
 | `/review-astack` | Pre-landing PR review against the plan and diff. |
@@ -53,6 +53,8 @@ bun run skill:check
 - The release-folder artifacts are the workflow source of truth:
   `docs/releases/VERSION`, `docs/releases/RELEASE_LOG.md`, and
   `docs/releases/<version>-<slug>.md`.
+- Multi-release roadmaps live under `docs/roadmaps/<slug>.md` so planned future
+  releases do not overwrite the shipped release contract.
 - `/review-astack`, `/qa-astack`, `/ship-astack`, and `/document-release-astack` should align with the
   active release artifact instead of hidden sidecar planning files.
 - Durable host behavior belongs in `docs/host-support.md`, not ad hoc workflow folders under `enhancement/`.

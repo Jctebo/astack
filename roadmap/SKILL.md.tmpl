@@ -1,0 +1,230 @@
+---
+name: roadmap-astack
+version: 1.0.0
+description: |
+  Multi-release roadmap planning. Combines the useful parts of scope discovery,
+  repository research, and lightweight planning into one roadmap document with
+  a summary first and then release sections. Ask whether the user wants a simple roadmap
+  (feature list only) or a detailed roadmap (features and stories). Use when
+  asked to "make a roadmap", "plan multiple releases", "sequence this into
+  phases", or "turn this into releases and stories".
+allowed-tools:
+  - Bash
+  - Read
+  - Grep
+  - Glob
+  - Write
+  - Edit
+  - AskUserQuestion
+  - WebSearch
+---
+
+{{PREAMBLE}}
+
+# /roadmap-astack
+
+You are running the `/roadmap-astack` workflow. This is a roadmap-first planning
+skill. Your job is to produce one durable roadmap document that starts with a
+summary of changes and then breaks the work into multiple release sections.
+
+## Hard Gates
+
+- Do NOT write implementation code.
+- Do NOT mutate `docs/releases/VERSION` just to plan future work.
+- Do NOT create fake future shipped release artifacts under `docs/releases/`.
+- Keep the roadmap concrete enough to sequence work, but lighter than an
+  implementation-ready `/plan-astack` spec.
+- Your durable output lives at `docs/roadmaps/<roadmap-slug>.md`.
+
+## Step 1: Ground in the repo
+
+Read the project context before writing the roadmap:
+
+```bash
+git branch --show-current 2>/dev/null || echo "unknown"
+git log --oneline -20 2>/dev/null
+git diff origin/main --stat 2>/dev/null || true
+```
+
+Then read, if present:
+
+- `README.md`
+- `CLAUDE.md`
+- `TODOS.md`
+- `DESIGN.md`
+- `docs/releases/RELEASE_LOG.md`
+- relevant files in `docs/releases/` that explain the current direction
+
+Use Grep/Glob to inspect the codebase areas most relevant to the request. Treat
+existing roadmap docs as drafts to improve, not replace blindly.
+
+## Step 1.5: Resolve the roadmap document
+
+Use this roadmap output contract:
+
+- `docs/roadmaps/<roadmap-slug>.md`
+
+Resolve the roadmap target like this:
+
+- If the user already named the roadmap or file, use that slug.
+- If one roadmap file already clearly matches the request, state which exact
+  file you are updating and proceed.
+- If no roadmap slug is obvious, ask for the roadmap name or slug.
+- If multiple existing roadmap files could match, ask which one should be
+  updated.
+
+Keep roadmap docs separate from shipped release artifacts so planned future
+releases do not overwrite the current release contract.
+
+## Step 1.6: Bootstrap the roadmap branch
+
+If the current branch is `main`, move the roadmap work onto a fresh branch
+before you start writing:
+
+1. Derive the branch name from the roadmap slug: `enhancement/<slug>`.
+2. If the worktree is dirty, stop and tell the user to commit or stash local
+   changes first.
+3. If that branch already exists locally, switch to it.
+4. Otherwise create it from `main` and continue there.
+
+If the current branch is already a feature branch, keep using it.
+
+## Step 1.7: Lock the roadmap depth
+
+If the user already chose the depth, use it.
+
+Otherwise ask one focused question:
+
+- `Simple roadmap` = features only
+- `Detailed roadmap` = features plus user stories for each release
+
+Recommend the detailed mode when the roadmap will be used to delegate work,
+sequence implementation, or align multiple collaborators. Recommend the simple
+mode when the user only wants prioritization and release ordering.
+
+Record the chosen mode in the roadmap doc.
+
+## Step 2: Combine scope, research, and planning
+
+Do the useful parts of `/scope-astack`, `/research-astack`, and `/plan-astack`
+without turning this into a code-ready build spec:
+
+- Clarify the problem, audience, and desired outcome.
+- Inspect the existing system and note what already exists.
+- Identify dependencies, constraints, and reuse opportunities.
+- Break the work into sensible releases with a clear reason for the order.
+- Keep facts separate from inference.
+- Ask focused questions only when the answer changes release ordering, roadmap
+  depth, or the number of releases.
+
+Prefer 2-5 releases unless the user explicitly asks for a broader or narrower
+roadmap.
+
+## Step 3: Write the roadmap document
+
+Write or update `docs/roadmaps/<roadmap-slug>.md` with this structure:
+
+```markdown
+# Roadmap: <title>
+
+## Summary Of Changes
+- High-level summary of what is changing
+- Why the roadmap exists now
+
+## Roadmap Mode
+- Simple roadmap | Detailed roadmap
+
+## Problem
+- Core user or business problem
+
+## Audience
+- Primary user
+- Secondary stakeholders
+
+## Current Status Quo
+- What people do today
+- Why that is insufficient
+
+## What Already Exists
+- Existing code, systems, docs, or patterns we can reuse
+
+## Sequencing Principles
+- Why the releases are ordered this way
+- Constraints or dependencies shaping the order
+
+## Release Overview
+- Release 1: name + short outcome
+- Release 2: name + short outcome
+- Additional releases only when needed
+
+## Release 1: <title>
+
+### Goal
+- Desired outcome for this release
+
+### Scope
+- What is in this release
+- What is explicitly deferred
+
+### Why This Release Now
+- Dependencies, learning value, or urgency
+
+### Research Notes
+- Relevant files, systems, or external constraints
+
+### Plan
+- Lightweight delivery approach
+- Validation expectations
+
+### Features
+- Feature 1
+- Feature 2
+
+### Stories
+- Only include this section in detailed mode
+- As a <user>, I want <capability>, so that <outcome>
+
+### Dependencies
+- Technical or product dependencies
+
+### Risks
+- Main risks for this release
+
+### Exit Criteria
+- What must be true to call this release complete
+
+## Release N: <title>
+- Repeat the same structure for each release
+
+## Cross-Cutting Risks
+- Risks that affect multiple releases
+
+## Assumptions And Unknowns
+- Facts that still need validation
+
+## Recommended Next Step
+- Which release should be planned in detail first
+```
+
+Requirements:
+
+- Keep this file executive-readable at the top and delivery-usable in the
+  release sections.
+- Start with the summary of changes before drilling into releases.
+- Preserve useful existing material when updating a roadmap.
+
+- The roadmap doc should let a human scan the whole plan quickly from the top.
+- The release sections should stand on their own even though they live in the
+  same document.
+- In simple mode, omit `Stories` entirely.
+- In detailed mode, keep stories concise and outcome-oriented.
+- Do not over-spec implementation details that belong in `/plan-astack`.
+
+## Step 4: Handoff
+
+After writing the roadmap document:
+
+- Summarize the roadmap in release order.
+- Call out the biggest cross-release risk.
+- Recommend `/plan-astack` for the first release that should move into
+  implementation planning next.

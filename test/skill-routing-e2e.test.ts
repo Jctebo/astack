@@ -57,6 +57,7 @@ function installSkills(tmpDir: string) {
     'scope',
     'research',
     'plan',
+    'roadmap',
     'implement',
     'qa',
     'qa-only',
@@ -216,6 +217,20 @@ describeE2E('Skill Routing E2E - astack journey', () => {
           '## Research\n\n### Current System Map\n- `src/notes.ts`\n\n### Recommended Direction\n- Extend note summarization into action extraction.\n',
         ]);
         fs.mkdirSync(path.join(tmpDir, 'src'), { recursive: true });
+        fs.writeFileSync(path.join(tmpDir, 'src', 'notes.ts'), 'export function summarizeNotes(input: string) { return input.trim(); }\n');
+        commitAll(tmpDir, 'initial');
+      },
+    });
+  }, 120_000);
+
+  testIfSelected('journey-roadmap', async () => {
+    await runRoutingCase({
+      testName: 'journey-roadmap',
+      expectedSkill: 'roadmap-astack',
+      prompt: 'Use /roadmap-astack to turn this initiative into one roadmap document with a summary of changes first and then sections for multiple releases. I want the option for features only or features plus stories.',
+      setup: (tmpDir) => {
+        fs.mkdirSync(path.join(tmpDir, 'src'), { recursive: true });
+        fs.writeFileSync(path.join(tmpDir, 'README.md'), '# Sales Notes\n');
         fs.writeFileSync(path.join(tmpDir, 'src', 'notes.ts'), 'export function summarizeNotes(input: string) { return input.trim(); }\n');
         commitAll(tmpDir, 'initial');
       },

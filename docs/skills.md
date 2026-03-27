@@ -13,6 +13,7 @@ For install roots, generated host folders, and Copilot scope, see
 | `/architecture-astack` | Shape the early technical direction and write durable architecture docs | `docs/architecture/<scope>.md` plus a summary pointer in the active release artifact |
 | `/research-astack` | Map the current system, reuse paths, constraints, and unknowns | `Research` section in `docs/releases/<version>-<slug>.md` |
 | `/plan-astack` | Produce the implementation spec and QA matrix | `Plan` section in `docs/releases/<version>-<slug>.md` |
+| `/roadmap-astack` | Create a multi-release roadmap document with a summary first and then release sections | `docs/roadmaps/<slug>.md` |
 | `/implement-astack` | Execute the plan and keep progress current | `Progress` section in `docs/releases/<version>-<slug>.md` |
 
 ### `/scope-astack`
@@ -138,6 +139,43 @@ The `Plan` section should cover:
 - rollout notes
 - items out of scope
 - open questions
+
+### `/roadmap-astack`
+
+`/roadmap-astack` is the roadmap-first planning alternative for work that spans
+multiple releases.
+
+Use it when:
+
+- the user wants a roadmap instead of one implementation-ready spec
+- the work should be sequenced across multiple releases
+- we need a summary of changes first and then release sections in the same document
+- the user may want features only or features plus stories
+
+It should:
+
+- read the repo and current docs before splitting the work
+- ask whether the user wants a simple roadmap or a detailed roadmap
+- write one roadmap doc under `docs/roadmaps/<slug>.md`
+- structure the file as a summary first, then release sections
+- keep roadmap docs separate from `docs/releases/` so future plans do not
+  mutate the shipped release contract
+
+The roadmap document should cover:
+
+- summary of changes
+- problem and audience
+- sequencing principles
+- release ordering
+- reusable systems and constraints
+- per-release features
+- optional stories per release
+- risks and assumptions
+
+The release sections should stand on their own, but remain lighter than a full
+`/plan-astack` implementation spec. When the user is ready to execute a
+specific release, `/plan-astack` should turn that release section into the
+detailed implementation plan.
 
 ### `/implement-astack`
 
@@ -300,6 +338,7 @@ The happy-path loop is:
 1. Run `/scope-astack` to define the problem and wedge. If the work started on `main`, this creates or reuses the enhancement branch.
 2. Run `/research-astack` to map the current system and constraints.
 3. Run `/plan-astack` to lock the implementation and QA spec.
+   Or run `/roadmap-astack` instead when the deliverable should be a summary of changes plus multiple release sections in one roadmap document.
 4. Run `/implement-astack` to build and track progress.
 5. Run `/review-astack` to compare the diff to the plan.
 6. Run `/qa-astack` or `/qa-only-astack` to verify the feature in a browser.

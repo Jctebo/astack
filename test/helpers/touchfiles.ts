@@ -86,6 +86,7 @@ export const E2E_TOUCHFILES: Record<string, string[]> = {
   'journey-scope': ['scope/**', 'SKILL.md.tmpl', 'scripts/gen-skill-docs.ts'],
   'journey-research': ['research/**', 'SKILL.md.tmpl', 'scripts/gen-skill-docs.ts'],
   'journey-plan': ['plan/**', 'SKILL.md.tmpl', 'scripts/gen-skill-docs.ts'],
+  'journey-roadmap': ['roadmap/**', 'SKILL.md.tmpl', 'scripts/gen-skill-docs.ts'],
   'journey-implement': ['implement/**', 'SKILL.md.tmpl', 'scripts/gen-skill-docs.ts'],
   'journey-debug': ['investigate/**', 'SKILL.md.tmpl', 'scripts/gen-skill-docs.ts'],
   'journey-qa': ['qa/**', 'qa-only/**', 'browse/**', 'SKILL.md.tmpl', 'scripts/gen-skill-docs.ts'],
