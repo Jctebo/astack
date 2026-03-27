@@ -8,6 +8,7 @@ const ROOT = path.resolve(import.meta.dir, '..');
 const AGENTS_DIR = path.join(ROOT, '.agents', 'skills');
 const COPILOT_DIR = path.join(ROOT, '.copilot', 'skills');
 const WORKFLOW_SKILLS = ['scope', 'architecture', 'research', 'plan', 'implement'] as const;
+const ROADMAP_SKILLS = ['roadmap'] as const;
 const RETIRED_SKILLS = ['office-hours', 'plan-ceo-review', 'plan-eng-review', 'plan-design-review'] as const;
 const BUN = process.execPath;
 
@@ -63,6 +64,7 @@ const EXPECTED_COPILOT_SKILLS = [
   'research-astack',
   'retro-astack',
   'review-astack',
+  'roadmap-astack',
   'scope-astack',
   'setup-browser-cookies-astack',
   'ship-astack',
@@ -104,6 +106,10 @@ describe('gen-skill-docs', () => {
       expect(fs.existsSync(path.join(ROOT, skill, 'SKILL.md.tmpl'))).toBe(true);
       expect(fs.existsSync(path.join(ROOT, skill, 'SKILL.md'))).toBe(true);
     }
+    for (const skill of ROADMAP_SKILLS) {
+      expect(fs.existsSync(path.join(ROOT, skill, 'SKILL.md.tmpl'))).toBe(true);
+      expect(fs.existsSync(path.join(ROOT, skill, 'SKILL.md'))).toBe(true);
+    }
 
     for (const retired of RETIRED_SKILLS) {
       expect(fs.existsSync(path.join(ROOT, retired))).toBe(false);
@@ -115,6 +121,7 @@ describe('gen-skill-docs', () => {
     const architectureContent = fs.readFileSync(path.join(ROOT, 'architecture', 'SKILL.md'), 'utf-8');
     const researchContent = fs.readFileSync(path.join(ROOT, 'research', 'SKILL.md'), 'utf-8');
     const planContent = fs.readFileSync(path.join(ROOT, 'plan', 'SKILL.md'), 'utf-8');
+    const roadmapContent = fs.readFileSync(path.join(ROOT, 'roadmap', 'SKILL.md'), 'utf-8');
     const implementContent = fs.readFileSync(path.join(ROOT, 'implement', 'SKILL.md'), 'utf-8');
 
     expect(scopeContent).toContain('docs/releases/');
@@ -123,6 +130,8 @@ describe('gen-skill-docs', () => {
     expect(architectureContent).toContain('pointer summary');
     expect(researchContent).toContain('Research');
     expect(planContent).toContain('Plan');
+    expect(roadmapContent).toContain('docs/roadmaps/');
+    expect(roadmapContent).toContain('Summary Of Changes');
     expect(implementContent).toContain('Progress');
   });
 
@@ -130,6 +139,7 @@ describe('gen-skill-docs', () => {
     const scopeContent = fs.readFileSync(path.join(ROOT, 'scope', 'SKILL.md'), 'utf-8');
     const researchContent = fs.readFileSync(path.join(ROOT, 'research', 'SKILL.md'), 'utf-8');
     const planContent = fs.readFileSync(path.join(ROOT, 'plan', 'SKILL.md'), 'utf-8');
+    const roadmapContent = fs.readFileSync(path.join(ROOT, 'roadmap', 'SKILL.md'), 'utf-8');
     const implementContent = fs.readFileSync(path.join(ROOT, 'implement', 'SKILL.md'), 'utf-8');
     const shipContent = fs.readFileSync(path.join(ROOT, 'ship', 'SKILL.md'), 'utf-8');
     const skillsContent = fs.readFileSync(path.join(ROOT, 'docs', 'skills.md'), 'utf-8');
@@ -139,6 +149,7 @@ describe('gen-skill-docs', () => {
     expect(scopeContent).toContain('enhancement/<slug>');
     expect(researchContent).toContain('Step 1.5: Ensure the enhancement branch');
     expect(planContent).toContain('Step 1.5: Ensure the enhancement branch');
+    expect(roadmapContent).toContain('Step 1.6: Bootstrap the roadmap branch');
     expect(implementContent).toContain('Step 1.5: Ensure the enhancement branch');
     expect(shipContent).toContain('Step 8.6: Final merge decision');
     expect(shipContent).toContain('gh pr merge --merge --delete-branch');
@@ -155,6 +166,7 @@ describe('gen-skill-docs', () => {
     expect(content).toContain('suggest /architecture-astack');
     expect(content).toContain('suggest /research-astack');
     expect(content).toContain('suggest /plan-astack');
+    expect(content).toContain('suggest /roadmap-astack');
     expect(content).toContain('suggest /implement-astack');
   });
 
@@ -194,6 +206,7 @@ describe('Codex generation (--host codex)', () => {
     expect(fs.existsSync(path.join(AGENTS_DIR, 'architecture-astack', 'SKILL.md'))).toBe(true);
     expect(fs.existsSync(path.join(AGENTS_DIR, 'research-astack', 'SKILL.md'))).toBe(true);
     expect(fs.existsSync(path.join(AGENTS_DIR, 'plan-astack', 'SKILL.md'))).toBe(true);
+    expect(fs.existsSync(path.join(AGENTS_DIR, 'roadmap-astack', 'SKILL.md'))).toBe(true);
     expect(fs.existsSync(path.join(AGENTS_DIR, 'implement-astack', 'SKILL.md'))).toBe(true);
   });
 
@@ -233,6 +246,7 @@ describe('Copilot generation (--host copilot)', () => {
     expect(fs.existsSync(path.join(COPILOT_DIR, 'architecture-astack', 'SKILL.md'))).toBe(true);
     expect(fs.existsSync(path.join(COPILOT_DIR, 'research-astack', 'SKILL.md'))).toBe(true);
     expect(fs.existsSync(path.join(COPILOT_DIR, 'plan-astack', 'SKILL.md'))).toBe(true);
+    expect(fs.existsSync(path.join(COPILOT_DIR, 'roadmap-astack', 'SKILL.md'))).toBe(true);
     expect(fs.existsSync(path.join(COPILOT_DIR, 'implement-astack', 'SKILL.md'))).toBe(true);
   });
 

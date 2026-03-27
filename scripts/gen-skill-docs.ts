@@ -39,6 +39,7 @@ const COPILOT_WORKFLOW_DIRS = new Set([
   'plan',
   'qa',
   'qa-only',
+  'roadmap',
   'research',
   'retro',
   'review',

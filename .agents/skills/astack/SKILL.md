@@ -14,6 +14,7 @@ description: |
   - Defining the system architecture before implementation → suggest /architecture-astack
   - Mapping the existing system before planning → suggest /research-astack
   - Locking the implementation plan → suggest /plan-astack
+  - Breaking work into a multi-release roadmap → suggest /roadmap-astack
   - Building an approved plan → suggest /implement-astack
   - Running one enhancement all the way through scope to ship → suggest /end-to-end
   - Creating a design system → suggest /design-consultation-astack

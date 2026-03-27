@@ -52,6 +52,7 @@ Installed Copilot skills:
 - `/architecture-astack`
 - `/research-astack`
 - `/plan-astack`
+- `/roadmap-astack`
 - `/implement-astack`
 - `/review-astack`
 - `/qa-astack`

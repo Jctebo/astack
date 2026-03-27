@@ -5,12 +5,17 @@ delivery workflow:
 
 **scope -> architecture -> research -> plan -> implement -> review -> qa -> ship -> retro**
 
+When the deliverable is a phased roadmap instead of one implementation-ready
+spec, `/roadmap-astack` creates one roadmap doc under `docs/roadmaps/` with a
+summary of changes first and release sections after it.
+
 The planning path is now built around one canonical release artifact model:
 
 - `/scope-astack` updates the `Scope` section and bootstraps the enhancement branch when starting on `main`
 - `/architecture-astack` writes the full architecture doc to `docs/architecture/` and adds a pointer summary to the active release artifact
 - `/research-astack` updates the `Research` section
 - `/plan-astack` updates the `Plan` section
+- `/roadmap-astack` creates one roadmap doc with a summary first and per-release sections after it
 - `/implement-astack` updates the `Progress` section
 
 Those workflow sections live in `docs/releases/<version>-<slug>.md`, alongside
@@ -41,6 +46,7 @@ artifacts to compact context for implementation.
 ## What astack is for
 
 - Turn vague feature requests into a scoped build plan
+- Break larger initiatives into multiple releases with optional stories
 - Decide system architecture early and document it durably
 - Map the existing codebase before implementation starts
 - Keep implementation aligned with the approved plan
@@ -52,6 +58,7 @@ astack still includes the supporting skill set from gstack:
 - `/architecture-astack`
 - `/end-to-end`
 - `/document-release-astack`
+- `/roadmap-astack`
 - `/qa-only-astack`
 - `/review-astack`
 - `/qa-astack`
@@ -144,6 +151,25 @@ The `Plan` section captures:
 - QA and test matrix
 - rollout notes
 - items explicitly out of scope
+
+### `/roadmap-astack`
+
+Use `/roadmap-astack` when the real deliverable is a phased roadmap rather than
+one implementation-ready feature plan. It combines scoped framing, repository
+research, and lightweight planning into one roadmap doc under
+`docs/roadmaps/<slug>.md`.
+
+That roadmap doc starts with a summary of changes, then breaks the work into
+release sections inside the same file.
+
+The roadmap output captures:
+
+- summary of changes
+- release ordering and why
+- reusable systems and constraints
+- features per release section
+- optional stories per release section
+- cross-release risks and assumptions
 
 ### 5. `/implement-astack`
 
@@ -240,7 +266,8 @@ Add an `astack` section to your project instructions:
 Use `/browse-astack` from astack for web browsing.
 Prefer the astack workflow:
 `/scope-astack` -> `/research-astack` -> `/plan-astack` -> `/implement-astack` -> `/review-astack` -> `/qa-astack` -> `/ship-astack`.
-Available skills: `/scope-astack`, `/architecture-astack`, `/research-astack`, `/plan-astack`, `/implement-astack`,
+For phased multi-release planning, use `/roadmap-astack` as the roadmap-first alternative to the separate scope/research/plan chain.
+Available skills: `/scope-astack`, `/architecture-astack`, `/research-astack`, `/plan-astack`, `/roadmap-astack`, `/implement-astack`,
 `/review-astack`, `/qa-astack`, `/qa-only-astack`, `/ship-astack`, `/document-release-astack`, `/retro-astack`,
 `/browse-astack`, `/setup-browser-cookies-astack`, `/design-consultation-astack`, `/design-review-astack`,
 `/investigate-astack`, `/codex-astack`, `/careful-astack`, `/freeze-astack`, `/guard-astack`,
@@ -251,6 +278,7 @@ Available skills: `/scope-astack`, `/architecture-astack`, `/research-astack`, `
 
 ```text
 astack/
+├── roadmap/                # /roadmap skill
 ├── scope/                  # /scope skill
 ├── research/               # /research skill
 ├── plan/                   # /plan skill
